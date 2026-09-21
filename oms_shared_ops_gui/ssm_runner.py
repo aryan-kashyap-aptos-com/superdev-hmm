@@ -10,8 +10,8 @@ from botocore.exceptions import ClientError
 from aws_env import aws_region, aws_session
 
 DOCUMENT = "AWS-RunPowerShellScript"
-POLL_SECONDS = 2
-INVOCATION_WARMUP_SECONDS = 1.5
+POLL_SECONDS = 1.25
+INVOCATION_WARMUP_SECONDS = 0.35
 
 
 def ssm_ping_status(instance_id: str) -> str:
@@ -180,9 +180,128 @@ Get-Content -Path $log.FullName -Tail {lines} -ErrorAction Stop
 """.strip()
 
 
-def ps_wait_service_settle(service_name: str, seconds: int = 4) -> str:
+def ps_service_status(service_name: str) -> str:
     safe = service_name.replace("'", "''")
-    return f"Start-Sleep -Seconds {seconds}; Get-Service -Name '{safe}' | Select-Object Name, Status | ConvertTo-Json -Compress"
+    return (
+        f"$s = Get-Service -Name '{safe}' -ErrorAction SilentlyContinue; "
+        f"if (-not $s) {{ '{{\"Status\":\"Missing\"}}' }} else "
+        f"{{ $s | Select-Object Name, @{{N='Status';E={{$_.Status.ToString()}}}} | ConvertTo-Json -Compress }}"
+    )
+
+
+def ps_website_state(site_name: str) -> str:
+    safe = site_name.replace("'", "''")
+    return (
+        f"Import-Module WebAdministration -ErrorAction Stop; "
+        f"$w = Get-Website -Name '{safe}' -ErrorAction SilentlyContinue; "
+        f"if (-not $w) {{ '{{\"State\":\"Missing\"}}' }} else "
+        f"{{ $pool = $w.applicationPool; $ps = (Get-WebAppPoolState -Name $pool).Value; "
+        f"@{{ Name='{safe}'; State=[string]$w.State; AppPool=$pool; PoolState=[string]$ps }} | ConvertTo-Json -Compress }}"
+    )
+
+
+def ps_app_pool_state(pool_name: str) -> str:
+    safe = pool_name.replace("'", "''")
+    return (
+        f"Import-Module WebAdministration -ErrorAction Stop; "
+        f"@{{ Pool='{safe}'; PoolState=[string](Get-WebAppPoolState -Name '{safe}').Value }} | ConvertTo-Json -Compress"
+    )
+
+
+def ps_list_directory(path: str) -> str:
+    """List folder + server clock in one SSM round-trip."""
+    safe = path.replace("'", "''")
+    return f"""
+$ErrorActionPreference = 'Stop'
+$p = '{safe}'
+if (-not (Test-Path -LiteralPath $p)) {{ throw "PATH_NOT_FOUND: $p" }}
+$items = @(Get-ChildItem -LiteralPath $p -Force | ForEach-Object {{
+  [PSCustomObject]@{{
+    Name = $_.Name
+    IsDirectory = [bool]$_.PSIsContainer
+    Length = if ($_.PSIsContainer) {{ 0 }} else {{ [long]$_.Length }}
+    LastWriteTime = $_.LastWriteTime.ToString('o')
+  }}
+}})
+if ($items.Count -gt 0) {{
+  $items = $items | Sort-Object @{{Expression='IsDirectory';Descending=$true}}, Name
+}}
+@{{ 
+  Server = @{{
+    ComputerName = $env:COMPUTERNAME
+    ServerTimeLocal = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+    ServerTimeUtc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm:ss')
+    TimeZone = [System.TimeZoneInfo]::Local.Id
+  }}
+  Items = @($items)
+}} | ConvertTo-Json -Compress -Depth 5
+""".strip()
+
+
+def ssm_failed_message(result: dict[str, str]) -> str:
+    from ui_helpers import format_ssm_error
+
+    return format_ssm_error(
+        result.get("stderr", ""),
+        result.get("stdout", ""),
+        result.get("status", ""),
+    )
+
+
+def ps_file_length(path: str) -> str:
+    safe = path.replace("'", "''")
+    return (
+        f"$p = '{safe}'; if (-not (Test-Path -LiteralPath $p -PathType Leaf)) {{ throw 'NOT_A_FILE' }}; "
+        f"(Get-Item -LiteralPath $p).Length"
+    )
+
+
+def ps_read_file_chunk_base64(path: str, offset: int, length: int) -> str:
+    safe = path.replace("'", "''")
+    return f"""
+$ErrorActionPreference = 'Stop'
+$p = '{safe}'
+$offset = {offset}
+$length = {length}
+$fs = [System.IO.File]::Open($p, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+try {{
+  $fs.Seek($offset, [System.IO.SeekOrigin]::Begin) | Out-Null
+  $buf = New-Object byte[] $length
+  $read = $fs.Read($buf, 0, $length)
+  @{{ Offset = $offset; Read = $read; Base64 = [Convert]::ToBase64String($buf, 0, $read) }} | ConvertTo-Json -Compress
+}} finally {{
+  $fs.Close()
+}}
+""".strip()
+
+
+def ps_tail_text_file(path: str, tail_lines: int = 200, max_bytes: int = 524_288) -> str:
+    """Read tail of a text file on the remote host (for log/config preview)."""
+    safe = path.replace("'", "''")
+    return f"""
+$ErrorActionPreference = 'Stop'
+$p = '{safe}'
+if (-not (Test-Path -LiteralPath $p -PathType Leaf)) {{ throw "NOT_A_FILE: $p" }}
+$len = (Get-Item -LiteralPath $p).Length
+Write-Output "=== $p ($len bytes) ==="
+if ($len -gt {max_bytes}) {{
+  Get-Content -LiteralPath $p -Tail {tail_lines} -ErrorAction Stop
+}} else {{
+  Get-Content -LiteralPath $p -ErrorAction Stop
+}}
+""".strip()
+
+
+def ps_read_file_base64(path: str, max_bytes: int = 8_388_608) -> str:
+    safe = path.replace("'", "''")
+    return f"""
+$ErrorActionPreference = 'Stop'
+$p = '{safe}'
+if (-not (Test-Path -LiteralPath $p -PathType Leaf)) {{ throw "NOT_A_FILE: $p" }}
+$len = (Get-Item -LiteralPath $p).Length
+if ($len -gt {max_bytes}) {{ throw "FILE_TOO_LARGE: $len bytes (max {max_bytes})" }}
+@{{ Path = $p; Length = $len; Base64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($p)) }} | ConvertTo-Json -Compress
+""".strip()
 
 
 def ps_service_action(service_name: str, action: str) -> str:

@@ -1,11 +1,20 @@
 {
   "region": "us-east-1",
-  "updated": "2026-09-20",
+  "updated": "2026-09-22",
   "stacks": [
     {
       "id": "eom-core-shared-dev",
       "label": "EOM Core Shared Dev (multi-tenant Toro + Site Manager)",
       "description": "Toro on shared Toronado EC2. IIS on SM EC2; ShopLogic logs on content EC2 under D:\\content\\dev\\{env}\\sm (UNC in IIS points at the share).",
+      "sftp": {
+        "host": "oms-shared-dev-sftp.dev.eom.aptos.io",
+        "port": 22,
+        "domain": "omspod",
+        "path_roots": {
+          "sm": "/dev/{env}/sm",
+          "task": "/task/{env}/"
+        }
+      },
       "hosts": [
         {
           "role": "toronado",
@@ -34,6 +43,15 @@
       "id": "oms-pod2-dev",
       "label": "OMS Pod2 Dev (standalone stack)",
       "description": "Dedicated pod2-dev Toronado and Site Manager (poddev DB tier).",
+      "sftp": {
+        "host": "oms-pod2-dev-sftp-86bee7bd6535b74c.elb.us-east-1.amazonaws.com",
+        "port": 22,
+        "domain": "omspod",
+        "path_roots": {
+          "sm": "/dev/{env}/sm",
+          "task": "/task/{env}/"
+        }
+      },
       "hosts": [
         {
           "role": "toronado",

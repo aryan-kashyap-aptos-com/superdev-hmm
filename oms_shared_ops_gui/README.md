@@ -1,6 +1,19 @@
-# OMS Shared Ops GUI
+# OMS Engine
 
-Desktop UI to check and control **Toronado** Windows services and **Site Manager** IIS (app pool recycle / site restart) on shared and standalone OMS stacks via **AWS SSM**, plus **log tails** (ShopLogic on SM, Toro on Toronado host, API via CloudWatch).
+Desktop UI (**OMS Engine**) to check and control **Toronado** Windows services and **Site Manager** IIS on shared and standalone OMS stacks via **AWS SSM**, plus **log tails**, **remote file browse/download**, and optional **live sync** polling.
+
+UI reference mockup (HTML): [docs/oms-engine-ui-reference.html](./docs/oms-engine-ui-reference.html).
+
+### SFTP (large files)
+
+- **SFTP** tab: hosts come from `inventory.json` per stack (shared dev + pod2 configured).
+- Set `OMS_SFTP_USER` / `OMS_SFTP_PASSWORD` in `.env`, or use **Connect SFTP** (prompt; session only, not saved in repo).
+- **SM path from IIS site** maps `\\dev\\{env}\\sm` → `/dev/{env}/sm` on SFTP.
+- **Files (SSM)** tab: small files inline (≤8 MB); larger files download in 1 MB chunks with a progress bar.
+
+### How OMS environments are detected
+
+There is **no fixed env list** in the app. On each refresh, rows from `Get-Service` / `Get-Website` are classified using heuristics in `env_detection.py` (Toro `OMS-*-{env}-{slot}` names, IIS `\\dev\\{env}\\` paths, `-sm` / `-shoplogic` site suffixes). Use **Detection rules** in the title bar for the full explanation. New regression or pod tenants appear automatically when IIS/Toro lists them.
 
 **Log architecture and SFTP vs SSM:** see [LOGS-INTEGRATION.md](./LOGS-INTEGRATION.md).
 

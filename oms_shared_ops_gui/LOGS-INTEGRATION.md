@@ -106,5 +106,6 @@ The GUI loads **BIOS serial** via SSM (`Win32_BIOS`). On EC2 this is often the *
 | Phase | Deliverable |
 |-------|-------------|
 | **Now** | Readable Running/Stopped; host S/N; SSM retry; Logs tab (SM + Toro SSM tail, CW tail) |
-| **Next** | SFTP "copy path" per stack/env; open archiver list for SM folder |
+| **Now (OMS Engine)** | **SFTP** tab per stack (`inventory.json`); browse/download with progress; SSM chunked download for large files |
+| **Next** | SFTP upload; open archiver list for SM folder |
 | **Later** | Unified search; Sumo MCP; bookmark log paths in `inventory.json` |

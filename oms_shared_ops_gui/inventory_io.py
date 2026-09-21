@@ -13,7 +13,21 @@ from aws_env import aws_region, aws_session
 ROOT = Path(__file__).resolve().parent
 INVENTORY_PATH = ROOT / "inventory.json"
 
-ROLE_ORDER = ("toronado", "sitemanager")
+ROLE_ORDER = ("toronado", "sitemanager", "content")
+
+
+@dataclass(frozen=True)
+class SftpConfig:
+    host: str
+    port: int = 22
+    domain: str = "omspod"
+    path_roots: dict[str, str] | None = None
+
+    def with_defaults(self) -> SftpConfig:
+        roots = dict(self.path_roots or {})
+        roots.setdefault("sm", "/dev/{env}/sm")
+        roots.setdefault("task", "/task/{env}/")
+        return SftpConfig(host=self.host, port=self.port, domain=self.domain, path_roots=roots)
 
 
 @dataclass(frozen=True)
@@ -31,6 +45,7 @@ class Stack:
     label: str
     description: str
     hosts: tuple[Host, ...]
+    sftp: SftpConfig | None = None
 
     def host_by_role(self, role: str) -> Host | None:
         for h in self.hosts:
@@ -54,12 +69,22 @@ def load_inventory() -> tuple[str, list[Stack]]:
             )
             for h in raw.get("hosts", [])
         )
+        sftp_raw = raw.get("sftp")
+        sftp: SftpConfig | None = None
+        if isinstance(sftp_raw, dict) and sftp_raw.get("host"):
+            sftp = SftpConfig(
+                host=str(sftp_raw["host"]),
+                port=int(sftp_raw.get("port", 22)),
+                domain=str(sftp_raw.get("domain", "omspod")),
+                path_roots=sftp_raw.get("path_roots"),
+            ).with_defaults()
         stacks.append(
             Stack(
                 id=raw["id"],
                 label=raw["label"],
                 description=raw.get("description", ""),
                 hosts=hosts,
+                sftp=sftp,
             )
         )
     return region, stacks

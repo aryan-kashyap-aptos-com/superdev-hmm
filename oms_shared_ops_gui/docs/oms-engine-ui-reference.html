@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMS Engine — Shared Operations Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#ffffff; --line:#e3e8ef; --line-2:#cbd3de;
+    --ink:#0f1b2d; --ink-2:#3b475a; --ink-3:#6b7788; --ink-4:#98a3b3;
+    --navy:#0f1b2d; --navy-2:#182640; --teal:#14b8a6; --teal-2:#0d9488; --teal-soft:#e6f7f5;
+    --green:#16a34a; --green-soft:#e7f6ec; --red:#dc2626; --red-soft:#fdeaea;
+    --amber:#f59e0b; --amber-soft:#fff4dc; --blue:#2563eb; --blue-soft:#e8efff;
+    --r:10px; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    --shadow:0 1px 2px rgba(15,27,45,.06),0 4px 16px rgba(15,27,45,.05);
+  }
+  /* ---------- Dark theme ---------- */
+  [data-theme="dark"]{
+    --bg:#0b1220; --panel:#111a2b; --line:#1e2a40; --line-2:#2a3852;
+    --ink:#e6ecf5; --ink-2:#c3cddd; --ink-3:#8b99b0; --ink-4:#5f6f8a;
+    --navy:#070d18; --navy-2:#121c2e;
+    --teal-soft:rgba(20,184,166,.14); --green:#34d399; --green-soft:rgba(52,211,153,.14);
+    --red:#f87171; --red-soft:rgba(248,113,113,.14); --amber:#fbbf24; --amber-soft:rgba(251,191,36,.14);
+    --blue:#60a5fa; --blue-soft:rgba(96,165,250,.14); --teal-2:#2dd4bf;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.35);
+    --hover:#0f2a2c; --sub:#0e1626; --track:#1e2a40; --code:#0e1626;
+  }
+  :root{--hover:#eef8f6;--sub:#fafbfd;--track:#e9edf2;--code:#f3f5f9}
+  [data-theme="dark"] .titlebar{border-bottom:1px solid var(--line)}
+  [data-theme="dark"] .stack{border-color:var(--line-2)}
+  [data-theme="dark"] .tb-btn{border-color:var(--line-2)}
+  [data-theme="dark"] .tb-btn.primary{color:#062421}
+  [data-theme="dark"] .search,[data-theme="dark"] .btn{background:var(--sub)}
+  [data-theme="dark"] .btn.solid,[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--teal);color:#062421;border-color:var(--teal)}
+  [data-theme="dark"] .btn.start{border-color:rgba(52,211,153,.35)}[data-theme="dark"] .btn.stop{border-color:rgba(248,113,113,.35)}[data-theme="dark"] .btn.restart{border-color:rgba(251,191,36,.35);color:var(--amber)}
+  [data-theme="dark"] .pill.warn{color:var(--amber)}
+  [data-theme="dark"] .pill.neutral{background:#1a2538;color:var(--ink-3)}
+  [data-theme="dark"] .tab .n{background:#1a2538}
+  [data-theme="dark"] tbody tr.selected td{border-bottom-color:rgba(20,184,166,.25)}
+  [data-theme="dark"] .toast{background:#e6ecf5;color:#0f1b2d}
+  [data-theme="dark"] .skel{background:linear-gradient(90deg,#16213a 25%,#1e2a40 37%,#16213a 63%);background-size:400% 100%}
+  [data-theme="dark"] .spin{border-color:rgba(251,191,36,.3);border-top-color:var(--amber)}
+  [data-theme="dark"] .logwrap{border-top:1px solid var(--line)}
+  [data-theme="dark"] .drawer{box-shadow:-12px 0 40px rgba(0,0,0,.5)}
+  [data-theme="dark"] .job .jp,[data-theme="dark"] .healthbar,[data-theme="dark"] .summary .bar{background:var(--track)}
+  .theme-toggle{width:34px;height:32px;border-radius:7px;border:1px solid #2a3b57;color:#e6ecf5;display:inline-flex;align-items:center;justify-content:center}
+  .theme-toggle:hover{background:var(--navy-2)}
+  .theme-toggle .sun{display:none}[data-theme="dark"] .theme-toggle .sun{display:block}[data-theme="dark"] .theme-toggle .moon{display:none}
+  html{transition:background .2s}body,.panel,.side,.dock,.search,.btn,thead th{transition:background-color .2s,border-color .2s}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:Inter,'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- App frame ---------- */
+  .app{display:grid;grid-template-columns:232px minmax(0,1fr);grid-template-rows:52px 1fr;height:100vh;min-height:600px}
+  .titlebar{grid-column:1/-1;background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:0 12px;min-width:0;overflow:hidden}
+  .brand{display:flex;align-items:center;gap:10px;flex:none}
+  .brand .mark{width:30px;height:30px;flex:none}
+  .brand .name{font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .brand .name small{display:block;font-weight:500;font-size:10.5px;color:#9fb0c8;letter-spacing:.04em;text-transform:uppercase;margin-top:-1px}
+  .stack{display:flex;align-items:center;gap:8px;background:var(--navy-2);border:1px solid #2a3b57;border-radius:8px;padding:0 10px;height:34px;flex:1 1 200px;min-width:0;max-width:560px}
+  .stack label{color:#9fb0c8;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .stack select{background:transparent;color:#fff;border:0;font:inherit;font-weight:600;flex:1;min-width:0;outline:none;text-overflow:ellipsis}
+  .stack select option{color:var(--ink)}
+  .tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+  .conn{display:flex;align-items:center;gap:8px;font-size:12px;color:#c9d4e4;font-family:var(--mono);white-space:nowrap}
+  .conn .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 0 rgba(20,184,166,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(20,184,166,.55)}70%{box-shadow:0 0 0 8px rgba(20,184,166,0)}100%{box-shadow:0 0 0 0 rgba(20,184,166,0)}}
+  .tb-btn{height:32px;padding:0 12px;border-radius:7px;border:1px solid #2a3b57;color:#e6ecf5;font-weight:600;font-size:12px;display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none}
+  .tb-btn:hover{background:var(--navy-2)}
+  .tb-btn.primary{background:var(--teal);border-color:var(--teal);color:#07201d}
+  .tb-btn.primary:hover{background:#19c9b6}
+  kbd{font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;border:1px solid rgba(255,255,255,.12)}
+
+  /* ---------- Sidebar (hosts) ---------- */
+  .side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
+  .side h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:16px 16px 8px}
+  .host{padding:10px 16px;border-left:3px solid transparent;display:flex;flex-direction:column;gap:3px}
+  .host:hover{background:var(--hover)}
+  .host .role{font-weight:600;font-size:12.5px;display:flex;align-items:center;justify-content:space-between}
+  .host .tag{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .host .meta{font-family:var(--mono);font-size:11px;color:var(--ink-4);display:flex;gap:10px}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;line-height:16px;white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .pill.ok{background:var(--green-soft);color:var(--green)}
+  .pill.bad{background:var(--red-soft);color:var(--red)}
+  .pill.warn{background:var(--amber-soft);color:#b45309}
+  .pill.info{background:var(--blue-soft);color:var(--blue)}
+  .pill.neutral{background:#eef1f5;color:var(--ink-3)}
+  .side .summary{margin:14px 16px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--sub)}
+  .summary .row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--ink-2)}
+  .summary .row b{font-family:var(--mono);font-weight:500}
+  .summary .bar{height:6px;border-radius:3px;background:var(--track);overflow:hidden;display:flex;margin-top:8px}
+  .summary .bar i{display:block;height:100%}
+  .side .foot{margin-top:auto;padding:14px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-4);font-family:var(--mono)}
+
+  /* ---------- Main ---------- */
+  .main{display:grid;grid-template-rows:auto 1fr 200px;min-height:0;min-width:0;overflow:hidden}
+  .tabs{display:flex;gap:2px;padding:12px 20px 0;background:var(--bg);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;flex:none}
+  .tab{padding:9px 14px;border-radius:8px 8px 0 0;font-weight:600;color:var(--ink-3);display:flex;align-items:center;gap:8px;border:1px solid transparent;border-bottom:0;position:relative;top:1px}
+  .tab .n{font-family:var(--mono);font-weight:500;font-size:11px;background:var(--track);padding:0 6px;border-radius:4px;color:var(--ink-3)}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .tab[aria-selected="true"] .n{background:var(--teal-soft);color:var(--teal-2)}
+  .panel{background:var(--panel);display:none;flex-direction:column;min-height:0;overflow:hidden}
+  .panel.active{display:flex}
+
+  .toolbar{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;row-gap:8px}
+  .search{display:flex;align-items:center;gap:8px;border:1px solid var(--line-2);border-radius:8px;padding:0 10px;height:34px;width:280px;max-width:100%;flex:1 1 160px;min-width:140px;background:var(--panel)}
+  .search input{border:0;outline:none;font:inherit;flex:1;background:transparent}
+  .search svg{color:var(--ink-4)}
+  .seg{display:flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;height:34px}
+  .seg button{padding:0 12px;font-weight:600;font-size:12px;color:var(--ink-3);border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--line-2);background:var(--panel);font-weight:600;font-size:12.5px;display:inline-flex;align-items:center;gap:7px;color:var(--ink)}
+  .btn:hover{border-color:var(--ink-4)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.start{color:var(--green);border-color:#bfe6cb}.btn.start:hover{background:var(--green-soft)}
+  .btn.stop{color:var(--red);border-color:#f3c4c4}.btn.stop:hover{background:var(--red-soft)}
+  .btn.restart{color:#b45309;border-color:#f6d9a4}.btn.restart:hover{background:var(--amber-soft)}
+  .btn.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.ghost{border-color:transparent;color:var(--ink-2)}
+  .spacer{flex:1}
+  .actions{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto}
+  .seg{flex:none}
+  .btn{white-space:nowrap}
+  .sel-count{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+  .sel-count b{color:var(--ink);font-weight:500}
+
+  /* ---------- Data table ---------- */
+  .grid{overflow:auto;flex:1;min-height:0}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  thead th{position:sticky;top:0;background:var(--sub);border-bottom:1px solid var(--line);text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);padding:7px 10px;z-index:1;white-space:nowrap}
+  tbody td{padding:4px 10px;height:34px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+  /* Hover: subtle tinted band + accent edge; text is forced to full contrast */
+  tbody tr:hover{background:var(--hover)}
+  tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
+  tbody tr:hover td,tbody tr:hover .name,tbody tr:hover .fname,tbody tr:hover .fname span{color:var(--ink)!important;opacity:1!important}
+  tbody tr:hover .name .env{color:var(--teal)!important}
+  tbody tr:hover .name .pod,tbody tr:hover .muted{color:var(--ink-2)!important}
+  tbody tr:hover .fname svg{color:var(--ink-3)}
+  .name,.fname span{color:var(--ink)}
+  tbody tr.selected{background:var(--teal-soft)}
+  tbody tr.selected td{border-bottom-color:#cdeee9}
+  tbody tr.transition{background:var(--amber-soft)}
+  th.chk,td.chk{width:36px;padding-left:16px}
+  table{table-layout:auto}
+  #svcTable th:nth-child(2){width:34%}#svcTable th:nth-child(3){width:20%}#svcTable th:nth-child(4){width:120px}#svcTable th:nth-child(5),#svcTable th:nth-child(6),#svcTable th:nth-child(7){width:90px}
+  #svcTable td:nth-child(2){padding-right:24px}
+  .name{font-family:var(--mono);font-size:12px;font-weight:500}
+  .name .env{color:var(--teal-2)}
+  .name .pod{color:var(--ink-4);font-weight:400}
+  .muted{color:var(--ink-4);font-family:var(--mono);font-size:11.5px}
+  .spin{width:12px;height:12px;border:2px solid #f0c67a;border-top-color:#b45309;border-radius:50%;display:inline-block;animation:rot .7s linear infinite;vertical-align:-2px;margin-right:5px}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .rowact{opacity:0;display:flex;gap:4px}
+  tr:hover .rowact{opacity:1}
+  .icon-btn{width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3)}
+  .icon-btn:hover{background:var(--track);color:var(--ink)}
+  .stripe{width:4px;height:100%;position:absolute;left:0;top:0}
+  td.status-cell{position:relative}
+  .healthbar{display:inline-block;width:56px;height:6px;border-radius:3px;background:var(--track);overflow:hidden;vertical-align:middle;margin-right:6px}
+  .healthbar i{display:block;height:100%;background:var(--green)}
+
+  /* ---------- Files ---------- */
+  .files{display:grid;grid-template-columns:240px 1fr;flex:1;min-height:0}
+  .tree{border-right:1px solid var(--line);padding:10px 8px;overflow:auto;font-size:12.5px}
+  .tree .node{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;color:var(--ink-2)}
+  .tree .node:hover{background:var(--hover)}
+  .tree .node.open{background:var(--teal-soft);color:var(--teal-2);font-weight:600}
+  .tree .lvl1{padding-left:24px}.tree .lvl2{padding-left:40px}
+  .crumbs{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;color:var(--ink-3);padding:10px 16px;border-bottom:1px solid var(--line)}
+  .crumbs b{color:var(--ink);font-weight:500}
+  .crumbs .sep{color:var(--ink-4)}
+  .drop{position:absolute;inset:0;background:rgba(20,184,166,.08);border:2px dashed var(--teal);display:none;align-items:center;justify-content:center;font-weight:600;color:var(--teal-2)}
+  .filepane{position:relative;display:flex;flex-direction:column;min-height:0}
+  .fname{display:flex;align-items:center;gap:8px}
+  .fname svg{color:var(--ink-4);flex:none}
+  .transfer{position:absolute;right:20px;bottom:16px;width:340px;background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px rgba(15,27,45,.35);display:none;flex-direction:column;gap:8px}
+  .transfer.show{display:flex}
+  .transfer .t{font-weight:600;font-size:12.5px;display:flex;justify-content:space-between}
+  .transfer .t span{font-family:var(--mono);font-weight:400;color:#9fb0c8}
+  .transfer .p{height:5px;background:#2a3b57;border-radius:3px;overflow:hidden}
+  .transfer .p i{display:block;height:100%;background:var(--teal);width:0;transition:width .25s}
+
+  /* ---------- Logs ---------- */
+  .logwrap{flex:1;min-height:0;display:flex;flex-direction:column;background:#0b1220}
+  .logview{flex:1;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.6;padding:12px 16px;color:#c9d4e4}
+  .logview .ts{color:#5d708f}
+  .logview .lvl{font-weight:600;padding:0 6px;border-radius:3px;margin:0 6px}
+  .lvl.INFO{color:#7dd3fc;background:rgba(125,211,252,.1)}.lvl.WARN{color:#fbbf24;background:rgba(251,191,36,.12)}.lvl.ERROR{color:#f87171;background:rgba(248,113,113,.14)}
+  .logview mark{background:rgba(20,184,166,.3);color:#fff;border-radius:2px}
+  .logbar{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid #1c2940;background:#0f1728;color:#c9d4e4}
+  .logbar .chip{font-family:var(--mono);font-size:11.5px;padding:4px 9px;border-radius:6px;border:1px solid #2a3b57;color:#c9d4e4}
+  .logbar .chip.on{background:var(--teal);color:#062421;border-color:var(--teal)}
+  .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#f87171}
+  .live i{width:7px;height:7px;background:#f87171;border-radius:50%;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* ---------- Activity dock ---------- */
+  .dock{border-top:1px solid var(--line);background:var(--panel);display:grid;grid-template-columns:1fr 300px;min-height:0}
+  .dock h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:10px 20px 6px;display:flex;align-items:center;gap:10px}
+  .act{overflow:auto;font-family:var(--mono);font-size:12px;padding:0 20px 10px}
+  .act .ln{display:grid;grid-template-columns:64px 74px 1fr;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line);animation:in .25s ease}
+  @keyframes in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+  .act .ts{color:var(--ink-4)}
+  .act .st{font-weight:600}
+  .st.ok{color:var(--green)}.st.err{color:var(--red)}.st.run{color:#b45309}.st.inf{color:var(--blue)}
+  .jobs{border-left:1px solid var(--line);padding:0 16px 10px;overflow:auto}
+  .job{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px}
+  .job .jt{display:flex;justify-content:space-between;font-weight:600;font-family:var(--mono);font-size:11.5px}
+  .job .jp{height:4px;background:var(--track);border-radius:2px;margin-top:6px;overflow:hidden}
+  .job .jp i{display:block;height:100%;background:var(--teal);transition:width .3s}
+  .job .jd{color:var(--ink-4);font-size:11px;margin-top:4px}
+
+  /* ---------- Detection drawer ---------- */
+  .drawer{position:fixed;top:52px;right:0;bottom:0;width:440px;background:var(--panel);border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(15,27,45,.12);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;z-index:10}
+  .drawer.open{transform:none}
+  .drawer header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .drawer header h2{font-size:15px;font-weight:700}
+  .drawer .body{padding:16px 20px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+  .rule{border:1px solid var(--line);border-radius:var(--r);padding:12px}
+  .rule h5{font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .rule p{color:var(--ink-2);font-size:12px}
+  .rule code{font-family:var(--mono);font-size:11px;background:var(--code);padding:1px 5px;border-radius:4px;color:var(--ink)}
+  .rule .w{font-family:var(--mono);font-size:11px;color:var(--teal-2);font-weight:600}
+  .envrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line);font-family:var(--mono);font-size:12px}
+  .envrow .why{color:var(--ink-4);font-size:11px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 14px;border-radius:8px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .25s;display:flex;gap:10px;align-items:center;z-index:20}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .skel{background:linear-gradient(90deg,#eef1f5 25%,#f7f9fc 37%,#eef1f5 63%);background-size:400% 100%;animation:sk 1.2s infinite;border-radius:4px;height:12px}
+  @keyframes sk{0%{background-position:100% 0}100%{background-position:0 0}}
+  .empty{padding:40px;text-align:center;color:var(--ink-4)}
+  @media (max-width:1400px){.conn{display:none}.tb-btn kbd{display:none}}
+  @media (max-width:1250px){.tb-btn.primary{display:none}.stack label{display:none}}
+  @media (max-width:1100px){.app{grid-template-columns:1fr}.side{display:none}.files{grid-template-columns:1fr}.tree{display:none}.dock{grid-template-columns:1fr}.jobs{display:none}.brand .name small{display:none}.toolbar{padding:10px 14px}.tabs{padding:10px 14px 0}}
+  @media (max-width:1200px){.sel-count{display:none}.btn.start,.btn.stop,.btn.restart{padding:0 11px}}
+  @media (max-width:820px){.tb-btn span.lbl{display:none}.tb-btn{padding:0 9px}.seg button{padding:0 9px}.main{grid-template-rows:auto 1fr 160px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ Title bar ============ -->
+  <header class="titlebar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 3 57 17.5v29L32 61 7 46.5v-29z" fill="#14b8a6"/>
+        <path d="M32 11 50 21.5v21L32 53 14 42.5v-21z" fill="#0f1b2d"/>
+        <path d="M24 22h9l9 10-9 10h-9l9-10z" fill="#fff"/>
+        <path d="M18 27h5l5 5-5 5h-5l5-5z" fill="#14b8a6"/>
+      </svg>
+      <div class="name">OMS Engine<small>Shared operations</small></div>
+    </div>
+    <div class="stack">
+      <label for="stack">Stack</label>
+      <select id="stack">
+        <option>EOM Core Shared Dev — multi-tenant Toro + Site Manager</option>
+        <option>EOM Core Shared QA</option>
+        <option>EOM Core Shared Perf (v2)</option>
+      </select>
+      <span class="pill ok">3/3 hosts</span>
+    </div>
+    <div class="tb-right">
+      <div class="conn"><span class="dot"></span>SSM session · 42 ms</div>
+      <button class="theme-toggle" id="themeBtn" title="Toggle dark mode (D)" aria-label="Toggle dark mode">
+        <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <button class="tb-btn" id="detectBtn" title="How environments are detected">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span class="lbl">Detection rules</span>
+      </button>
+      <button class="tb-btn" id="refreshBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>
+        <span class="lbl">Refresh</span> <kbd>R</kbd>
+      </button>
+      <button class="tb-btn primary">Command palette <kbd style="background:rgba(0,0,0,.15);border-color:transparent">⌘K</kbd></button>
+    </div>
+  </header>
+
+  <!-- ============ Sidebar ============ -->
+  <aside class="side">
+    <h3>Hosts</h3>
+    <div class="host" style="border-left-color:var(--teal)">
+      <div class="role">Toronado (shared) <span class="pill ok">Online</span></div>
+      <div class="tag">eom-core-shared-dev-toronado</div>
+      <div class="meta"><span>i-03b3fb1c107fde172</span><span>20.108.20.254</span></div>
+    </div>
+    <div class="host">
+      <div class="role">Site Manager (IIS) <span class="pill ok">Online</span></div>
+      <div class="tag">eom-core-shared-dev-sitemanager</div>
+      <div class="meta"><span>i-0ec04567a61c5b4f5</span><span>20.108.20.115</span></div>
+    </div>
+    <div class="host">
+      <div class="role">Content (UNC / ShopLogic) <span class="pill ok">Online</span></div>
+      <div class="tag">eom-core-shared-dev-cont</div>
+      <div class="meta"><span>i-0364472ad7dcb1458</span><span>20.108.20.55</span></div>
+    </div>
+
+    <div class="summary">
+      <div class="row"><span>Windows services</span><b id="sumSvc">13 / 16 running</b></div>
+      <div class="row"><span>IIS sites</span><b id="sumIis">24 / 28 started</b></div>
+      <div class="row"><span>Environments detected</span><b>19</b></div>
+      <div class="bar" id="sumBar"><i style="width:81%;background:var(--green)"></i><i style="width:19%;background:var(--red)"></i></div>
+    </div>
+
+    <div class="foot">last full refresh 09:41:12<br>delta poll every 3 s · cache warm</div>
+  </aside>
+
+  <!-- ============ Main ============ -->
+  <main class="main">
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="toro">Toronado <span class="n">16</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="iis">Site Manager (IIS) <span class="n">28</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="logs">Logs <span class="n">live</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="files">Files <span class="n">UNC</span></button>
+    </nav>
+
+    <!-- ---------- Toronado ---------- -->
+    <section class="panel active" id="tab-toro">
+      <div class="toolbar">
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="svcFilter" placeholder="Filter services… (env, pod, name)">
+        </div>
+        <div class="seg" id="svcSeg">
+          <button aria-pressed="true" data-f="all">All</button>
+          <button aria-pressed="false" data-f="Running">Running</button>
+          <button aria-pressed="false" data-f="Stopped">Stopped</button>
+          <button aria-pressed="false" data-f="JobManager">JobManager</button>
+          <button aria-pressed="false" data-f="AmazonService">Amazon</button>
+        </div>
+        <span class="spacer"></span>
+        <div class="actions">
+          <span class="sel-count" id="svcSel"><b>0</b> selected</span>
+          <button class="btn start" data-act="start" data-kind="svc" disabled>▶ Start</button>
+          <button class="btn stop" data-act="stop" data-kind="svc" disabled>■ Stop</button>
+          <button class="btn restart" data-act="restart" data-kind="svc" disabled>↻ Restart</button>
+        </div>
+      </div>
+      <div class="grid">
+        <table id="svcTable">
+          <thead><tr><th class="chk"><input type="checkbox" id="svcAll"></th><th>Service</th><th>Environment</th><th>Status</th><th>Startup</th><th>Uptime</th><th>PID</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- IIS ---------- -->
+    <section class="panel" id="tab-iis">
+      <div class="toolbar">
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="iisFilter" placeholder="Filter sites… (env, binding, pool)">
+        </div>
+        <div class="seg" id="iisSeg">
+          <button aria-pressed="true" data-f="all">All</button>
+          <button aria-pressed="false" data-f="Started">Started</button>
+          <button aria-pressed="false" data-f="Stopped">Stopped</button>
+          <button aria-pressed="false" data-f="Degraded">Degraded</button>
+        </div>
+        <span class="spacer"></span>
+        <div class="actions">
+          <span class="sel-count" id="iisSel"><b>0</b> selected</span>
+          <button class="btn start" data-act="start" data-kind="iis" disabled>▶ Start</button>
+          <button class="btn stop" data-act="stop" data-kind="iis" disabled>■ Stop</button>
+          <button class="btn restart" data-act="restart" data-kind="iis" disabled>↻ Recycle</button>
+        </div>
+      </div>
+      <div class="grid">
+        <table id="iisTable">
+          <thead><tr><th class="chk"><input type="checkbox" id="iisAll"></th><th>Site</th><th>Environment</th><th>Site</th><th>App pool</th><th>Health</th><th>Binding</th><th>Physical path</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- Logs ---------- -->
+    <section class="panel" id="tab-logs">
+      <div class="logwrap">
+        <div class="logbar">
+          <span class="live"><i></i>LIVE</span>
+          <span class="chip on">ShopLogic · poddev-26</span>
+          <span class="chip">JobManager · omnipoddev-11</span>
+          <span class="chip">IIS · W3SVC · poddev-sm</span>
+          <span class="chip">+ add stream</span>
+          <span class="spacer"></span>
+          <div class="search" style="width:240px;height:30px;background:#0b1220;border-color:#2a3b57;color:#fff"><input placeholder="grep… /regex/" style="color:#fff" id="logGrep"></div>
+          <span class="chip" id="pauseLog">⏸ pause</span>
+          <span class="chip">↓ follow</span>
+          <span class="chip">⤓ export</span>
+        </div>
+        <div class="logview" id="logview"></div>
+      </div>
+    </section>
+
+    <!-- ---------- Files ---------- -->
+    <section class="panel" id="tab-files">
+      <div class="toolbar">
+        <div class="seg">
+          <button aria-pressed="true">Content EC2 · D:\content</button>
+          <button aria-pressed="false">Toronado · D:\OMS</button>
+          <button aria-pressed="false">Site Manager · C:\inetpub</button>
+        </div>
+        <span class="spacer"></span>
+        <div class="actions">
+          <button class="btn ghost">⤒ Upload to host</button>
+          <button class="btn solid" id="copyBtn" disabled>⤓ Copy to my system</button>
+        </div>
+      </div>
+      <div class="files">
+        <div class="tree">
+          <div class="node">▸ D:\content</div>
+          <div class="node lvl1">▾ dev</div>
+          <div class="node lvl2 open">poddev-26</div>
+          <div class="node lvl2">poddevodx-50026</div>
+          <div class="node lvl2">omnipoddev-11</div>
+          <div class="node lvl2">omnipoddev-44</div>
+          <div class="node lvl2">integrationqa-22</div>
+          <div class="node lvl1">▸ qa</div>
+          <div class="node lvl1">▸ regression</div>
+          <div class="node lvl1">▸ _shared</div>
+        </div>
+        <div class="filepane" id="filepane">
+          <div class="crumbs">D:\content <span class="sep">›</span> dev <span class="sep">›</span> <b>poddev-26</b> <span class="sep">›</span> <b>sm</b> <span class="spacer"></span><span>12 items · 1.8 GB</span></div>
+          <div class="grid">
+            <table id="fileTable">
+              <thead><tr><th class="chk"><input type="checkbox" id="fileAll"></th><th>Name</th><th>Size</th><th>Modified</th><th>Type</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="drop">Drop to upload to D:\content\dev\poddev-26\sm</div>
+          <div class="transfer" id="transfer">
+            <div class="t">Copying to Downloads\OMS Engine\poddev-26 <span id="tPct">0%</span></div>
+            <div class="p"><i id="tBar"></i></div>
+            <div style="font-family:var(--mono);font-size:11px;color:#9fb0c8" id="tFile">preparing…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Activity dock ---------- -->
+    <div class="dock">
+      <div style="display:flex;flex-direction:column;min-height:0">
+        <h4>Activity <span class="pill info" id="actLive" style="display:none">streaming</span><span class="spacer"></span><button class="icon-btn" title="Clear" id="clearAct">✕</button></h4>
+        <div class="act" id="activity"></div>
+      </div>
+      <div class="jobs">
+        <h4 style="padding-left:0">Running jobs</h4>
+        <div id="jobs"><div class="empty" style="padding:20px 0">No jobs in flight</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ Detection drawer ============ -->
+<aside class="drawer" id="drawer" aria-label="Environment detection rules">
+  <header><h2>How OMS Engine finds environments</h2><button class="icon-btn" id="closeDrawer">✕</button></header>
+  <div class="body">
+    <p style="color:var(--ink-2)">An environment is anything that appears in at least one of these sources. Nothing is hard-coded — new pods/envs show up on the next refresh automatically. Confidence is a weighted score; below 40 it is listed under <em>Unclassified</em> instead of hidden.</p>
+
+    <div class="rule"><h5>1 · Windows service name pattern <span class="w">weight 40</span></h5>
+      <p>Toronado host, <code>Get-Service</code> via SSM. Regex <code>^OMS-(JobManager|AmazonService)-(?&lt;env&gt;[a-z0-9]+?)-(?&lt;pod&gt;\d+)$</code>. Env + pod are parsed from the name, never from a list.</p></div>
+    <div class="rule"><h5>2 · IIS site / app-pool inventory <span class="w">weight 30</span></h5>
+      <p>Site Manager host, <code>Get-IISSite</code> + bindings. Site name, host header (<code>*.dev.eom.internal</code>) and physical path are all matched; any of them containing an env token counts.</p></div>
+    <div class="rule"><h5>3 · Content share folders <span class="w">weight 20</span></h5>
+      <p>Content host, directory listing of <code>D:\content\{dev|qa|perf}\*</code> that contains an <code>sm\</code> or <code>shoplogic\</code> subfolder. Catches envs that are provisioned but have no service yet.</p></div>
+    <div class="rule"><h5>4 · EC2 tags <span class="w">weight 10</span></h5>
+      <p><code>Name</code>, <code>oms:env</code>, <code>oms:pod</code>, <code>oms:arch=v2</code>. Used to discover brand-new V2 stacks (Gamma, podv2, perfv2) before any service exists; a tagged instance auto-adds a host row.</p></div>
+    <div class="rule"><h5>5 · Cross-check &amp; drift <span class="w">flag</span></h5>
+      <p>If an env is present in one source but missing in another (e.g. IIS site but no JobManager service) it is shown with an amber <strong>Partial</strong> badge so gaps are visible rather than silently dropped.</p></div>
+
+    <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:4px">Recent discoveries</h4>
+    <div class="envrow"><span>gamma-v2-01</span><span class="pill info">new · EC2 tag</span></div>
+    <div class="envrow"><span>podv2-30</span><span class="pill info">new · service + IIS</span></div>
+    <div class="envrow"><span>aoregression202530qa-11</span><span class="pill warn">Partial · no IIS site</span></div>
+    <div class="envrow"><span>perfv2-01</span><span class="pill neutral">Unclassified · 25</span><span class="why">content folder only</span></div>
+    <button class="btn" style="margin-top:6px;align-self:flex-start">Edit patterns…</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= Data ================= */
+const SERVICES = [
+ ['OMS-AmazonService','poddev','26','Running','Automatic','14d 3h','4120'],
+ ['OMS-AmazonService','poddevodx','50026','Stopped','Automatic','—','—'],
+ ['OMS-AmazonService','Site Manager Task','50092','Running','Automatic','14d 3h','4188'],
+ ['OMS-JobManager','aoregression202520qa','11','Running','Automatic','2d 11h','9021'],
+ ['OMS-JobManager','aoregression202530qa','11','Stopped','Automatic','—','—'],
+ ['OMS-JobManager','automationqa','1','Running','Automatic','14d 3h','5210'],
+ ['OMS-JobManager','integrationqa','22','Running','Automatic','6d 2h','7712'],
+ ['OMS-JobManager','omnipoddev','11','Running','Automatic','14d 3h','5364'],
+ ['OMS-JobManager','omnipoddev','44','Running','Automatic','14d 3h','5390'],
+ ['OMS-JobManager','omnipodqa','11','Stopped','Automatic','—','—'],
+ ['OMS-JobManager','omnipodqa2','11','Running','Automatic','1d 20h','10233'],
+ ['OMS-JobManager','omnipodqa2','44','Running','Automatic','1d 20h','10240'],
+ ['OMS-JobManager','poddev','26','Running','Automatic','14d 3h','5402'],
+ ['OMS-JobManager','poddevodx','50026','Running','Automatic','3h 12m','11890'],
+ ['OMS-JobManager','podqa','26','Running','Automatic','14d 3h','5416'],
+ ['OMS-JobManager','regression202510qa','26','Running','Automatic','9d 7h','6633'],
+].map((r,i)=>({id:'s'+i,prefix:r[0],env:r[1],pod:r[2],status:r[3],startup:r[4],uptime:r[5],pid:r[6]}));
+
+const SITES = [];
+const envs=['poddev-26','poddevodx-50026','omnipoddev-11','omnipoddev-44','omnipodqa-11','omnipodqa2-11','omnipodqa2-44','podqa-26','integrationqa-22','automationqa-1','regression202510qa-26','aoregression202520qa-11','aoregression202530qa-11','podv2-30'];
+envs.forEach((e,i)=>{
+  const [env,pod]=e.split('-');
+  const s1 = (e==='omnipodqa-11'||e==='aoregression202530qa-11')?'Stopped':'Started';
+  const s2 = e==='poddevodx-50026'?'Stopped':(e==='omnipoddev-44'?'Degraded':'Started');
+  SITES.push({id:'i'+i+'a',name:`${env}-sm`,env,pod,site:s1,pool:s1==='Started'?'Started':'Stopped',health:s1==='Started'?100:0,bind:`${env}-sm.dev.eom.internal:443`,path:`\\\\eom-core-shared-dev-cont\\content\\dev\\${e}\\sm`});
+  SITES.push({id:'i'+i+'b',name:`${env}-shoplogic`,env,pod,site:s2==='Stopped'?'Stopped':'Started',pool:s2==='Degraded'?'Recycling':s2,health:s2==='Started'?100:(s2==='Degraded'?62:0),bind:`${env}.dev.eom.internal:443`,path:`\\\\eom-core-shared-dev-cont\\content\\dev\\${e}\\shoplogic`});
+});
+
+const FILES=[
+ ['..','','','folder'],['bin','—','2026-09-18 14:02','folder'],['config','—','2026-09-20 09:11','folder'],['logs','1.2 GB','2026-09-21 09:40','folder'],
+ ['web.config','18 KB','2026-09-20 09:11','xml'],['appsettings.poddev-26.json','6 KB','2026-09-19 17:44','json'],
+ ['SiteManager.dll','4.1 MB','2026-09-18 14:02','dll'],['Aptos.OMS.Core.dll','12.7 MB','2026-09-18 14:02','dll'],
+ ['deploy-manifest.yaml','2 KB','2026-09-18 14:02','yaml'],['sm-2026-09-21.log','214 MB','2026-09-21 09:41','log'],
+ ['sm-2026-09-20.log','388 MB','2026-09-20 23:59','log'],['healthcheck.ps1','1 KB','2026-08-30 11:20','ps1'],
+];
+
+/* ================= Helpers ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const now=()=>new Date().toTimeString().slice(0,8);
+const sel={svc:new Set(),iis:new Set(),file:new Set()};
+const pending=new Set();
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200)}
+function act(st,cls,msg){const a=$('#activity');a.insertAdjacentHTML('afterbegin',`<div class="ln"><span class="ts">${now()}</span><span class="st ${cls}">${st}</span><span>${msg}</span></div>`);if(a.children.length>80)a.lastChild.remove()}
+function pillFor(s){
+  if(pending.has(s))return `<span class="pill warn"><span class="spin"></span>${s}</span>`;
+  const m={Running:'ok',Started:'ok',Stopped:'bad',Recycling:'warn',Degraded:'warn'};return `<span class="pill ${m[s]||'neutral'}">${s}</span>`;
+}
+function updateSummary(){
+  const r=SERVICES.filter(s=>s.status==='Running').length, st=SITES.filter(s=>s.site==='Started').length;
+  $('#sumSvc').textContent=`${r} / ${SERVICES.length} running`;$('#sumIis').textContent=`${st} / ${SITES.length} started`;
+  const ok=(r+st)/(SERVICES.length+SITES.length)*100;$('#sumBar').innerHTML=`<i style="width:${ok}%;background:var(--green)"></i><i style="width:${100-ok}%;background:var(--red)"></i>`;
+}
+
+/* ================= Services table ================= */
+let svcFilterMode='all';
+function renderSvc(){
+  const q=$('#svcFilter').value.toLowerCase();
+  const rows=SERVICES.filter(s=>{
+    const full=`${s.prefix}-${s.env}-${s.pod}`.toLowerCase();
+    if(q&&!full.includes(q))return false;
+    if(svcFilterMode==='all')return true;
+    return s.status===svcFilterMode||s.prefix.includes(svcFilterMode);
+  });
+  $('#svcTable tbody').innerHTML=rows.length?rows.map(s=>{
+    const p=pending.has(s.id), tcls=sel.svc.has(s.id)?'selected':(p?'transition':'');
+    return `<tr class="${tcls}" data-id="${s.id}">
+      <td class="chk"><input type="checkbox" ${sel.svc.has(s.id)?'checked':''}></td>
+      <td class="name">${s.prefix}-<span class="env">${s.env}</span>-<span class="pod">${s.pod}</span></td>
+      <td class="muted">${s.env}-${s.pod}</td>
+      <td>${p?`<span class="pill warn"><span class="spin"></span>${p&&s.status==='Running'?'Stopping':'Starting'}</span>`:pillFor(s.status)}</td>
+      <td class="muted">${s.startup}</td><td class="muted">${s.uptime}</td><td class="muted">${s.pid}</td>
+      <td><div class="rowact"><button class="icon-btn" title="Tail log" data-log="${s.env}-${s.pod}">≡</button><button class="icon-btn" title="Open folder" data-folder="${s.env}-${s.pod}">▣</button></div></td></tr>`;
+  }).join(''):`<tr><td colspan="8" class="empty">No services match "${q}"</td></tr>`;
+  $('#svcSel').innerHTML=`<b>${sel.svc.size}</b> selected`;
+  $$('[data-kind="svc"]').forEach(b=>b.disabled=!sel.svc.size);
+}
+let iisFilterMode='all';
+function renderIis(){
+  const q=$('#iisFilter').value.toLowerCase();
+  const rows=SITES.filter(s=>{
+    if(q&&!(s.name+s.bind+s.path).toLowerCase().includes(q))return false;
+    if(iisFilterMode==='all')return true;
+    if(iisFilterMode==='Degraded')return s.health>0&&s.health<100;
+    return s.site===iisFilterMode;
+  });
+  $('#iisTable tbody').innerHTML=rows.length?rows.map(s=>{
+    const p=pending.has(s.id), tcls=sel.iis.has(s.id)?'selected':(p?'transition':'');
+    const stripe=s.site==='Started'?(s.health<100?'var(--amber)':'var(--green)'):'var(--red)';
+    return `<tr class="${tcls}" data-id="${s.id}">
+      <td class="chk"><input type="checkbox" ${sel.iis.has(s.id)?'checked':''}></td>
+      <td class="name status-cell"><span class="stripe" style="background:${stripe}"></span>${s.name}</td>
+      <td><span class="pill neutral">${s.env}-${s.pod}</span></td>
+      <td>${p?`<span class="pill warn"><span class="spin"></span>${s.site==='Started'?'Stopping':'Starting'}</span>`:pillFor(s.site)}</td>
+      <td>${pillFor(s.pool)}</td>
+      <td><span class="healthbar"><i style="width:${s.health}%;background:${s.health===100?'var(--green)':s.health?'var(--amber)':'var(--red)'}"></i></span><span class="muted">${s.health}%</span></td>
+      <td class="muted">${s.bind}</td><td class="muted" title="${s.path}">${s.path.replace('\\\\eom-core-shared-dev-cont\\content','…')}</td>
+      <td><div class="rowact"><button class="icon-btn" title="Open in browser">↗</button><button class="icon-btn" title="Browse files" data-folder="${s.env}-${s.pod}">▣</button></div></td></tr>`;
+  }).join(''):`<tr><td colspan="9" class="empty">No sites match</td></tr>`;
+  $('#iisSel').innerHTML=`<b>${sel.iis.size}</b> selected`;
+  $$('[data-kind="iis"]').forEach(b=>b.disabled=!sel.iis.size);
+}
+function renderFiles(){
+  const ico={folder:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'};
+  const f='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8l6 6v14H6z"/><path d="M14 2v6h6"/></svg>';
+  $('#fileTable tbody').innerHTML=FILES.map((r,i)=>`<tr class="${sel.file.has(i)?'selected':''}" data-id="${i}">
+    <td class="chk">${i?`<input type="checkbox" ${sel.file.has(i)?'checked':''}>`:''}</td>
+    <td><div class="fname">${ico[r[3]]||f}<span class="name" style="font-weight:${r[3]==='folder'?600:500}">${r[0]}</span></div></td>
+    <td class="muted">${r[1]}</td><td class="muted">${r[2]}</td><td class="muted">${r[3]}</td>
+    <td><div class="rowact"><button class="icon-btn" title="Copy to my system">⤓</button><button class="icon-btn" title="Tail">≡</button><button class="icon-btn" title="Copy path">⧉</button></div></td></tr>`).join('');
+  $('#copyBtn').disabled=!sel.file.size;$('#copyBtn').textContent=sel.file.size?`⤓ Copy ${sel.file.size} item${sel.file.size>1?'s':''} to my system`:'⤓ Copy to my system';
+}
+
+/* ================= Selection wiring ================= */
+function wireTable(tableId,key,render){
+  $(tableId).addEventListener('click',e=>{
+    const tr=e.target.closest('tr[data-id]');if(!tr)return;
+    if(e.target.closest('[data-log]')){switchTab('logs');toast('Tailing '+e.target.closest('[data-log]').dataset.log);return}
+    if(e.target.closest('[data-folder]')){switchTab('files');toast('Opened '+e.target.closest('[data-folder]').dataset.folder);return}
+    if(e.target.closest('.icon-btn'))return;
+    const id=key==='file'?+tr.dataset.id:tr.dataset.id; if(key==='file'&&id===0)return;
+    if(sel[key].has(id))sel[key].delete(id);else sel[key].add(id);render();
+  });
+}
+wireTable('#svcTable','svc',renderSvc);wireTable('#iisTable','iis',renderIis);wireTable('#fileTable','file',renderFiles);
+$('#svcAll').onchange=e=>{sel.svc=e.target.checked?new Set(SERVICES.map(s=>s.id)):new Set();renderSvc()};
+$('#iisAll').onchange=e=>{sel.iis=e.target.checked?new Set(SITES.map(s=>s.id)):new Set();renderIis()};
+$('#fileAll').onchange=e=>{sel.file=e.target.checked?new Set(FILES.map((_,i)=>i).filter(Boolean)):new Set();renderFiles()};
+$('#svcFilter').oninput=renderSvc;$('#iisFilter').oninput=renderIis;
+$('#svcSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('#svcSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));svcFilterMode=b.dataset.f;renderSvc()};
+$('#iisSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('#iisSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));iisFilterMode=b.dataset.f;renderIis()};
+
+/* ================= Tabs ================= */
+function switchTab(id){$$('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===id));$$('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+id))}
+$$('.tab').forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+/* ================= Actions with live progress (no 5s wait, no reload) ================= */
+function addJob(id,title,sub){$('#jobs').querySelector('.empty')?.remove();$('#jobs').insertAdjacentHTML('afterbegin',`<div class="job" id="job-${id}"><div class="jt"><span>${title}</span><span class="jpct">0%</span></div><div class="jp"><i></i></div><div class="jd">${sub}</div></div>`)}
+function updJob(id,p,sub){const j=$('#job-'+id);if(!j)return;j.querySelector('.jp i').style.width=p+'%';j.querySelector('.jpct').textContent=p+'%';if(sub)j.querySelector('.jd').textContent=sub;if(p>=100)setTimeout(()=>{j.remove();if(!$('#jobs').children.length)$('#jobs').innerHTML='<div class="empty" style="padding:20px 0">No jobs in flight</div>'},1200)}
+
+function runAction(kind,action){
+  const ids=[...sel[kind]]; const list=kind==='svc'?SERVICES:SITES; const stKey=kind==='svc'?'status':'site';
+  const on=kind==='svc'?'Running':'Started';
+  const jobId=Date.now();
+  addJob(jobId,`${action} · ${ids.length} ${kind==='svc'?'service(s)':'site(s)'}`,'dispatching SSM command…');
+  act('RUN','run',`${action.toUpperCase()} ${ids.length} ${kind==='svc'?'service(s)':'IIS site(s)'} — SSM command ${Math.random().toString(16).slice(2,10)}`);
+  $('#actLive').style.display='';
+  ids.forEach(id=>pending.add(id));
+  sel[kind].clear(); kind==='svc'?renderSvc():renderIis();
+  let done=0;
+  ids.forEach((id,i)=>{
+    const item=list.find(x=>x.id===id); const label=kind==='svc'?`${item.prefix}-${item.env}-${item.pod}`:item.name;
+    const steps=action==='restart'?['stop signalled','stopped','start signalled','started']:action==='start'?['start signalled','started']:['stop signalled','stopped'];
+    steps.forEach((s,k)=>setTimeout(()=>{
+      act(k===steps.length-1?'OK':'…',k===steps.length-1?'ok':'inf',`${label}: ${s}`);
+      if(k===steps.length-1){
+        pending.delete(id);
+        item[stKey]=action==='stop'?(kind==='svc'?'Stopped':'Stopped'):on;
+        if(kind==='iis'){item.pool=item.site==='Started'?'Started':'Stopped';item.health=item.site==='Started'?100:0}
+        else{item.uptime=item.status==='Running'?'0m':'—';item.pid=item.status==='Running'?String(10000+Math.floor(Math.random()*9000)):'—'}
+        done++;updJob(jobId,Math.round(done/ids.length*100),`${done}/${ids.length} complete`);
+        kind==='svc'?renderSvc():renderIis();updateSummary();
+        if(done===ids.length){$('#actLive').style.display='none';toast(`${action} complete — ${ids.length} ${kind==='svc'?'service(s)':'site(s)'}`)}
+      }
+    },350+i*220+k*450));
+  });
+}
+$$('[data-act]').forEach(b=>b.onclick=()=>runAction(b.dataset.kind,b.dataset.act));
+
+/* ================= Files: copy with transfer progress ================= */
+$('#copyBtn').onclick=()=>{
+  const items=[...sel.file].map(i=>FILES[i]);const t=$('#transfer');t.classList.add('show');
+  act('RUN','run',`Copy ${items.length} item(s) from \\\\eom-core-shared-dev-cont\\content\\dev\\poddev-26\\sm → local Downloads`);
+  let p=0,idx=0;const iv=setInterval(()=>{p+=Math.random()*9+3;if(p>=100){p=100;clearInterval(iv);$('#tFile').textContent='done · opened in Explorer';act('OK','ok',`Copied ${items.length} item(s) to Downloads\\OMS Engine\\poddev-26`);toast('Copied to your system');setTimeout(()=>t.classList.remove('show'),1500);sel.file.clear();renderFiles()}
+    else{idx=Math.min(items.length-1,Math.floor(p/100*items.length));$('#tFile').textContent=items[idx][0]+' · '+items[idx][1]}
+    $('#tBar').style.width=p+'%';$('#tPct').textContent=Math.round(p)+'%'},180)
+};
+const fp=$('#filepane');['dragenter','dragover'].forEach(ev=>fp.addEventListener(ev,e=>{e.preventDefault();fp.querySelector('.drop').style.display='flex'}));
+['dragleave','drop'].forEach(ev=>fp.addEventListener(ev,e=>{e.preventDefault();fp.querySelector('.drop').style.display='none';if(ev==='drop')toast('Upload queued')}));
+
+/* ================= Live log stream ================= */
+const LOGS=[
+ ['INFO','ShopLogic','Order 7731092 routed to node DC-EAST (score 0.91)'],
+ ['INFO','ShopLogic','Inventory ATP refreshed: 4,212 SKUs in 380 ms'],
+ ['WARN','JobManager','Job ExportOrders-poddev-26 took 8.4 s (threshold 5 s)'],
+ ['INFO','W3SVC','GET /sm/api/health 200 12 ms'],
+ ['INFO','ShopLogic','BOPIS pickup confirmed 7730988 store 0412'],
+ ['ERROR','JobManager','Retry 2/3 — FeedPublisher: connection reset by peer (10.108.20.55:445)'],
+ ['INFO','ShopLogic','Return RMA-55201 authorized, refund tender=GIFTCARD'],
+ ['INFO','W3SVC','POST /sm/api/orders/allocate 201 94 ms'],
+ ['INFO','JobManager','Job SequenceReconcile completed: 0 gaps'],
+];
+let logPaused=false;
+function pushLog(){
+  if(logPaused)return;
+  const [l,src,msg]=LOGS[Math.floor(Math.random()*LOGS.length)];const q=$('#logGrep').value;
+  let m=msg;if(q){try{m=msg.replace(new RegExp(q.replace(/^\/|\/$/g,''),'gi'),x=>`<mark>${x}</mark>`)}catch{}}
+  const v=$('#logview');const stick=v.scrollTop+v.clientHeight>=v.scrollHeight-10;
+  v.insertAdjacentHTML('beforeend',`<div><span class="ts">${new Date().toISOString().slice(11,23)}</span><span class="lvl ${l}">${l}</span><span style="color:#8ea2c0">${src}</span>  ${m}</div>`);
+  if(v.children.length>400)v.firstChild.remove(); if(stick)v.scrollTop=v.scrollHeight;
+}
+for(let i=0;i<30;i++)pushLog();setInterval(pushLog,900);
+$('#pauseLog').onclick=e=>{logPaused=!logPaused;e.target.textContent=logPaused?'▶ resume':'⏸ pause';e.target.classList.toggle('on',logPaused)};
+
+/* ================= Theme ================= */
+const root=document.documentElement;
+function setTheme(t){root.dataset.theme=t;act('INF','inf',`Theme: ${t}`)}
+$('#themeBtn').onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');
+/* ================= Misc ================= */
+$('#detectBtn').onclick=()=>$('#drawer').classList.add('open');$('#closeDrawer').onclick=()=>$('#drawer').classList.remove('open');
+$('#clearAct').onclick=()=>$('#activity').innerHTML='';
+$('#refreshBtn').onclick=()=>{act('RUN','run','Delta refresh: services + IIS + EC2 tags (parallel)');setTimeout(()=>act('OK','ok','Refreshed in 412 ms · 0 changes · cache updated'),450)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#drawer').classList.remove('open');if(e.key.toLowerCase()==='r'&&!e.target.matches('input,select'))$('#refreshBtn').click();if(e.key.toLowerCase()==='d'&&!e.target.matches('input,select'))$('#themeBtn').click()});
+
+/* Background delta poll: silently reconciles state every 3 s (simulated drift) */
+setInterval(()=>{if(Math.random()<0.15){const s=SITES.find(x=>x.health>0&&x.health<100);if(s){s.health=Math.min(100,s.health+12);if(s.health===100)s.pool='Started';renderIis();act('INF','inf',`${s.name}: app pool warmed, health ${s.health}%`)}}},3000);
+
+act('OK','ok','Loaded 16 services, 28 IIS sites, 19 environments from warm cache (38 ms)');
+act('INF','inf','Discovery: 2 new environments since last session — gamma-v2-01, podv2-30');
+renderSvc();renderIis();renderFiles();updateSummary();
+</script>
+</body>
+</html>
