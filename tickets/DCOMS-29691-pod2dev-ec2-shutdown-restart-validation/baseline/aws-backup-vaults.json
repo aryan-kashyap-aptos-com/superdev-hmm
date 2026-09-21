@@ -1,0 +1,34 @@
+﻿{
+    "BackupVaultList": [
+        {
+            "BackupVaultName": "Default",
+            "BackupVaultArn": "arn:aws:backup:us-east-1:268173716021:backup-vault:Default",
+            "VaultType": "BACKUP_VAULT",
+            "CreationDate": "2021-05-17T20:35:24.416000+05:30",
+            "EncryptionKeyArn": "arn:aws:kms:us-east-1:268173716021:key/f30a5807-8434-43a1-866d-1cd478f1c941",
+            "CreatorRequestId": "Default",
+            "NumberOfRecoveryPoints": 0,
+            "Locked": false
+        },
+        {
+            "BackupVaultName": "aws/efs/automatic-backup-vault",
+            "BackupVaultArn": "arn:aws:backup:us-east-1:268173716021:backup-vault:aws/efs/automatic-backup-vault",
+            "VaultType": "BACKUP_VAULT",
+            "CreationDate": "2023-08-16T15:10:09.096000+05:30",
+            "EncryptionKeyArn": "arn:aws:kms:us-east-1:268173716021:key/f30a5807-8434-43a1-866d-1cd478f1c941",
+            "CreatorRequestId": "aws/efs/automatic-backup-268173716021-us-east-1",
+            "NumberOfRecoveryPoints": 0,
+            "Locked": false
+        },
+        {
+            "BackupVaultName": "odx_dev_cluster",
+            "BackupVaultArn": "arn:aws:backup:us-east-1:268173716021:backup-vault:odx_dev_cluster",
+            "VaultType": "BACKUP_VAULT",
+            "CreationDate": "2025-12-18T14:38:28.416000+05:30",
+            "EncryptionKeyArn": "arn:aws:kms:us-east-1:268173716021:key/f30a5807-8434-43a1-866d-1cd478f1c941",
+            "CreatorRequestId": "dd325f63-51c5-4c3d-b0ea-c4ea19a52a70",
+            "NumberOfRecoveryPoints": 0,
+            "Locked": false
+        }
+    ]
+}

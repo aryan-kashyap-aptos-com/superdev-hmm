@@ -1,0 +1,76 @@
+{
+  "region": "us-east-1",
+  "updated": "2026-09-20",
+  "stacks": [
+    {
+      "id": "eom-core-shared-dev",
+      "label": "EOM Core Shared Dev (multi-tenant Toro + Site Manager)",
+      "description": "Toro on shared Toronado EC2. IIS on SM EC2; ShopLogic logs on content EC2 under D:\\content\\dev\\{env}\\sm (UNC in IIS points at the share).",
+      "hosts": [
+        {
+          "role": "toronado",
+          "label": "Shared Toronado server",
+          "name_tag": "eom-core-shared-dev-toronado",
+          "instance_id": "i-03b3fb1c107fde172",
+          "private_ip": "20.108.20.254"
+        },
+        {
+          "role": "sitemanager",
+          "label": "Shared Site Manager (IIS)",
+          "name_tag": "eom-core-shared-dev-sitemanager",
+          "instance_id": "i-0ec04567a61c5b4f5",
+          "private_ip": "20.108.20.115"
+        },
+        {
+          "role": "content",
+          "label": "Shared content (UNC / site files)",
+          "name_tag": "eom-core-shared-dev-cont",
+          "instance_id": "i-0364472ad7dcb1458",
+          "private_ip": "20.108.20.55"
+        }
+      ]
+    },
+    {
+      "id": "oms-pod2-dev",
+      "label": "OMS Pod2 Dev (standalone stack)",
+      "description": "Dedicated pod2-dev Toronado and Site Manager (poddev DB tier).",
+      "hosts": [
+        {
+          "role": "toronado",
+          "label": "Pod2 Dev Toronado",
+          "name_tag": "oms-pod2-dev-toronado",
+          "instance_id": "i-09ed32ca27fa7ec17",
+          "private_ip": "20.115.11.25"
+        },
+        {
+          "role": "sitemanager",
+          "label": "Pod2 Dev Site Manager (IIS)",
+          "name_tag": "oms-pod2-dev-sitemanager",
+          "instance_id": "i-036505377f8ad5c6e",
+          "private_ip": "20.115.11.102"
+        }
+      ]
+    },
+    {
+      "id": "eom-core-perf15-qa",
+      "label": "EOM Core Perf15 QA",
+      "description": "Standalone perf15 QA Toronado (OMS-*-perf15qa-*) and Site Manager.",
+      "hosts": [
+        {
+          "role": "toronado",
+          "label": "Perf15 QA Toronado",
+          "name_tag": "eom-core-perf15-qa-toronado",
+          "instance_id": "i-04d71cb70d26088a9",
+          "private_ip": "20.110.20.244"
+        },
+        {
+          "role": "sitemanager",
+          "label": "Perf15 QA Site Manager (IIS)",
+          "name_tag": "eom-core-perf15-qa-sitemanager",
+          "instance_id": "i-00692026be69f0df0",
+          "private_ip": "20.110.20.101"
+        }
+      ]
+    }
+  ]
+}

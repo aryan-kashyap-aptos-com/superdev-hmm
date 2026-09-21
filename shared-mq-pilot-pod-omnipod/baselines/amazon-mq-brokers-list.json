@@ -1,0 +1,194 @@
+﻿{
+    "BrokerSummaries": [
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-integration-qa-mq-broker:b-0546c1aa-3527-419e-9655-da1685d60cf5",
+            "BrokerId": "b-0546c1aa-3527-419e-9655-da1685d60cf5",
+            "BrokerName": "oms-integration-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-07-02T04:12:24.477481+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-automation-qa-mq-broker:b-1d3835ff-b2fd-42e9-a416-d1312cfd9d24",
+            "BrokerId": "b-1d3835ff-b2fd-42e9-a416-d1312cfd9d24",
+            "BrokerName": "oms-automation-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-26T05:22:45.567979+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-pod-qa-mq-broker:b-33868518-8da9-4292-9014-786ccbf8642d",
+            "BrokerId": "b-33868518-8da9-4292-9014-786ccbf8642d",
+            "BrokerName": "oms-pod-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-17T09:15:20.562953+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-omnipod-dev-mq-broker:b-4487f5c8-cdf6-4819-868f-ec0e74b2189f",
+            "BrokerId": "b-4487f5c8-cdf6-4819-868f-ec0e74b2189f",
+            "BrokerName": "oms-omnipod-dev-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-28T03:08:52.935679+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-shared-dev-mq-broker:b-5d413804-aec7-4af1-9a26-1de2f913f107",
+            "BrokerId": "b-5d413804-aec7-4af1-9a26-1de2f913f107",
+            "BrokerName": "oms-shared-dev-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-04-30T07:10:43.742395+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-regression202520-qa-mq-broker:b-604ddc84-af58-493e-9729-6a1e39887328",
+            "BrokerId": "b-604ddc84-af58-493e-9729-6a1e39887328",
+            "BrokerName": "oms-regression202520-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-23T02:40:26.268629+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-perf-qa-mq-broker:b-7b73b946-1f5b-4898-979b-b0b6bba76b54",
+            "BrokerId": "b-7b73b946-1f5b-4898-979b-b0b6bba76b54",
+            "BrokerName": "oms-perf-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2023-11-17T07:14:42.227000+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-omnipod-qa-mq-broker:b-aa4f9294-525c-4c56-bdec-16dc30e652ee",
+            "BrokerId": "b-aa4f9294-525c-4c56-bdec-16dc30e652ee",
+            "BrokerName": "oms-omnipod-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-19T01:58:16.158796+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-regression202530-qa-mq-broker:b-abd78f29-1991-4cea-ac6d-f1a510cfe9da",
+            "BrokerId": "b-abd78f29-1991-4cea-ac6d-f1a510cfe9da",
+            "BrokerName": "oms-regression202530-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-05T09:52:26.977396+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-regression202540-qa-mq-broker:b-c026ea54-a06c-457a-a119-0650b333b95f",
+            "BrokerId": "b-c026ea54-a06c-457a-a119-0650b333b95f",
+            "BrokerName": "oms-regression202540-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-07-16T06:45:16.387641+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-appsec-dast-mq-broker:b-c6297f39-bcee-40b8-8c91-78b30ed33fd3",
+            "BrokerId": "b-c6297f39-bcee-40b8-8c91-78b30ed33fd3",
+            "BrokerName": "oms-appsec-dast-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-04-10T06:05:30.541883+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-aoregression202530-qa-mq-broker:b-c8844640-2df7-4ecb-9c5e-f053e9577d9d",
+            "BrokerId": "b-c8844640-2df7-4ecb-9c5e-f053e9577d9d",
+            "BrokerName": "oms-aoregression202530-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-09T07:17:59.988599+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-gamma-ops-mq:b-d39db71c-a018-45a0-aa10-e0e8c3747464",
+            "BrokerId": "b-d39db71c-a018-45a0-aa10-e0e8c3747464",
+            "BrokerName": "oms-gamma-ops-mq",
+            "BrokerState": "RUNNING",
+            "Created": "2026-06-11T13:39:59.844222+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-perf15-qa-mq-broker:b-e12e76cf-229e-4213-91a3-424fd628f4fe",
+            "BrokerId": "b-e12e76cf-229e-4213-91a3-424fd628f4fe",
+            "BrokerName": "oms-perf15-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-06-10T07:15:00.419420+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-omnipod-qa2-mq-broker:b-e30b6be5-f651-47d8-8786-5829a3f4e58e",
+            "BrokerId": "b-e30b6be5-f651-47d8-8786-5829a3f4e58e",
+            "BrokerName": "oms-omnipod-qa2-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2026-05-15T13:48:33.925964+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-pod-dev-mq-broker:b-e93a05aa-377d-441c-8e35-5b862ff6b9cd",
+            "BrokerId": "b-e93a05aa-377d-441c-8e35-5b862ff6b9cd",
+            "BrokerName": "oms-pod-dev-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-17T03:58:40.585915+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-pod2-dev-mq:b-eca0d1c3-dcd1-4b50-b367-9f7b3c8ab1c9",
+            "BrokerId": "b-eca0d1c3-dcd1-4b50-b367-9f7b3c8ab1c9",
+            "BrokerName": "oms-pod2-dev-mq",
+            "BrokerState": "RUNNING",
+            "Created": "2026-06-18T09:11:27.093861+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.m7g.medium"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-regression202510-qa-mq-broker:b-fb407674-2a5e-495c-8f70-1ed66e3926c1",
+            "BrokerId": "b-fb407674-2a5e-495c-8f70-1ed66e3926c1",
+            "BrokerName": "oms-regression202510-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-21T02:58:32.103217+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        },
+        {
+            "BrokerArn": "arn:aws:mq:us-east-1:268173716021:broker:oms-aoregression202520-qa-mq-broker:b-fb8375d2-8c2b-44fd-99b2-a5acdfb4fa54",
+            "BrokerId": "b-fb8375d2-8c2b-44fd-99b2-a5acdfb4fa54",
+            "BrokerName": "oms-aoregression202520-qa-mq-broker",
+            "BrokerState": "RUNNING",
+            "Created": "2025-05-18T01:10:20.635108+00:00",
+            "DeploymentMode": "SINGLE_INSTANCE",
+            "EngineType": "RabbitMQ",
+            "HostInstanceType": "mq.t3.micro"
+        }
+    ]
+}

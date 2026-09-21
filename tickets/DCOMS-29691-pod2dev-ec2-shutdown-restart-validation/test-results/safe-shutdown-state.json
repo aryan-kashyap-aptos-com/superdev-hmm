@@ -1,0 +1,86 @@
+﻿{
+    "action":  "safe-stop",
+    "captured_at_utc":  "2026-09-04T12:30:35Z",
+    "region":  "us-east-1",
+    "instance_ids":  [
+                         "i-0b489a48f31463d74",
+                         "i-02b70bcb094c2dcec",
+                         "i-0f603ed7f8f947bd7",
+                         "i-036505377f8ad5c6e",
+                         "i-0f2a63e597d421e39",
+                         "i-0d23caf16cd2c5adb",
+                         "i-0aee83fe4726581e4"
+                     ],
+    "asg_suspend_applied":  [
+                                "Launch",
+                                "ReplaceUnhealthy",
+                                "HealthCheck"
+                            ],
+    "asg_before":  [
+                       {
+                           "name":  "oms-pod2-dev-sm-asg",
+                           "min_size":  1,
+                           "max_size":  3,
+                           "desired_capacity":  1,
+                           "suspended_before":  [
+                                                    "HealthCheck",
+                                                    "ReplaceUnhealthy"
+                                                ],
+                           "instances":  [
+                                             "i-036505377f8ad5c6e"
+                                         ]
+                       },
+                       {
+                           "name":  "oms-pod2-dev-api-asg",
+                           "min_size":  1,
+                           "max_size":  3,
+                           "desired_capacity":  1,
+                           "suspended_before":  [
+                                                    "ReplaceUnhealthy",
+                                                    "HealthCheck"
+                                                ],
+                           "instances":  [
+                                             "i-02b70bcb094c2dcec"
+                                         ]
+                       },
+                       {
+                           "name":  "oms-pod2-dev-cnt-asg",
+                           "min_size":  1,
+                           "max_size":  3,
+                           "desired_capacity":  1,
+                           "suspended_before":  [
+                                                    "ReplaceUnhealthy",
+                                                    "HealthCheck"
+                                                ],
+                           "instances":  [
+                                             "i-0d23caf16cd2c5adb"
+                                         ]
+                       },
+                       {
+                           "name":  "oms-pod2-dev-svc-asg",
+                           "min_size":  1,
+                           "max_size":  3,
+                           "desired_capacity":  1,
+                           "suspended_before":  [
+                                                    "ReplaceUnhealthy",
+                                                    "HealthCheck"
+                                                ],
+                           "instances":  [
+                                             "i-0f603ed7f8f947bd7"
+                                         ]
+                       },
+                       {
+                           "name":  "oms-pod2-dev-toronado-asg",
+                           "min_size":  1,
+                           "max_size":  1,
+                           "desired_capacity":  1,
+                           "suspended_before":  [
+
+                                                ],
+                           "instances":  [
+                                             "i-0aee83fe4726581e4"
+                                         ]
+                       }
+                   ],
+    "asg_restore_file":  "C:\\PROD\\ConnectorSuite\\tickets\\DCOMS-29691-pod2dev-ec2-shutdown-restart-validation\\test-results\\asg-settings-before-shutdown.json"
+}

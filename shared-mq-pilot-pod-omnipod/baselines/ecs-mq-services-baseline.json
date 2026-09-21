@@ -1,0 +1,72 @@
+﻿[
+    {
+        "environment":  "pod/dev",
+        "cluster":  "oms-pod-dev-ecs-cluster",
+        "service":  "oms-pod-dev-taskprocessor-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "pod/dev",
+        "cluster":  "oms-pod-dev-ecs-cluster",
+        "service":  "oms-pod-dev-inventoryfacade-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "pod/dev",
+        "cluster":  "oms-pod-dev-ecs-cluster",
+        "service":  "oms-pod-dev-omsinventoryfeed-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "pod/dev",
+        "cluster":  "oms-pod-dev-ecs-cluster",
+        "service":  "oms-pod-dev-omsfeed-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "pod/dev",
+        "cluster":  "oms-pod-dev-ecs-cluster",
+        "service":  "oms-pod-dev-taskscheduler-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "omnipod/qa",
+        "cluster":  "oms-omnipod-qa-ecs-cluster",
+        "service":  "oms-omnipod-qa-inventoryfacade-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "omnipod/qa",
+        "cluster":  "oms-omnipod-qa-ecs-cluster",
+        "service":  "oms-omnipod-qa-taskscheduler-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "omnipod/qa",
+        "cluster":  "oms-omnipod-qa-ecs-cluster",
+        "service":  "oms-omnipod-qa-omsfeed-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "omnipod/qa",
+        "cluster":  "oms-omnipod-qa-ecs-cluster",
+        "service":  "oms-omnipod-qa-omsinventoryfeed-service",
+        "running":  1,
+        "desired":  1
+    },
+    {
+        "environment":  "omnipod/qa",
+        "cluster":  "oms-omnipod-qa-ecs-cluster",
+        "service":  "oms-omnipod-qa-taskprocessor-service",
+        "running":  1,
+        "desired":  1
+    }
+]

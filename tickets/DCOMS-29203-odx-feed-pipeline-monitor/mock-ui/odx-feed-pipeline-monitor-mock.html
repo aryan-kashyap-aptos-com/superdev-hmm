@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODX feed pipeline — UI mock (DCOMS-29203)</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+  <style>
+    :root {
+      --aptos-navy: #192f55;
+      --aptos-lime: #c4d600;
+      --aptos-blue: #0074d9;
+      --aptos-blue-dark: #005bb5;
+      --bg-page: #eef1f5;
+      --bg-card: #ffffff;
+      --border: #d8dee6;
+      --text: #1a1a1a;
+      --text-muted: #5c6672;
+      --queued: #6b7c93;
+      --started: #0074d9;
+      --done: #2d8a4e;
+      --error: #c0392b;
+      --warning: #d97706;
+      --pending: #b0b8c4;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg-page);
+    }
+
+    /* Site Manager chrome (simplified) */
+    .sm-nav {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.25rem 1rem 0;
+    }
+    .sm-nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .sm-logo {
+      font-weight: 700;
+      color: var(--aptos-navy);
+      padding: 0.75rem 1rem;
+      font-size: 15px;
+    }
+    .sm-nav a {
+      color: rgba(0,0,0,0.6);
+      text-decoration: none;
+      padding: 1rem;
+      font-weight: 500;
+      border-radius: 8px 8px 0 0;
+    }
+    .sm-nav a.active {
+      background: var(--aptos-navy);
+      color: var(--aptos-lime);
+    }
+    .sm-subnav {
+      background: var(--aptos-navy);
+      padding: 0 1rem;
+    }
+    .sm-subnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+    }
+    .sm-subnav a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 0.65rem 1.25rem;
+      font-size: 12px;
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+    }
+    .sm-subnav a.active {
+      color: #fff;
+      border-bottom-color: var(--aptos-lime);
+    }
+
+    .page-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .page-header h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--aptos-navy);
+    }
+    .page-header .desc {
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .time-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .time-controls label { font-weight: 500; color: var(--text-muted); }
+    .time-controls select, .time-controls button {
+      font-family: inherit;
+      font-size: 13px;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+    }
+    .btn-primary {
+      background: var(--aptos-blue);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-primary:hover { background: var(--aptos-blue-dark); }
+    .btn-ghost {
+      background: #fff;
+      color: var(--aptos-blue);
+      border: 1px solid var(--aptos-blue);
+      cursor: pointer;
+    }
+
+    /* Summary tiles */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      cursor: default;
+      transition: box-shadow 0.15s;
+    }
+    .tile:hover { box-shadow: 0 2px 8px rgba(25,47,85,0.08); }
+    .tile-name {
+      font-weight: 500;
+      color: var(--aptos-navy);
+      font-size: 12px;
+      margin-bottom: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tile-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.25rem;
+      font-size: 11px;
+    }
+    .tile-stat { text-align: center; }
+    .tile-stat .n { display: block; font-size: 16px; font-weight: 500; }
+    .tile-stat .l { color: var(--text-muted); }
+    .tile-stat.q .n { color: var(--queued); }
+    .tile-stat.s .n { color: var(--started); }
+    .tile-stat.d .n { color: var(--done); }
+    .tile-stat.e .n { color: var(--error); }
+
+    /* Alert panels row */
+    .panels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 900px) {
+      .panels { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 0.6rem 0.85rem;
+      background: #f4f6f9;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-head .badge {
+      background: var(--aptos-navy);
+      color: #fff;
+      font-size: 11px;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    .panel-head .badge.warn { background: var(--warning); }
+    .panel-head .badge.err { background: var(--error); }
+    .panel-body {
+      padding: 0.5rem 0;
+      max-height: 140px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .panel-row {
+      padding: 0.4rem 0.85rem;
+      border-bottom: 1px solid #f0f2f5;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .panel-row:last-child { border-bottom: none; }
+    .panel-row a {
+      color: var(--aptos-blue);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .panel-row a:hover { text-decoration: underline; }
+    .panel-row .meta { color: var(--text-muted); white-space: nowrap; }
+
+    /* Search + grid */
+    .search-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-bar input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+    .search-bar select {
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    .grid-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    table.data-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    table.data-grid th {
+      background: #f4f6f9;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      color: var(--aptos-navy);
+    }
+    table.data-grid td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    table.data-grid tr:hover td { background: #f8fafc; }
+    table.data-grid tr.clickable { cursor: pointer; }
+    .status-pill {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-pill.done { background: #e6f4ea; color: var(--done); }
+    .status-pill.error { background: #fdecea; color: var(--error); }
+    .status-pill.backlog { background: #fff4e5; color: var(--warning); }
+    .status-pill.partial { background: #e8f0fe; color: var(--started); }
+    .grid-footer {
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Detail view */
+    #detail-view { display: none; }
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .detail-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .meta-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.65rem 0.85rem;
+    }
+    .meta-card .label { font-size: 11px; color: var(--text-muted); }
+    .meta-card .value { font-weight: 500; margin-top: 0.15rem; word-break: break-all; }
+
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1rem;
+    }
+    @media (max-width: 900px) {
+      .detail-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Timeline */
+    .timeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+    }
+    .timeline-card h2 {
+      margin: 0 0 1rem;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--aptos-navy);
+    }
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--border);
+    }
+    .tl-step {
+      position: relative;
+      padding-bottom: 1.25rem;
+    }
+    .tl-step:last-child { padding-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -28px;
+      top: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: #fff;
+    }
+    .tl-step.complete .tl-dot { border-color: var(--done); background: var(--done); }
+    .tl-step.error .tl-dot { border-color: var(--error); background: var(--error); }
+    .tl-step.pending .tl-dot { border-color: var(--pending); background: #f4f6f9; }
+    .tl-step.active .tl-dot { border-color: var(--started); background: var(--started); }
+    .tl-title { font-weight: 500; font-size: 13px; }
+    .tl-time { font-size: 11px; color: var(--text-muted); margin-top: 0.15rem; }
+    .tl-note { font-size: 11px; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .side-panels .panel { margin-bottom: 0.75rem; }
+    .error-box {
+      background: #fdecea;
+      border: 1px solid #f5c6c2;
+      border-radius: 4px;
+      padding: 0.65rem 0.85rem;
+      font-size: 12px;
+    }
+    .error-box .type { font-weight: 500; color: var(--error); }
+    .stuck-flag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #fff4e5;
+      color: var(--warning);
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .mock-banner {
+      background: var(--aptos-navy);
+      color: var(--aptos-lime);
+      text-align: center;
+      padding: 0.35rem;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="mock-banner">MOCK UI — DCOMS-29203 understanding demo · Not production code · Click grid rows to open detail timeline</div>
+
+  <!-- Site Manager shell -->
+  <nav class="sm-nav">
+    <div class="sm-nav-inner">
+      <span class="sm-logo">Aptos</span>
+      <a href="#">Users</a>
+      <a href="#" class="active">Content</a>
+      <a href="#">Commerce</a>
+      <a href="#">CRM</a>
+      <a href="#">Analytics</a>
+      <a href="#">Admin</a>
+    </div>
+  </nav>
+  <nav class="sm-subnav">
+    <div class="sm-subnav-inner">
+      <a href="#">Pages</a>
+      <a href="#">Products</a>
+      <a href="#" class="active">Tasks</a>
+      <a href="#">International</a>
+    </div>
+  </nav>
+  <div class="sm-subnav" style="background:#243a5c;padding-top:0">
+    <div class="sm-subnav-inner">
+      <a href="#">Service Manager</a>
+      <a href="#" class="active" style="border-bottom-color:#c4d600">ODX feed pipeline</a>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <!-- LANDING VIEW -->
+    <div id="landing-view">
+      <div class="page-header">
+        <div>
+          <h1>ODX feed pipeline</h1>
+          <p class="desc">Monitor OMS and ODX feed processing across queued, started, completed, staged, and file-output states.</p>
+        </div>
+        <div class="time-controls">
+          <label for="window">Time window</label>
+          <select id="window">
+            <option value="24">Last 24 hours</option>
+            <option value="48">Last 48 hours</option>
+            <option value="168">Last 7 days</option>
+          </select>
+          <button type="button" class="btn-primary" onclick="refreshMock()">Refresh</button>
+        </div>
+      </div>
+
+      <!-- Summary tiles by taskname -->
+      <div class="tiles" id="tiles"></div>
+
+      <!-- Backlog / Stuck / Errors -->
+      <div class="panels">
+        <div class="panel">
+          <div class="panel-head">
+            <span>Backlog</span>
+            <span class="badge warn" id="backlog-count">12</span>
+          </div>
+          <div class="panel-body" id="backlog-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <span>Stuck in queue</span>
+            <span class="badge warn" id="stuck-count">3</span>
+          </div>
+          <div class="panel-body" id="stuck-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <span>Recent errors</span>
+            <span class="badge err" id="error-count">5</span>
+          </div>
+          <div class="panel-body" id="error-list"></div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <select id="search-type">
+          <option value="order">Order ID</option>
+          <option value="message">Message ID</option>
+          <option value="task">Task name</option>
+        </select>
+        <input type="text" id="search-input" placeholder="Search messages..." value="" />
+        <button type="button" class="btn-primary" onclick="filterGrid()">Search</button>
+        <button type="button" class="btn-ghost" onclick="clearSearch()">Clear</button>
+      </div>
+
+      <!-- Results grid (ag-Grid stand-in) -->
+      <div class="grid-wrap">
+        <table class="data-grid">
+          <thead>
+            <tr>
+              <th>Message ID</th>
+              <th>Task</th>
+              <th>Order / Ref</th>
+              <th>Status</th>
+              <th>Queued</th>
+              <th>Done</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="grid-body"></tbody>
+        </table>
+        <div class="grid-footer">
+          <span id="grid-summary">Showing 1–10 of 142 messages (server-side pagination)</span>
+          <span>Page 1 of 15 ◀ ▶</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div id="detail-view">
+      <div class="detail-header">
+        <button type="button" class="btn-ghost" onclick="showLanding()">← Back to pipeline</button>
+        <h1 style="margin:0;font-size:1.25rem;font-weight:500;color:var(--aptos-navy)">Message detail</h1>
+      </div>
+
+      <div class="detail-meta" id="detail-meta"></div>
+
+      <div class="detail-layout">
+        <div class="timeline-card">
+          <h2>Pipeline timeline</h2>
+          <div class="timeline" id="timeline"></div>
+        </div>
+        <div class="side-panels">
+          <div class="panel" id="error-panel-wrap">
+            <div class="panel-head"><span>Consumer errors</span></div>
+            <div class="panel-body" style="padding:0.75rem" id="detail-errors"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span>Queue lock status</span></div>
+            <div class="panel-body" style="padding:0.75rem" id="queue-status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MOCK_MESSAGES = [
+      {
+        id: 'a7f3c91e2b4d6085f1e9a0c3b7d2e4f1',
+        task: 'OMSFeeds:Fulfillment',
+        ref: 4781085,
+        status: 'done',
+        queued: '2025-12-18 16:35:29',
+        done: '2025-12-18 16:35:45',
+        duration: '16s',
+        stages: [
+          { name: 'Queued', state: 'complete', time: '2025-12-18 16:35:29 UTC', note: 'OMS producer published to RabbitMQ' },
+          { name: 'Started', state: 'complete', time: '2025-12-18 16:35:31 UTC', note: 'omsfeedsupervisor picked up message' },
+          { name: 'Done', state: 'complete', time: '2025-12-18 16:35:45 UTC', note: 'Result: Success' },
+          { name: 'Staged (omsfeedexport)', state: 'complete', time: '2025-12-18 16:35:46 UTC', note: 'Export JSON written to staging table' },
+          { name: 'File written', state: 'pending', time: null, note: 'Not applicable for this feed type' }
+        ],
+        errors: [],
+        stuck: false
+      },
+      {
+        id: 'b2e8d04f1a9c7356e0f8b1d4c6a3f2e8',
+        task: 'OMSFeeds:OrderCreated',
+        ref: 4778049,
+        status: 'backlog',
+        queued: '2025-12-18 04:00:51',
+        done: '—',
+        duration: '12h+',
+        stages: [
+          { name: 'Queued', state: 'complete', time: '2025-12-18 04:00:51 UTC', note: 'OMS producer published to RabbitMQ' },
+          { name: 'Started', state: 'pending', time: null, note: 'Not reached' },
+          { name: 'Done', state: 'pending', time: null, note: 'Not reached' },
+          { name: 'Staged (omsfeedexport)', state: 'pending', time: null, note: 'Not reached' },
+          { name: 'File written', state: 'pending', time: null, note: 'Not reached' }
+        ],
+        errors: [],
+        stuck: true,
+        stuckHours: 12.4
+      },
+      {
+        id: 'c9a1f56b3d7e8204f2c9b5e8a1d6f3c0',
+        task: 'OMSFeeds:PaymentReceived',
+        ref: 4775046,
+        status: 'error',
+        queued: '2025-12-17 21:50:29',
+        done: '2025-12-17 21:51:02',
+        duration: '33s',
+        stages: [
+          { name: 'Queued', state: 'complete', time: '2025-12-17 21:50:29 UTC' },
+          { name: 'Started', state: 'complete', time: '2025-12-17 21:50:31 UTC' },
+          { name: 'Done', state: 'error', time: '2025-12-17 21:51:02 UTC', note: 'Result: Error' },
+          { name: 'Staged (omsfeedexport)', state: 'pending', time: null, note: 'Not reached' },
+          { name: 'File written', state: 'pending', time: null, note: 'Not reached' }
+        ],
+        errors: [{ type: 'ExportException', time: '2025-12-17 21:51:02 UTC', summary: 'Payment auth not found for order 4775046' }],
+        stuck: false
+      },
+      {
+        id: 'd4b7e29a8c1f6035d0a8b6e2f9c4d1a7',
+        task: 'Inventory feed',
+        ref: 1042,
+        status: 'done',
+        queued: '2025-12-18 14:12:00',
+        done: '2025-12-18 14:14:22',
+        duration: '2m 22s',
+        stages: [
+          { name: 'Queued', state: 'complete', time: '2025-12-18 14:12:00 UTC' },
+          { name: 'Started', state: 'complete', time: '2025-12-18 14:12:05 UTC' },
+          { name: 'Done', state: 'complete', time: '2025-12-18 14:14:22 UTC', note: 'Result: Success' },
+          { name: 'S3 XML written', state: 'complete', time: '2025-12-18 14:14:23 UTC', note: 's3://inventory-feeds/podqa/supplier-1042/20251218.xml' }
+        ],
+        errors: [],
+        stuck: false
+      },
+      {
+        id: 'e5c8f30b9d2a7146e1b9c7f3a0e5b2d8',
+        task: 'OMSFeeds:ExportOrderItems',
+        ref: 4762103,
+        status: 'partial',
+        queued: '2025-12-18 10:05:11',
+        done: '2025-12-18 10:05:28',
+        duration: '17s',
+        stages: [
+          { name: 'Queued', state: 'complete', time: '2025-12-18 10:05:11 UTC' },
+          { name: 'Started', state: 'complete', time: '2025-12-18 10:05:13 UTC' },
+          { name: 'Done', state: 'complete', time: '2025-12-18 10:05:28 UTC', note: 'Result: Success' },
+          { name: 'Staged (omsfeedexport)', state: 'complete', time: '2025-12-18 10:05:29 UTC' },
+          { name: 'Reader cursor processed', state: 'complete', time: '2025-12-18 10:08:00 UTC', note: 'omsfeedexportreader advanced' },
+          { name: 'Notification file written', state: 'pending', time: null, note: 'OMSFeedsFileOutput job not yet run' }
+        ],
+        errors: [],
+        stuck: false
+      }
+    ];
+
+    const TILES = [
+      { name: 'OMSFeeds:Fulfillment', q: 342, s: 338, d: 330, e: 8 },
+      { name: 'OMSFeeds:OrderCreated', q: 89, s: 85, d: 77, e: 4 },
+      { name: 'OMSFeeds:PaymentReceived', q: 156, s: 154, d: 150, e: 6 },
+      { name: 'OMSFeeds:Return', q: 45, s: 44, d: 43, e: 1 },
+      { name: 'Inventory feed', q: 12, s: 12, d: 11, e: 1 },
+      { name: 'OMSFeeds:ExportOrderItems', q: 28, s: 27, d: 24, e: 3 }
+    ];
+
+    function renderTiles() {
+      document.getElementById('tiles').innerHTML = TILES.map(t => `
+        <div class="tile">
+          <div class="tile-name" title="${t.name}">${t.name}</div>
+          <div class="tile-stats">
+            <div class="tile-stat q"><span class="n">${t.q}</span><span class="l">Queued</span></div>
+            <div class="tile-stat s"><span class="n">${t.s}</span><span class="l">Started</span></div>
+            <div class="tile-stat d"><span class="n">${t.d}</span><span class="l">Done</span></div>
+            <div class="tile-stat e"><span class="n">${t.e}</span><span class="l">Error</span></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderPanels() {
+      const backlog = MOCK_MESSAGES.filter(m => m.status === 'backlog');
+      document.getElementById('backlog-count').textContent = backlog.length;
+      document.getElementById('backlog-list').innerHTML = backlog.map(m => `
+        <div class="panel-row">
+          <a onclick="openDetail('${m.id}')">${m.task}</a>
+          <span class="meta">Order ${m.ref}</span>
+        </div>
+      `).join('') || '<div class="panel-row"><span class="meta">No backlog</span></div>';
+
+      const stuck = MOCK_MESSAGES.filter(m => m.stuck);
+      document.getElementById('stuck-count').textContent = stuck.length;
+      document.getElementById('stuck-list').innerHTML = stuck.map(m => `
+        <div class="panel-row">
+          <a onclick="openDetail('${m.id}')">Order ${m.ref}</a>
+          <span class="meta">${m.stuckHours || '?'}h in queue</span>
+        </div>
+      `).join('') || '<div class="panel-row"><span class="meta">None</span></div>';
+
+      const errors = MOCK_MESSAGES.filter(m => m.errors.length);
+      document.getElementById('error-count').textContent = errors.length;
+      document.getElementById('error-list').innerHTML = errors.map(m => `
+        <div class="panel-row">
+          <a onclick="openDetail('${m.id}')">${m.errors[0].summary.slice(0, 40)}…</a>
+          <span class="meta">${m.errors[0].time.split(' ')[0]}</span>
+        </div>
+      `).join('') || '<div class="panel-row"><span class="meta">No recent errors</span></div>';
+    }
+
+    function statusLabel(s) {
+      const map = { done: 'Complete', error: 'Error', backlog: 'Backlog', partial: 'In progress' };
+      return map[s] || s;
+    }
+
+    function statusClass(s) {
+      const map = { done: 'done', error: 'error', backlog: 'backlog', partial: 'partial' };
+      return map[s] || '';
+    }
+
+    function renderGrid(filter = '') {
+      const rows = MOCK_MESSAGES.filter(m => {
+        if (!filter) return true;
+        const f = filter.toLowerCase();
+        return String(m.ref).includes(f) || m.id.includes(f) || m.task.toLowerCase().includes(f);
+      });
+      document.getElementById('grid-body').innerHTML = rows.map(m => `
+        <tr class="clickable" onclick="openDetail('${m.id}')">
+          <td><a style="color:var(--aptos-blue)">${m.id.slice(0, 12)}…</a></td>
+          <td>${m.task}</td>
+          <td>${m.ref}</td>
+          <td><span class="status-pill ${statusClass(m.status)}">${statusLabel(m.status)}</span></td>
+          <td>${m.queued}</td>
+          <td>${m.done}</td>
+          <td>${m.duration}</td>
+        </tr>
+      `).join('');
+      document.getElementById('grid-summary').textContent = `Showing 1–${rows.length} of ${rows.length} messages (mock data)`;
+    }
+
+    function openDetail(id) {
+      const m = MOCK_MESSAGES.find(x => x.id === id);
+      if (!m) return;
+      document.getElementById('landing-view').style.display = 'none';
+      document.getElementById('detail-view').style.display = 'block';
+
+      document.getElementById('detail-meta').innerHTML = `
+        <div class="meta-card"><div class="label">Message ID</div><div class="value">${m.id}</div></div>
+        <div class="meta-card"><div class="label">Task</div><div class="value">${m.task}</div></div>
+        <div class="meta-card"><div class="label">Reference ID</div><div class="value">${m.ref}</div></div>
+        <div class="meta-card"><div class="label">Overall status</div><div class="value"><span class="status-pill ${statusClass(m.status)}">${statusLabel(m.status)}</span></div></div>
+      `;
+
+      document.getElementById('timeline').innerHTML = m.stages.map(s => `
+        <div class="tl-step ${s.state}">
+          <div class="tl-dot"></div>
+          <div class="tl-title">${s.name}</div>
+          <div class="tl-time">${s.time || 'Pending / Not reached'}</div>
+          ${s.note ? `<div class="tl-note">${s.note}</div>` : ''}
+        </div>
+      `).join('');
+
+      document.getElementById('detail-errors').innerHTML = m.errors.length
+        ? m.errors.map(e => `<div class="error-box"><div class="type">${e.type}</div><div>${e.summary}</div><div class="tl-time">${e.time}</div></div>`).join('')
+        : '<span style="color:var(--text-muted)">No errors recorded</span>';
+
+      document.getElementById('queue-status').innerHTML = m.stuck
+        ? `<div class="stuck-flag">⚠ Order locked in omsfeedsqueuedorder</div><div class="tl-note" style="margin-top:0.5rem">In queue for ${m.stuckHours}h — no odxfeederror row (DCOMS-27496 pattern)</div>`
+        : '<span style="color:var(--done);font-weight:500">✓ Not in queue lock table</span>';
+    }
+
+    function showLanding() {
+      document.getElementById('detail-view').style.display = 'none';
+      document.getElementById('landing-view').style.display = 'block';
+    }
+
+    function filterGrid() {
+      renderGrid(document.getElementById('search-input').value.trim());
+    }
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      renderGrid();
+    }
+    function refreshMock() {
+      renderTiles();
+      renderPanels();
+      renderGrid(document.getElementById('search-input').value.trim());
+    }
+
+    renderTiles();
+    renderPanels();
+    renderGrid();
+  </script>
+</body>
+</html>

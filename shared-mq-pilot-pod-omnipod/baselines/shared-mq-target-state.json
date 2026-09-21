@@ -1,0 +1,62 @@
+{
+  "description": "Target SSM + vhost layout after pilot cutover (do not apply until RabbitMQ topology is created)",
+  "sharedBrokerEndpoint": "b-5d413804-aec7-4af1-9a26-1de2f913f107.mq.us-east-1.on.aws",
+  "environments": {
+    "pod/dev": {
+      "ssmPrefix": "/oms/pod/dev/aws-mq-broker",
+      "virtualhost": "pod-dev",
+      "applicationusername": "pod-dev-app",
+      "applicationpassword": "SET_IN_RABBITMQ_UI",
+      "endpoint": "b-5d413804-aec7-4af1-9a26-1de2f913f107.mq.us-east-1.on.aws",
+      "port": "5671",
+      "scheme": "amqps",
+      "sslenabled": "true",
+      "sslprotocols": "None",
+      "ecsCluster": "oms-pod-dev-ecs-cluster",
+      "ecsServicesToRedeploy": [
+        "oms-pod-dev-omsfeed-service",
+        "oms-pod-dev-omsinventoryfeed-service",
+        "oms-pod-dev-taskprocessor-service",
+        "oms-pod-dev-taskscheduler-service",
+        "oms-pod-dev-inventoryfacade-service"
+      ],
+      "queuesPerVhost": [
+        "export_requested",
+        "inventory_requested",
+        "taskprocessing_requested",
+        "taskprocessing_status",
+        "eom_atp_service_queue",
+        "eom_inventory_service_queue"
+      ],
+      "exchange": "main_exchange"
+    },
+    "omnipod/qa": {
+      "ssmPrefix": "/oms/omnipod/qa/aws-mq-broker",
+      "virtualhost": "omnipod-qa",
+      "applicationusername": "omnipod-qa-app",
+      "applicationpassword": "SET_IN_RABBITMQ_UI",
+      "endpoint": "b-5d413804-aec7-4af1-9a26-1de2f913f107.mq.us-east-1.on.aws",
+      "port": "5671",
+      "scheme": "amqps",
+      "sslenabled": "true",
+      "sslprotocols": "None",
+      "ecsCluster": "oms-omnipod-qa-ecs-cluster",
+      "ecsServicesToRedeploy": [
+        "oms-omnipod-qa-omsfeed-service",
+        "oms-omnipod-qa-omsinventoryfeed-service",
+        "oms-omnipod-qa-taskprocessor-service",
+        "oms-omnipod-qa-taskscheduler-service",
+        "oms-omnipod-qa-inventoryfacade-service"
+      ],
+      "queuesPerVhost": [
+        "export_requested",
+        "inventory_requested",
+        "taskprocessing_requested",
+        "taskprocessing_status",
+        "eom_atp_service_queue",
+        "eom_inventory_service_queue"
+      ],
+      "exchange": "main_exchange"
+    }
+  }
+}

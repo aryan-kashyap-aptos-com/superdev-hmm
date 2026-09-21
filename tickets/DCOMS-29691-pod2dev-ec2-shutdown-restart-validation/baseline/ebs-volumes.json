@@ -1,0 +1,386 @@
+﻿[
+    {
+        "VolumeId": "vol-036df55287aed2f5d",
+        "InstanceId": "i-036505377f8ad5c6e",
+        "Device": "xvdb",
+        "Size": 15,
+        "Type": "gp3",
+        "Encrypted": false,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-01d86048397a90eff",
+        "DeleteOnTermination": false,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-sm-vol"
+            },
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-03341ce8c9fc14062",
+        "InstanceId": "i-0b489a48f31463d74",
+        "Device": "/dev/xvda",
+        "Size": 30,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-0c8cb623e808c9170",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-03071157f55d7b2a3",
+        "InstanceId": "i-0f2a63e597d421e39",
+        "Device": "/dev/sda1",
+        "Size": 8,
+        "Type": "gp2",
+        "Encrypted": false,
+        "State": "in-use",
+        "Iops": 100,
+        "SnapshotId": "snap-0cca891854a3d1d9c",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-0d2408140250101a4",
+        "InstanceId": "i-0d23caf16cd2c5adb",
+        "Device": "/dev/sdf",
+        "Size": 300,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-cnt-vol"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-0b2b74ad65de066af",
+        "InstanceId": "i-0f603ed7f8f947bd7",
+        "Device": "/dev/sda1",
+        "Size": 75,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-057c58123af7de496",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            },
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-svc-vol"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-0ad3fa80da32ec704",
+        "InstanceId": "i-036505377f8ad5c6e",
+        "Device": "/dev/sda1",
+        "Size": 75,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-057c58123af7de496",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            },
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-sm-vol"
+            },
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-0b033fbff09962da1",
+        "InstanceId": "i-0f603ed7f8f947bd7",
+        "Device": "xvdb",
+        "Size": 15,
+        "Type": "gp3",
+        "Encrypted": false,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-01d86048397a90eff",
+        "DeleteOnTermination": false,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-svc-vol"
+            },
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            },
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            }
+        ]
+    },
+    {
+        "VolumeId": "vol-0374e50cbcb16a4ad",
+        "InstanceId": "i-0aee83fe4726581e4",
+        "Device": "/dev/sda1",
+        "Size": 75,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-05c7e93171f31031e",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": null
+    },
+    {
+        "VolumeId": "vol-0c8c39f6df69cea36",
+        "InstanceId": "i-02b70bcb094c2dcec",
+        "Device": "/dev/sda1",
+        "Size": 75,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-057c58123af7de496",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": null
+    },
+    {
+        "VolumeId": "vol-0993ef4ee1488e021",
+        "InstanceId": "i-02b70bcb094c2dcec",
+        "Device": "xvdb",
+        "Size": 15,
+        "Type": "gp3",
+        "Encrypted": false,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-01d86048397a90eff",
+        "DeleteOnTermination": false,
+        "AZ": "us-east-1d",
+        "Tags": null
+    },
+    {
+        "VolumeId": "vol-0f5131178f53fb54b",
+        "InstanceId": "i-0aee83fe4726581e4",
+        "Device": "/dev/sdb",
+        "Size": 100,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": null
+    },
+    {
+        "VolumeId": "vol-04a0fda61dad784eb",
+        "InstanceId": "i-0d23caf16cd2c5adb",
+        "Device": "/dev/sda1",
+        "Size": 75,
+        "Type": "gp3",
+        "Encrypted": true,
+        "State": "in-use",
+        "Iops": 3000,
+        "SnapshotId": "snap-014c37bbde8e37158",
+        "DeleteOnTermination": true,
+        "AZ": "us-east-1d",
+        "Tags": [
+            {
+                "Key": "Department",
+                "Value": "ops"
+            },
+            {
+                "Key": "Terraform",
+                "Value": "true"
+            },
+            {
+                "Key": "Name",
+                "Value": "oms-pod2-dev-cnt-vol"
+            },
+            {
+                "Key": "Environment",
+                "Value": "dev"
+            },
+            {
+                "Key": "cat_environment",
+                "Value": "oms_pod2_dev"
+            },
+            {
+                "Key": "business_division",
+                "Value": "oms"
+            },
+            {
+                "Key": "Space",
+                "Value": "pod2"
+            }
+        ]
+    }
+]

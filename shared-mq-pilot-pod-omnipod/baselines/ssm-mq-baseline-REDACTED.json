@@ -1,0 +1,42 @@
+[
+  {
+    "ssmPrefix": "/oms/pod/dev/aws-mq-broker",
+    "space": "pod",
+    "environment": "dev",
+    "ecsCluster": "oms-pod-dev-ecs-cluster",
+    "standaloneBroker": "oms-pod-dev-mq-broker",
+    "parameters": {
+      "endpoint": "b-e93a05aa-377d-441c-8e35-5b862ff6b9cd.mq.us-east-1.on.aws",
+      "virtualhost": "/",
+      "applicationusername": "admin",
+      "applicationpassword": "REDACTED_SEE_ssm-mq-baseline-20260905.json",
+      "adminusername": "admin",
+      "adminpassword": "REDACTED_SEE_ssm-mq-baseline-20260905.json",
+      "port": "5671",
+      "scheme": "amqps",
+      "sslenabled": "true",
+      "sslprotocols": "None",
+      "webconsole-endpoint": "https://b-e93a05aa-377d-441c-8e35-5b862ff6b9cd.mq.us-east-1.on.aws"
+    }
+  },
+  {
+    "ssmPrefix": "/oms/omnipod/qa/aws-mq-broker",
+    "space": "omnipod",
+    "environment": "qa",
+    "ecsCluster": "oms-omnipod-qa-ecs-cluster",
+    "standaloneBroker": "oms-omnipod-qa-mq-broker",
+    "parameters": {
+      "endpoint": "b-aa4f9294-525c-4c56-bdec-16dc30e652ee.mq.us-east-1.on.aws",
+      "virtualhost": "/",
+      "applicationusername": "admin",
+      "applicationpassword": "REDACTED_SEE_ssm-mq-baseline-20260905.json",
+      "adminusername": "admin",
+      "adminpassword": "REDACTED_SEE_ssm-mq-baseline-20260905.json",
+      "port": "5671",
+      "scheme": "amqps",
+      "sslenabled": "true",
+      "sslprotocols": "None",
+      "webconsole-endpoint": "https://b-aa4f9294-525c-4c56-bdec-16dc30e652ee.mq.us-east-1.on.aws"
+    }
+  }
+]

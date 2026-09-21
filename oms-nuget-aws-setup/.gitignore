@@ -1,0 +1,5 @@
+# Never commit real AWS keys. Keep secrets only in NugetAWS.env (local copy).
+NugetAWS.env
+
+# Downloaded tooling
+tools/nuget.exe

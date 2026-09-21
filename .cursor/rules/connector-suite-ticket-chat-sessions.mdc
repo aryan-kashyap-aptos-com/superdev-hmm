@@ -1,0 +1,52 @@
+---
+description: Every ConnectorSuite chat must create or update a folder under tickets/ with README session notes
+alwaysApply: true
+---
+
+# ConnectorSuite ticket and chat session folders
+
+**Mandatory at the start of every chat** in ConnectorSuite: pick or create **one flat folder** under `tickets/` and keep its docs current. **No date subfolders.**
+
+## One folder per topic (flat)
+
+| Chat type | Folder (single level under `tickets/`) |
+|-----------|----------------------------------------|
+| **Jira ticket** | Reuse existing workspace if present (e.g. `tickets/DCOMS-29691-pod2dev-ec2-shutdown-restart-validation/`). Otherwise `tickets/<TICKET-KEY> - <short-kebab-summary>/` |
+| **Non-ticket** | `tickets/RANDOM/<task-kebab-summary>/` |
+
+Dates belong **in file content**, not in the directory tree.
+
+## Two files (simple split)
+
+| File | Purpose |
+|------|---------|
+| **`README.md`** | Stable overview: intent, status, links, artifacts, decisions, open questions. Update when those change. |
+| **`CHAT-LOG.md`** | Append-only trail of chats. **New chat = new top section** (newest first). |
+
+If a ticket workspace already has a rich `README.md` (epic docs), add **`CHAT-LOG.md`** beside it for Cursor sessions; do not duplicate the epic README.
+
+### CHAT-LOG.md section template (per chat)
+
+```markdown
+## 2026-09-19 — <one-line title>
+
+**Status when closed:** done | in progress | blocked | parked
+
+- What we did (bullets)
+- Files touched (paths)
+```
+
+Rename `RANDOM/...` folders when a better title is obvious; note renames at the top of `README.md` under **Previous names**.
+
+## When to create vs reuse
+
+- **First turn, new chat:** create the folder only if none exists for that ticket/topic; always add a new `CHAT-LOG.md` section for **this** chat.
+- **Same chat:** keep editing the same `CHAT-LOG.md` section (do not add a second section for the same conversation).
+
+## Durable work
+
+Scripts, runbooks, and ticket docs stay in the ticket workspace. Reference them from `CHAT-LOG.md`; do not bury runbooks inside chat-only folders.
+
+## Path hygiene
+
+After moving or renaming under `tickets/`, search ConnectorSuite for old paths and fix `AGENTS.md`, runbooks, and absolute `C:\PROD\ConnectorSuite\...` references.

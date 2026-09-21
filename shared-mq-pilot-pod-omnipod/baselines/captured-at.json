@@ -1,0 +1,40 @@
+{
+  "capturedAtUtc": "2026-09-04T20:15:00Z",
+  "capturedAtLocal": "2026-09-05T01:45:00+05:30",
+  "awsAccountId": "268173716021",
+  "awsRegion": "us-east-1",
+  "initiative": "shared-amq-pilot-pod-dev-omnipod-qa",
+  "pilotEnvironments": [
+    "pod/dev",
+    "omnipod/qa"
+  ],
+  "sharedBroker": {
+    "name": "oms-shared-dev-mq-broker",
+    "brokerId": "b-5d413804-aec7-4af1-9a26-1de2f913f107",
+    "endpointHost": "b-5d413804-aec7-4af1-9a26-1de2f913f107.mq.us-east-1.on.aws",
+    "instanceType": "mq.t3.micro",
+    "resizePlanned": false,
+    "vpcId": "vpc-0d5b8d7062341f295",
+    "webConsole": "https://b-5d413804-aec7-4af1-9a26-1de2f913f107.mq.us-east-1.on.aws"
+  },
+  "standaloneBrokersKeptForRollback": {
+    "pod/dev": {
+      "name": "oms-pod-dev-mq-broker",
+      "brokerId": "b-e93a05aa-377d-441c-8e35-5b862ff6b9cd",
+      "endpointHost": "b-e93a05aa-377d-441c-8e35-5b862ff6b9cd.mq.us-east-1.on.aws",
+      "instanceType": "mq.m7g.medium"
+    },
+    "omnipod/qa": {
+      "name": "oms-omnipod-qa-mq-broker",
+      "brokerId": "b-aa4f9294-525c-4c56-bdec-16dc30e652ee",
+      "endpointHost": "b-aa4f9294-525c-4c56-bdec-16dc30e652ee.mq.us-east-1.on.aws",
+      "instanceType": "mq.m7g.medium"
+    }
+  },
+  "baselineFiles": {
+    "ssmFull": "baselines/ssm-mq-baseline-20260905.json",
+    "ssmRedacted": "baselines/ssm-mq-baseline-REDACTED.json",
+    "ecsServices": "baselines/ecs-mq-services-baseline.json",
+    "allBrokers": "baselines/amazon-mq-brokers-list.json"
+  }
+}

@@ -1,0 +1,6 @@
+# Baseline exports contain MQ credentials (SSM SecureStrings decrypted).
+baselines/ssm-mq-baseline-*.json
+!baselines/ssm-mq-baseline-REDACTED.json
+baselines/pilot-app-credentials.json
+.aws-temp-credentials
+baselines/temp-mq-provision-output.json

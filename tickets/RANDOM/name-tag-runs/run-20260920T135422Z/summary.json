@@ -1,0 +1,26 @@
+{
+  "generated_at": "20260920T135422Z",
+  "dry_run": true,
+  "regions": [
+    "us-east-1"
+  ],
+  "workers": 10,
+  "scan": {
+    "total": 20551,
+    "already_had_Name": 20482,
+    "missing_Name": 69,
+    "by_type_missing": {
+      "cloudformation:stack": 22,
+      "cloudwatch:alarm": 1,
+      "apigateway:apis": 36,
+      "ec2:security-group": 1,
+      "events:rule": 9
+    }
+  },
+  "apply": {
+    "applied": 0,
+    "would_apply": 69,
+    "failed": 0
+  },
+  "run_dir": "c:\\PROD\\ConnectorSuite\\tickets\\RANDOM\\name-tag-runs\\run-20260920T135422Z"
+}

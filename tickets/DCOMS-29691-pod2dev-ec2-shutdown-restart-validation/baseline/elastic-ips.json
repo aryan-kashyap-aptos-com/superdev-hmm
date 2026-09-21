@@ -1,0 +1,45 @@
+﻿{
+    "Addresses": [
+        {
+            "AllocationId": "eipalloc-00ee486adc3c12aae",
+            "AssociationId": "eipassoc-0437a941347bf50c4",
+            "Domain": "vpc",
+            "NetworkInterfaceId": "eni-0ad9048d05af410a3",
+            "NetworkInterfaceOwnerId": "268173716021",
+            "PrivateIpAddress": "20.115.111.201",
+            "Tags": [
+                {
+                    "Key": "cat_environment",
+                    "Value": "oms_pod2_dev"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "oms-pod2-dev"
+                },
+                {
+                    "Key": "Terraform",
+                    "Value": "true"
+                },
+                {
+                    "Key": "Space",
+                    "Value": "pod2"
+                },
+                {
+                    "Key": "business_division",
+                    "Value": "oms"
+                },
+                {
+                    "Key": "Department",
+                    "Value": "ops"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "dev"
+                }
+            ],
+            "PublicIpv4Pool": "amazon",
+            "NetworkBorderGroup": "us-east-1",
+            "PublicIp": "54.164.148.105"
+        }
+    ]
+}

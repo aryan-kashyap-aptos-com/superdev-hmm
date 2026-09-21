@@ -1,0 +1,1 @@
+_sourceCategory=DCOMS/API/PROD/* | where _raw matches /JML/i | count by _sourceCategory

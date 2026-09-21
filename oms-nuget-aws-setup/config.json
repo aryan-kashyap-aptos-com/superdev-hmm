@@ -1,0 +1,20 @@
+{
+  "omsRepoPath": "c:\\oms",
+  "solutionFile": "DCEOM.All.sln",
+  "packagesDirectory": "packages",
+  "codeArtifact": {
+    "domain": "aptos-oms",
+    "domainOwner": "767398067331",
+    "repository": "aptos-oms-nuget",
+    "region": "us-east-1",
+    "feedUrl": "https://aptos-oms-767398067331.d.codeartifact.us-east-1.amazonaws.com/nuget/aptos-oms-nuget/v3/index.json"
+  },
+  "odxBuildProjects": [
+    "DCEOM.DataAccess\\DCEOM.DataAccess.csproj",
+    "DCEOM.Services\\DCEOM.Services.csproj",
+    "DCEOM.WebApi\\DCEOM.WebApi.csproj",
+    "DCEOM.WebApi.UnitTests\\DCEOM.WebApi.UnitTests.csproj",
+    "DCEOM.Services.UnitTests\\DCEOM.Services.UnitTests.csproj",
+    "ShopVisible.Services.Shipping\\ShopVisible.Services.Shipping.csproj"
+  ]
+}

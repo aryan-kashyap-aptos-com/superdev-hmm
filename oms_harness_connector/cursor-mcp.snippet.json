@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "harness": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "C:\\PROD\\ConnectorSuite\\oms_harness_connector\\run-harness-mcp.js"
+      ],
+      "env": {
+        "PATH": "C:\\Program Files\\nodejs"
+      }
+    }
+  }
+}
