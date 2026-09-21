@@ -1,30 +1,31 @@
 # OMS Engine
 
-Desktop UI (**OMS Engine**) to check and control **Toronado** Windows services and **Site Manager** IIS on shared and standalone OMS stacks via **AWS SSM**, plus **log tails**, **remote file browse/download**, and optional **live sync** polling.
+Desktop UI (**OMS Engine**) to check and control **Toronado** Windows services and **Site Manager** IIS on shared and standalone OMS stacks via **AWS SSM**, plus **log tails**, **remote file browse/download**, **Parameter Store** editing, and optional **live sync** polling.
 
 UI reference mockup (HTML): [docs/oms-engine-ui-reference.html](./docs/oms-engine-ui-reference.html).
 
-### SFTP (large files)
+### Files and logs
 
-- **SFTP** tab: hosts come from `inventory.json` per stack (shared dev + pod2 configured).
-- Set `OMS_SFTP_USER` / `OMS_SFTP_PASSWORD` in `.env`, or use **Connect SFTP** (prompt; session only, not saved in repo).
-- **SM path from IIS site** maps `\\dev\\{env}\\sm` → `/dev/{env}/sm` on SFTP.
-- **Files (SSM)** tab: small files inline (≤8 MB); larger files download in 1 MB chunks with a progress bar.
+- **Files** tab: browse on content / Site Manager / Toronado hosts. **View full file** loads the entire file (chunked SSM for large files, no tail trimming). **Download** saves to `%USERPROFILE%\Downloads\OMS Engine\`.
+- **Logs** tab: ShopLogic tails on the **content** server (1,500 lines), Toronado service logs (1,500 lines), CloudWatch API groups with selectable scan window.
 
 ### How OMS environments are detected
 
-There is **no fixed env list** in the app. On each refresh, rows from `Get-Service` / `Get-Website` are classified using heuristics in `env_detection.py` (Toro `OMS-*-{env}-{slot}` names, IIS `\\dev\\{env}\\` paths, `-sm` / `-shoplogic` site suffixes). Use **Detection rules** in the title bar for the full explanation. New regression or pod tenants appear automatically when IIS/Toro lists them.
+There is **no fixed env list** in the app. On each refresh, rows from `Get-Service` / `Get-Website` are classified using heuristics in `env_detection.py`. Use **Detection** in the title bar for the full explanation. **Tenant sites** on IIS filters to classified OMS tenant sites (not shared infrastructure).
 
-**Log architecture and SFTP vs SSM:** see [LOGS-INTEGRATION.md](./LOGS-INTEGRATION.md).
+**Log architecture:** see [LOGS-INTEGRATION.md](./LOGS-INTEGRATION.md).
 
 ## What to call the servers
 
 | You say | AWS Name tag | Role |
 |---------|----------------|------|
-| **Shared Toro server** | `eom-core-shared-dev-toronado` | Many `OMS-JobManager-*` / `OMS-JobProcessor-*` (regression*, poddev, omnipod*, …) |
-| **Shared Site Manager** | `eom-core-shared-dev-sitemanager` | IIS — recycle app pool / restart site |
+| **Shared Toro server** | `eom-core-shared-dev-toronado` | Many `OMS-JobManager-*` / `OMS-JobProcessor-*` |
+| **Shared Site Manager** | `eom-core-shared-dev-sitemanager` | IIS - recycle app pool / restart site |
+| **Shared content** | `eom-core-shared-dev-cont` | UNC site files, ShopLogic logs |
 | **Pod2 Toro** | `oms-pod2-dev-toronado` | Standalone pod2-dev |
 | **Pod2 Site Manager** | `oms-pod2-dev-sitemanager` | IIS for pod2-dev |
+
+Sidebar also shows **bastion public IP** when configured in `inventory.json`.
 
 See [../oms-infra-knowledge/toronado-hosts.md](../oms-infra-knowledge/toronado-hosts.md) for the full map.
 
@@ -46,33 +47,25 @@ Double-click **`run_gui.bat`** or:
 python app.py
 ```
 
-On open, the app **refreshes status** for the selected stack:
-
-1. **Hosts** table - role, name tag, instance ID, private IP, **S/N** (BIOS serial via SSM), SSM status  
-2. **Toronado** - all `OMS-*` services with readable **Running / Stopped / Start pending** (not numeric codes)  
-3. **Site Manager (IIS)** - sites, pools, **physical path** (for ShopLogic logs)  
-4. **Logs** - tail ShopLogic on SM, latest Toro `.log`, or CloudWatch **SHOPLOGICAPI** groups  
-
-Actions ask for confirmation before start / stop / restart / recycle.
-
 ## Refresh instance IDs after ASG replace
 
 ```powershell
 python refresh_inventory.py
 ```
 
-Or use **Refresh EC2 IDs from AWS** in the GUI.
+Or open **Detection** and use **Refresh instance IDs from AWS**.
 
 ## Stacks in `inventory.json`
 
-- **EOM Core Shared Dev** — multi-tenant Toro + SM  
-- **OMS Pod2 Dev** — standalone  
-- **EOM Core Perf15 QA** — standalone perf15  
+- **EOM Core Shared Dev** - multi-tenant Toro + SM + content  
+- **OMS Pod2 Dev** - standalone  
+- **EOM Core Perf15 QA** - standalone perf15  
 
-Edit `inventory.json` to add stacks or hosts (e.g. `api`, `services`).
+Edit `inventory.json` to add stacks, hosts, bastion, or `ssm_parameter_prefix`.
 
 ## Safety
 
-- On **shared Toro**, restart **one** service at a time (e.g. `OMS-JobProcessor-regression202510qa-26`). Do not kill all `JobProcessor` processes globally.  
-- IIS recycle affects the selected site’s app pool only.  
+- On **shared Toro**, restart **one** service at a time. Do not kill all `JobProcessor` processes globally.  
+- IIS recycle affects the selected site's app pool only.  
+- Parameter Store saves overwrite values in AWS; confirm before changing production parameters.  
 - Requires SSM **Online** on the instance (`AmazonSSMManagedInstanceCore`).

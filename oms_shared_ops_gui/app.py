@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OMS Engine — shared Toro / IIS operations console."""
+"""OMS Engine - shared Toro / IIS operations console."""
 
 from __future__ import annotations
 
@@ -17,7 +17,13 @@ from tkinter import filedialog, messagebox, scrolledtext, simpledialog, ttk
 import tkinter as tk
 from typing import Any, Callable
 
-from cloudwatch_logs import list_shoplogic_api_log_groups, preload_log_groups_background, tail_log_group
+from cloudwatch_logs import (
+    SCAN_WINDOW_CHOICES,
+    list_shoplogic_api_log_groups,
+    preload_log_groups_background,
+    tail_log_group,
+)
+from parameter_store import ParameterRow, create_parameter, list_parameters_under_path, put_parameter
 from display_utils import (
     format_file_size,
     format_remote_timestamp,
@@ -29,8 +35,6 @@ from display_utils import (
 from env_detection import classify_iis_site, classify_toro_service, detection_rules_markdown
 from inventory_io import INVENTORY_PATH, load_inventory, refresh_from_aws
 from path_candidates import content_server_path_from_unc, shoplogic_path_candidates
-from sftp_client import SftpSession, resolve_credentials
-from sftp_paths import sftp_path_for_iis_site
 from ssm_runner import (
     PS_HOST_META,
     PS_LIST_IIS,
@@ -42,7 +46,6 @@ from ssm_runner import (
     ps_list_directory,
     ps_read_file_base64,
     ps_read_file_chunk_base64,
-    ps_tail_text_file,
     ps_service_action,
     ps_service_status,
     ps_tail_shoplogic_debug_bases,
@@ -63,6 +66,14 @@ def ensure_ssm_ok(result: dict[str, str]) -> None:
 SSM_CHUNK_BYTES = 1_048_576
 SSM_INLINE_MAX = 8_388_608
 DIR_CACHE_TTL_SECONDS = 45
+LOG_TAIL_LINES = 1500
+
+
+def _downloads_folder() -> str:
+    home = os.environ.get("USERPROFILE") or os.path.expanduser("~")
+    path = os.path.join(home, "Downloads", "OMS Engine")
+    os.makedirs(path, exist_ok=True)
+    return path
 
 
 def _parse_list_directory_payload(raw: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -118,10 +129,9 @@ class OmsEngineApp(tk.Tk):
         self._file_host_role = tk.StringVar(value="content")
         self._live_after_id: str | None = None
         self._host_cards: list[tk.Frame] = []
-        self._sftp = SftpSession("")
-        self._sftp_path = tk.StringVar(value="/dev")
-        self._sftp_cred_user: str | None = None
-        self._sftp_cred_pass: str | None = None
+        self._param_path_var = tk.StringVar(value="/")
+        self._param_rows: list[ParameterRow] = []
+        self._cw_window_var = tk.StringVar(value="Last 24 hours")
         self._xfer_visible = False
         self._busy_jobs = 0
         self._dir_cache: dict[tuple[str, str], tuple[float, dict[str, Any], list[dict[str, Any]]]] = {}
@@ -131,6 +141,7 @@ class OmsEngineApp(tk.Tk):
         self._apply_theme()
         if self._stacks:
             self._stack_var.set(self._stacks[0].label)
+            self._param_path_var.set(self._stacks[0].ssm_parameter_prefix)
         self.after(100, self._refresh_all)
         self._cw_group_var.set("Loading CloudWatch groups...")
         preload_log_groups_background(self._on_cw_groups_preloaded)
@@ -184,7 +195,7 @@ class OmsEngineApp(tk.Tk):
             getattr(self, "_toro_tree", None),
             getattr(self, "_iis_tree", None),
             getattr(self, "_file_tree", None),
-            getattr(self, "_sftp_tree", None),
+            getattr(self, "_param_tree", None),
         ):
             if tree is None:
                 continue
@@ -313,8 +324,14 @@ class OmsEngineApp(tk.Tk):
             width=52,
         )
         stack_combo.pack(side=tk.LEFT, padx=(0, 10), pady=6)
-        stack_combo.bind("<<ComboboxSelected>>", lambda _: self._refresh_all())
-        self._hosts_pill = tk.Label(stack_frame, text="— hosts", bg=p.navy_2, fg=p.teal, font=(p.mono, 9))
+        def on_stack_change(_event=None) -> None:
+            stack = self._current_stack()
+            if stack:
+                self._param_path_var.set(stack.ssm_parameter_prefix)
+            self._refresh_all()
+
+        stack_combo.bind("<<ComboboxSelected>>", on_stack_change)
+        self._hosts_pill = tk.Label(stack_frame, text="- hosts", bg=p.navy_2, fg=p.teal, font=(p.mono, 9))
         self._hosts_pill.pack(side=tk.LEFT, padx=8)
 
         tb_right = tk.Frame(self._title_bar, bg=p.navy)
@@ -324,7 +341,6 @@ class OmsEngineApp(tk.Tk):
         self._title_btn(tb_right, "Theme", self._toggle_theme).pack(side=tk.LEFT, padx=3)
         self._title_btn(tb_right, "Detection", self._show_detection_rules).pack(side=tk.LEFT, padx=3)
         self._title_btn(tb_right, "Refresh", self._refresh_all, accent=True).pack(side=tk.LEFT, padx=3)
-        self._title_btn(tb_right, "EC2 IDs", self._refresh_inventory).pack(side=tk.LEFT, padx=3)
 
         self._body_paned = ttk.Panedwindow(self, orient=tk.HORIZONTAL)
         self._body_paned.pack(fill=tk.BOTH, expand=True)
@@ -342,11 +358,11 @@ class OmsEngineApp(tk.Tk):
         tk.Label(
             self._summary_card, text="STACK HEALTH", bg=p.sub, fg=p.ink_muted, font=(p.ui, 8, "bold")
         ).pack(anchor=tk.W, padx=12, pady=(10, 6))
-        self._sum_svc = tk.Label(self._summary_card, text="Services —", bg=p.sub, fg=p.ink, font=(p.ui, 10))
+        self._sum_svc = tk.Label(self._summary_card, text="Services -", bg=p.sub, fg=p.ink, font=(p.ui, 10))
         self._sum_svc.pack(anchor=tk.W, padx=12, pady=2)
-        self._sum_iis = tk.Label(self._summary_card, text="IIS sites —", bg=p.sub, fg=p.ink, font=(p.ui, 10))
+        self._sum_iis = tk.Label(self._summary_card, text="IIS sites -", bg=p.sub, fg=p.ink, font=(p.ui, 10))
         self._sum_iis.pack(anchor=tk.W, padx=12, pady=2)
-        self._sum_env = tk.Label(self._summary_card, text="Environments —", bg=p.sub, fg=p.ink, font=(p.ui, 10))
+        self._sum_env = tk.Label(self._summary_card, text="Environments -", bg=p.sub, fg=p.ink, font=(p.ui, 10))
         self._sum_env.pack(anchor=tk.W, padx=12, pady=2)
         self._health_bar = tk.Canvas(self._summary_card, height=8, bg=p.line, highlightthickness=0)
         self._health_bar.pack(fill=tk.X, padx=12, pady=(8, 12))
@@ -379,9 +395,9 @@ class OmsEngineApp(tk.Tk):
         notebook.add(files_tab, text="Files")
         self._build_files_tab(files_tab)
 
-        sftp_tab = ttk.Frame(notebook, padding=(12, 8))
-        notebook.add(sftp_tab, text="SFTP")
-        self._build_sftp_tab(sftp_tab)
+        param_tab = ttk.Frame(notebook, padding=(12, 8))
+        notebook.add(param_tab, text="Parameter Store")
+        self._build_parameter_tab(param_tab)
 
         dock = ttk.Frame(self, padding=(0, 0))
         dock.pack(fill=tk.X)
@@ -425,18 +441,27 @@ class OmsEngineApp(tk.Tk):
         ent.bind("<KeyRelease>", lambda _: self._render_iis_tree())
         seg = ttk.Frame(row)
         seg.pack(side=tk.LEFT, padx=12)
-        for val, label in [("all", "All"), ("started", "Started"), ("stopped", "Stopped"), ("oms", "OMS only")]:
-            ttk.Radiobutton(seg, text=label, value=val, variable=self._iis_seg, command=self._render_iis_tree).pack(
-                side=tk.LEFT, padx=4
+        for val, label in [("all", "All"), ("started", "Started"), ("stopped", "Stopped"), ("oms", "Tenant sites")]:
+            rb = ttk.Radiobutton(
+                seg, text=label, value=val, variable=self._iis_seg, command=self._render_iis_tree
             )
-        for label, action in [
-            ("Recycle pool", None),
-            ("Start", "start"),
-            ("Stop", "stop"),
-            ("Restart", "restart"),
-        ]:
-            cmd = self._iis_recycle_pool if action is None else (lambda a=action: self._iis_site(a))
-            ttk.Button(row, text=label, command=cmd).pack(side=tk.RIGHT, padx=3)
+            rb.pack(side=tk.LEFT, padx=4)
+            if val == "oms":
+                ToolTip(
+                    rb,
+                    "Show only IIS sites classified as OMS tenant sites\n"
+                    "(not shared infrastructure like shared-dev-sitemanager).",
+                )
+        act = ttk.Frame(row)
+        act.pack(side=tk.RIGHT)
+        self._iis_btn_stop = ttk.Button(act, text="Stop site", command=lambda: self._iis_site("stop"))
+        self._iis_btn_stop.pack(side=tk.LEFT, padx=3)
+        self._iis_btn_start = ttk.Button(act, text="Start site", command=lambda: self._iis_site("start"))
+        self._iis_btn_start.pack(side=tk.LEFT, padx=3)
+        ttk.Button(act, text="Restart site", command=lambda: self._iis_site("restart")).pack(side=tk.LEFT, padx=3)
+        ttk.Button(act, text="Recycle pool", command=self._iis_recycle_pool).pack(side=tk.LEFT, padx=3)
+        self._iis_action_hint = ttk.Label(row, text="", style="Muted.TLabel")
+        self._iis_action_hint.pack(side=tk.RIGHT, padx=(0, 12))
 
         iis_cols = ("site", "environment", "site_state", "app_pool", "pool_state", "physical_path")
         self._iis_tree = ttk.Treeview(parent, columns=iis_cols, show="headings", height=18)
@@ -450,23 +475,26 @@ class OmsEngineApp(tk.Tk):
         self._iis_tree.column("pool_state", width=80)
         self._iis_tree.column("physical_path", width=320)
         self._iis_tree.pack(fill=tk.BOTH, expand=True, pady=(8, 0))
+        self._iis_tree.bind("<<TreeviewSelect>>", lambda _: self._update_iis_action_hint())
 
     def _build_logs_tab(self, parent: ttk.Frame) -> None:
         ttk.Label(
             parent,
-            text="Tail opens in a separate window so Toro / IIS tables keep the screen.",
+            text=f"Tails open in a separate window ({LOG_TAIL_LINES} lines for Toro and ShopLogic). "
+            "ShopLogic always tails on the content server.",
             style="Muted.TLabel",
+            wraplength=900,
         ).pack(anchor=tk.W, pady=(0, 10))
 
-        sm_row = ttk.LabelFrame(parent, text="Site Manager — ShopLogic", padding=10)
+        sm_row = ttk.LabelFrame(parent, text="ShopLogic (content server)", padding=10)
         sm_row.pack(fill=tk.X, pady=(0, 8))
-        self._log_site_var = tk.StringVar()
-        r1 = ttk.Frame(sm_row)
-        r1.pack(fill=tk.X)
-        ttk.Label(r1, text="IIS site").pack(side=tk.LEFT)
-        self._log_site_combo = ttk.Combobox(r1, textvariable=self._log_site_var, width=52, state="readonly")
-        self._log_site_combo.pack(side=tk.LEFT, padx=8, fill=tk.X, expand=True)
-        ttk.Button(r1, text="Tail ShopLogic log", command=self._tail_sm_log).pack(side=tk.RIGHT)
+        ttk.Label(
+            sm_row,
+            text="Select an IIS site on the Site Manager tab, then tail ShopLogic.debug on the content host.",
+            style="Muted.TLabel",
+            wraplength=880,
+        ).pack(anchor=tk.W, pady=(0, 6))
+        ttk.Button(sm_row, text="Tail ShopLogic log", command=self._tail_sm_log).pack(anchor=tk.W)
 
         toro_row = ttk.LabelFrame(parent, text="Toronado", padding=10)
         toro_row.pack(fill=tk.X, pady=(0, 8))
@@ -475,14 +503,22 @@ class OmsEngineApp(tk.Tk):
         )
         ttk.Button(toro_row, text="Tail latest .log", command=self._tail_toro_log).pack(anchor=tk.W)
 
-        api_row = ttk.LabelFrame(parent, text="API — CloudWatch", padding=10)
+        api_row = ttk.LabelFrame(parent, text="API CloudWatch", padding=10)
         api_row.pack(fill=tk.X)
         self._cw_group_var = tk.StringVar()
         r3 = ttk.Frame(api_row)
         r3.pack(fill=tk.X)
         ttk.Button(r3, text="Refresh groups", command=self._refresh_cw_groups).pack(side=tk.LEFT)
-        self._cw_combo = ttk.Combobox(r3, textvariable=self._cw_group_var, width=58, state="readonly")
+        self._cw_combo = ttk.Combobox(r3, textvariable=self._cw_group_var, width=48, state="readonly")
         self._cw_combo.pack(side=tk.LEFT, padx=8, fill=tk.X, expand=True)
+        ttk.Label(r3, text="Scan").pack(side=tk.LEFT, padx=(8, 4))
+        ttk.Combobox(
+            r3,
+            textvariable=self._cw_window_var,
+            values=list(SCAN_WINDOW_CHOICES.keys()),
+            state="readonly",
+            width=16,
+        ).pack(side=tk.LEFT)
         ttk.Button(r3, text="Tail events", command=self._tail_cw_log).pack(side=tk.RIGHT)
 
     def _build_files_tab(self, parent: ttk.Frame) -> None:
@@ -495,7 +531,7 @@ class OmsEngineApp(tk.Tk):
         ).pack(anchor=tk.W)
         self._file_server_label = tk.Label(
             parent,
-            text="Server time: — (open a folder to load)",
+            text="Server time: - (open a folder to load)",
             bg=p.panel,
             fg=p.ink_muted,
             font=(p.mono, 9),
@@ -520,7 +556,7 @@ class OmsEngineApp(tk.Tk):
         ttk.Button(bar, text="Open", command=lambda: self._file_list_dir(force=True)).pack(side=tk.LEFT, padx=3)
         ttk.Button(bar, text="Up", command=self._file_go_up).pack(side=tk.LEFT, padx=3)
         ttk.Button(bar, text="Site path", command=self._file_use_site_path).pack(side=tk.LEFT, padx=3)
-        ttk.Button(bar, text="View / tail", command=self._file_view).pack(side=tk.RIGHT, padx=3)
+        ttk.Button(bar, text="View full file", command=self._file_view).pack(side=tk.RIGHT, padx=3)
         ttk.Button(bar, text="Open on PC", command=self._file_open_locally).pack(side=tk.RIGHT, padx=3)
         ttk.Button(bar, text="Download", command=self._file_download).pack(side=tk.RIGHT, padx=3)
 
@@ -540,41 +576,46 @@ class OmsEngineApp(tk.Tk):
         self._file_tree.bind("<Double-1>", self._file_on_double_click)
         self._file_last_listed_path: str | None = None
 
-    def _build_sftp_tab(self, parent: ttk.Frame) -> None:
+    def _build_parameter_tab(self, parent: ttk.Frame) -> None:
         ttk.Label(
             parent,
-            text="SFTP mirror for large archives (ShopLogic / task logs). Credentials from .env or Connect.",
+            text="List and edit AWS SSM Parameter Store values for the current stack prefix. "
+            "Changes apply immediately in AWS when you save.",
             style="Muted.TLabel",
             wraplength=900,
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, pady=(0, 8))
         bar = ttk.Frame(parent)
-        bar.pack(fill=tk.X, pady=8)
-        self._sftp_status = ttk.Label(bar, text="Not connected", style="Muted.TLabel")
-        self._sftp_status.pack(side=tk.LEFT)
-        ttk.Button(bar, text="Connect SFTP", command=self._sftp_connect).pack(side=tk.LEFT, padx=8)
-        ttk.Button(bar, text="Disconnect", command=self._sftp_disconnect).pack(side=tk.LEFT, padx=3)
-        ttk.Button(bar, text="SM path from IIS site", command=self._sftp_use_site_path).pack(side=tk.LEFT, padx=12)
-        ttk.Button(bar, text="/dev/", command=lambda: self._sftp_goto("/dev")).pack(side=tk.LEFT)
-        ttk.Button(bar, text="/task/", command=lambda: self._sftp_goto("/task")).pack(side=tk.LEFT, padx=4)
+        bar.pack(fill=tk.X, pady=4)
+        ttk.Label(bar, text="Path prefix").pack(side=tk.LEFT)
+        ttk.Entry(bar, textvariable=self._param_path_var, width=48).pack(side=tk.LEFT, padx=8)
+        ttk.Button(bar, text="Load parameters", command=self._param_load).pack(side=tk.LEFT, padx=3)
+        ttk.Button(bar, text="New parameter", command=self._param_create_dialog).pack(side=tk.RIGHT, padx=3)
+        ttk.Button(bar, text="Save selected", command=self._param_save_selected).pack(side=tk.RIGHT, padx=3)
 
-        path_row = ttk.Frame(parent)
-        path_row.pack(fill=tk.X, pady=4)
-        ttk.Label(path_row, text="Remote path").pack(side=tk.LEFT)
-        ttk.Entry(path_row, textvariable=self._sftp_path, width=72).pack(side=tk.LEFT, padx=8, fill=tk.X, expand=True)
-        ttk.Button(path_row, text="List", command=self._sftp_list_dir).pack(side=tk.LEFT, padx=3)
-        ttk.Button(path_row, text="Up", command=self._sftp_go_up).pack(side=tk.LEFT)
-        ttk.Button(path_row, text="Download", command=self._sftp_download).pack(side=tk.RIGHT, padx=3)
+        pcols = ("name", "type", "version", "value")
+        self._param_tree = ttk.Treeview(parent, columns=pcols, show="headings", height=14)
+        self._param_tree.heading("name", text="Name")
+        self._param_tree.heading("type", text="Type")
+        self._param_tree.heading("version", text="Ver")
+        self._param_tree.heading("value", text="Value (select row to edit below)")
+        self._param_tree.column("name", width=360)
+        self._param_tree.column("type", width=80)
+        self._param_tree.column("version", width=48)
+        self._param_tree.column("value", width=420)
+        self._param_tree.pack(fill=tk.BOTH, expand=True, pady=(8, 4))
+        self._param_tree.bind("<<TreeviewSelect>>", lambda _: self._param_sync_editor_from_row())
 
-        scols = ("name", "kind", "size", "mtime")
-        self._sftp_tree = ttk.Treeview(parent, columns=scols, show="headings", height=16)
-        for col, label in zip(scols, ("Name", "Type", "Size", "Modified")):
-            self._sftp_tree.heading(col, text=label)
-        self._sftp_tree.column("name", width=360)
-        self._sftp_tree.column("kind", width=80)
-        self._sftp_tree.column("size", width=100)
-        self._sftp_tree.column("mtime", width=160)
-        self._sftp_tree.pack(fill=tk.BOTH, expand=True, pady=(8, 0))
-        self._sftp_tree.bind("<Double-1>", self._sftp_on_double_click)
+        edit = ttk.LabelFrame(parent, text="Edit value", padding=8)
+        edit.pack(fill=tk.BOTH, expand=True)
+        self._param_name_var = tk.StringVar()
+        ttk.Label(edit, text="Name").grid(row=0, column=0, sticky=tk.W)
+        ttk.Entry(edit, textvariable=self._param_name_var, width=72, state="readonly").grid(
+            row=0, column=1, sticky=tk.EW, padx=8, pady=2
+        )
+        self._param_value_box = scrolledtext.ScrolledText(edit, height=6, font=("Consolas", 10), wrap=tk.WORD)
+        self._param_value_box.grid(row=1, column=0, columnspan=2, sticky=tk.NSEW, pady=6)
+        edit.columnconfigure(1, weight=1)
+        edit.rowconfigure(1, weight=1)
 
     def _build_transfer_bar(self) -> None:
         self._xfer_frame = ttk.Frame(self, padding=(12, 4))
@@ -599,7 +640,7 @@ class OmsEngineApp(tk.Tk):
             self._xfer_bar["value"] = done
         text = f"{done:,} / {total:,} bytes" if total else f"{done:,} bytes"
         if suffix:
-            text = f"{suffix} — {text}"
+            text = f"{suffix} | {text}"
         self._xfer_label.config(text=text)
 
     def _hide_transfer(self) -> None:
@@ -612,11 +653,15 @@ class OmsEngineApp(tk.Tk):
     def _show_detection_rules(self) -> None:
         win = tk.Toplevel(self)
         win.title("OMS environment detection")
-        win.geometry("520x480")
+        win.geometry("520x520")
         text = scrolledtext.ScrolledText(win, font=("Consolas", 10), wrap=tk.WORD)
-        text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        text.pack(fill=tk.BOTH, expand=True, padx=10, pady=(10, 4))
         text.insert(tk.END, detection_rules_markdown())
         text.configure(state=tk.DISABLED)
+        btn_row = ttk.Frame(win)
+        btn_row.pack(fill=tk.X, padx=10, pady=(0, 10))
+        ttk.Button(btn_row, text="Refresh instance IDs from AWS", command=self._refresh_inventory).pack(side=tk.LEFT)
+        ttk.Button(btn_row, text="Close", command=win.destroy).pack(side=tk.RIGHT)
 
     def _activity_line(self, level: str, msg: str) -> None:
         ts = datetime.now().strftime("%H:%M:%S")
@@ -764,6 +809,25 @@ class OmsEngineApp(tk.Tk):
         for child in self._host_list.winfo_children():
             child.destroy()
         p = self._palette
+        if stack.bastion:
+            b = stack.bastion
+            card = tk.Frame(self._host_list, bg=p.panel, padx=14, pady=8)
+            card.pack(fill=tk.X)
+            tk.Frame(card, bg=p.amber, width=3).pack(side=tk.LEFT, fill=tk.Y, padx=(0, 8))
+            inner = tk.Frame(card, bg=p.panel)
+            inner.pack(side=tk.LEFT, fill=tk.X, expand=True)
+            tk.Label(inner, text=b.label, bg=p.panel, fg=p.ink, font=(p.ui, 10, "bold"), anchor=tk.W).pack(fill=tk.X)
+            ip = b.public_ip or "(no public IP in inventory)"
+            tk.Label(
+                inner,
+                text=f"{b.name_tag}\n{b.instance_id}\nBastion IP: {ip}",
+                bg=p.panel,
+                fg=p.ink_muted,
+                font=(p.mono, 8),
+                justify=tk.LEFT,
+                anchor=tk.W,
+            ).pack(fill=tk.X)
+            ToolTip(card, f"Bastion SSH jump host\n{b.name_tag}\nPublic IP: {ip}")
         for host in stack.hosts:
             ping = pings.get(host.instance_id, "?")
             card = tk.Frame(self._host_list, bg=p.panel, padx=14, pady=8)
@@ -843,9 +907,7 @@ class OmsEngineApp(tk.Tk):
         site_names = [s.get("Name", "") for s in sites]
         self.after(0, self._render_iis_tree)
         self.after(0, self._update_summary)
-        self.after(0, lambda: self._log_site_combo.configure(values=site_names))
-        if site_names:
-            self.after(0, lambda: self._log_site_var.set(site_names[0]))
+        self.after(0, self._update_iis_action_hint)
         self.after(0, lambda: self._notebook.tab(1, text=f"Site Manager ({len(sites)})"))
         return f"{len(sites)} sites"
 
@@ -892,7 +954,7 @@ class OmsEngineApp(tk.Tk):
             status = format_service_status(row.get("Status"))
             start = format_start_type(row.get("StartType"))
             det = classify_toro_service(name)
-            env = det.environment if det.is_oms else "—"
+            env = det.environment if det.is_oms else "-"
             tag = status_tag(status)
             stripe = "stripe" if len(self._toro_tree.get_children()) % 2 else ""
             tags = tuple(t for t in (tag, stripe) if t)
@@ -918,7 +980,7 @@ class OmsEngineApp(tk.Tk):
                 continue
             if filt and filt not in name.lower() and filt not in path.lower():
                 continue
-            env = det.environment if det.is_oms else "—"
+            env = det.environment if det.is_oms else "-"
             row_tag = iis_row_tag(site_state, pool_state)
             stripe = "stripe" if len(self._iis_tree.get_children()) % 2 else ""
             tags = (row_tag, stripe) if stripe else (row_tag,)
@@ -928,6 +990,7 @@ class OmsEngineApp(tk.Tk):
                 values=(name, env, site_state, pool, pool_state, path),
                 tags=tags,
             )
+        self._update_iis_action_hint()
 
     def _iis_row_iid(self, site_name: str) -> str | None:
         for iid in self._iis_tree.get_children():
@@ -1209,7 +1272,7 @@ class OmsEngineApp(tk.Tk):
         for idx, row in enumerate(rows):
             kind = "Folder" if row.get("IsDirectory") else "File"
             nbytes = int(row.get("Length") or 0)
-            size_disp = "—" if kind == "Folder" else format_file_size(nbytes)
+            size_disp = "-" if kind == "Folder" else format_file_size(nbytes)
             modified = format_remote_timestamp(row.get("LastWriteTime", ""))
             stripe = "stripe" if idx % 2 else ""
             tags = (stripe,) if stripe else ()
@@ -1296,27 +1359,81 @@ class OmsEngineApp(tk.Tk):
                 return
 
         def job():
-            result = run_powershell(instance_id, [ps_tail_text_file(remote)], timeout_seconds=120)
-            ensure_ssm_ok(result)
-            return result.get("stdout") or ""
+            return self._ssm_read_file_as_text(instance_id, remote)
 
         def on_ok(text: str):
-            self._show_file_preview(remote, text)
+            self._show_file_preview(remote, text, instance_id)
 
         self._run_async(f"View {filename}", job, on_ok=on_ok)
 
-    def _show_file_preview(self, remote_path: str, text: str) -> None:
+    def _ssm_read_file_as_text(self, instance_id: str, remote: str) -> str:
+        fd, temp_path = tempfile.mkstemp(prefix="oms-engine-view-", suffix=".bin")
+        os.close(fd)
+        try:
+            nbytes = self._ssm_download_to_file(instance_id, remote, temp_path)
+            with open(temp_path, "rb") as handle:
+                data = handle.read()
+            header = f"=== {remote} ({nbytes:,} bytes) ===\n"
+            return header + data.decode("utf-8", errors="replace")
+        finally:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            self.after(0, self._hide_transfer)
+
+    def _show_file_preview(self, remote_path: str, text: str, instance_id: str | None = None) -> None:
         win = tk.Toplevel(self)
-        win.title(f"Preview — {remote_path.split(chr(92))[-1]}")
+        basename = remote_path.split(chr(92))[-1]
+        win.title(f"Preview - {basename}")
         win.geometry("900x560")
         win.minsize(640, 400)
         header = ttk.Label(win, text=remote_path, font=("Consolas", 9))
         header.pack(anchor=tk.W, padx=12, pady=(10, 4))
         box = scrolledtext.ScrolledText(win, font=("Consolas", 10), wrap=tk.NONE)
-        box.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 12))
+        box.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 8))
         box.insert(tk.END, text)
         box.see(tk.END)
-        ttk.Button(win, text="Close", command=win.destroy).pack(pady=(0, 10))
+        btn_row = ttk.Frame(win)
+        btn_row.pack(fill=tk.X, padx=12, pady=(0, 10))
+
+        def save_downloads() -> None:
+            dest = os.path.join(_downloads_folder(), basename)
+            if os.path.exists(dest) and not messagebox.askyesno(
+                "Overwrite?", f"{dest} already exists.\nReplace it?", parent=win
+            ):
+                return
+            with open(dest, "w", encoding="utf-8", errors="replace") as handle:
+                handle.write(text)
+            self._activity_line("OK", f"Saved preview to {dest}")
+            messagebox.showinfo("Saved", f"File saved to:\n{dest}", parent=win)
+
+        def save_remote() -> None:
+            if not instance_id:
+                return
+            dest = os.path.join(_downloads_folder(), basename)
+            if os.path.exists(dest) and not messagebox.askyesno(
+                "Overwrite?", f"{dest} already exists.\nReplace it?", parent=win
+            ):
+                return
+
+            def job():
+                return self._ssm_download_to_file(instance_id, remote_path, dest)
+
+            def on_ok(nbytes: int):
+                self._hide_transfer()
+                self._activity_line("OK", f"Downloaded {nbytes:,} bytes to {dest}")
+                messagebox.showinfo("Downloaded", f"Saved to:\n{dest}", parent=win)
+
+            def on_fail():
+                self._hide_transfer()
+
+            self._run_async(f"Download {basename}", job, on_ok=on_ok, on_fail=on_fail)
+
+        ttk.Button(btn_row, text="Save to Downloads", command=save_downloads).pack(side=tk.LEFT, padx=4)
+        if instance_id:
+            ttk.Button(btn_row, text="Download original", command=save_remote).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btn_row, text="Close", command=win.destroy).pack(side=tk.RIGHT)
 
     def _file_open_locally(self) -> None:
         row = self._file_selected_name()
@@ -1421,8 +1538,10 @@ class OmsEngineApp(tk.Tk):
         if not instance_id:
             return
         remote = f"{self._file_path.get().strip().rstrip(chr(92))}\\{name}"
-        dest = filedialog.asksaveasfilename(initialfile=name, title="Save remote file locally")
-        if not dest:
+        dest = os.path.join(_downloads_folder(), name)
+        if os.path.exists(dest) and not messagebox.askyesno(
+            "Overwrite?", f"{dest} already exists.\nReplace it?"
+        ):
             return
 
         def job():
@@ -1432,198 +1551,150 @@ class OmsEngineApp(tk.Tk):
                 self.after(0, self._hide_transfer)
 
         def on_ok(nbytes: int):
-            self._activity_line("OK", f"SSM downloaded {nbytes:,} bytes → {dest}")
+            self._activity_line("OK", f"Downloaded {nbytes:,} bytes to {dest}")
+            messagebox.showinfo("Downloaded", f"Saved to:\n{dest}")
 
         self._run_async(f"Download {name}", job, on_ok=on_ok)
 
-    def _sftp_stack_host(self) -> tuple[str, int] | None:
-        stack = self._current_stack()
-        if not stack or not stack.sftp:
-            messagebox.showinfo("SFTP", "No SFTP host configured for this stack in inventory.json.")
-            return None
-        return stack.sftp.host, stack.sftp.port
-
-    def _sftp_connect(self) -> None:
-        host_port = self._sftp_stack_host()
-        if not host_port:
+    def _update_iis_action_hint(self) -> None:
+        if not hasattr(self, "_iis_action_hint"):
             return
-        host, port = host_port
-        try:
-            resolve_credentials(self._sftp_cred_user, self._sftp_cred_pass)
-        except ValueError:
-            user = simpledialog.askstring("SFTP user", "Domain\\user (e.g. omspod\\you):", parent=self)
-            if not user:
-                return
-            pwd = simpledialog.askstring("SFTP password", "Password (not stored in repo):", show="*", parent=self)
-            if pwd is None:
-                return
-            self._sftp_cred_user = user
-            self._sftp_cred_pass = pwd
-
-        def job():
-            session = SftpSession(host, port)
-            user, pwd = resolve_credentials(self._sftp_cred_user, self._sftp_cred_pass)
-            session.connect(user, pwd)
-            return session
-
-        def on_ok(session: SftpSession):
-            self._sftp = session
-            self._sftp_status.config(text=f"Connected {session.username} @ {host}")
-            self._activity_line("OK", f"SFTP connected to {host}")
-
-        self._run_async("SFTP connect", job, on_ok=on_ok)
-
-    def _sftp_disconnect(self) -> None:
-        self._sftp.close()
-        self._sftp_status.config(text="Not connected")
-
-    def _sftp_goto(self, path: str) -> None:
-        self._sftp_path.set(path.rstrip("/") or "/")
-        self._sftp_list_dir()
-
-    def _sftp_go_up(self) -> None:
-        path = self._sftp_path.get().strip().rstrip("/")
-        if path in ("", "/"):
+        sel = self._iis_tree.selection()
+        if not sel:
+            self._iis_action_hint.config(text="Select a site row for Start / Stop / Restart")
             return
-        parent = path.rsplit("/", 1)[0] or "/"
-        self._sftp_path.set(parent)
-        self._sftp_list_dir()
-
-    def _sftp_use_site_path(self) -> None:
-        row = self._selected_iis_row()
-        if not row:
-            messagebox.showinfo("Site", "Select an IIS site first.")
-            return
-        site, _, physical = row
-        stack = self._current_stack()
-        if not stack:
-            return
-        remote = sftp_path_for_iis_site(stack, site, physical)
-        if not remote:
-            messagebox.showinfo("SFTP", "Could not map this site to an SFTP path.")
-            return
-        self._sftp_path.set(remote)
-        self._select_notebook_tab("SFTP")
-        if self._sftp.connected:
-            self._sftp_list_dir()
+        vals = self._iis_tree.item(sel[0], "values")
+        site = str(vals[0])
+        site_state = str(vals[2]).lower()
+        if site_state == "started":
+            self._iis_action_hint.config(text=f"{site}: running - use Stop site or Restart site")
+            self._iis_btn_stop.state(["!disabled"])
+            self._iis_btn_start.state(["disabled"])
+        elif site_state == "stopped":
+            self._iis_action_hint.config(text=f"{site}: stopped - use Start site")
+            self._iis_btn_start.state(["!disabled"])
+            self._iis_btn_stop.state(["disabled"])
         else:
-            messagebox.showinfo("SFTP", "Path set. Connect SFTP, then List.")
+            self._iis_action_hint.config(text=f"{site}: {vals[2]}")
+            self._iis_btn_start.state(["!disabled"])
+            self._iis_btn_stop.state(["!disabled"])
 
-    def _sftp_list_dir(self) -> None:
-        if not self._sftp.connected:
-            messagebox.showinfo("SFTP", "Connect SFTP first.")
-            return
-        path = self._sftp_path.get().strip() or "/"
-
-        def job():
-            return self._sftp.list_dir(path)
-
-        def on_ok(entries):
-            for item in self._sftp_tree.get_children():
-                self._sftp_tree.delete(item)
-            for ent in entries:
-                kind = "Folder" if ent.is_directory else "File"
-                size = "—" if ent.is_directory else format_file_size(ent.size)
-                mtime = datetime.fromtimestamp(ent.mtime).strftime("%Y-%m-%d %H:%M") if ent.mtime else ""
-                self._sftp_tree.insert("", tk.END, values=(ent.name, kind, size, mtime))
-            self._activity_line("OK", f"SFTP listed {len(entries)} under {path}")
-
-        self._run_async(f"SFTP list {path}", job, on_ok=on_ok)
-
-    def _sftp_on_double_click(self, _event) -> None:
-        sel = self._sftp_tree.selection()
+    def _param_sync_editor_from_row(self) -> None:
+        sel = self._param_tree.selection()
         if not sel:
             return
-        name, kind, *_ = self._sftp_tree.item(sel[0], "values")
-        if kind != "Folder":
-            return
-        base = self._sftp_path.get().strip().rstrip("/")
-        self._sftp_path.set(f"{base}/{name}".replace("//", "/"))
-        self._sftp_list_dir()
+        name = str(self._param_tree.item(sel[0], "values")[0])
+        self._param_name_var.set(name)
+        full_value = ""
+        for row in self._param_rows:
+            if row.name == name:
+                full_value = row.value
+                break
+        self._param_value_box.delete("1.0", tk.END)
+        self._param_value_box.insert(tk.END, full_value)
 
-    def _sftp_download(self) -> None:
-        if not self._sftp.connected:
-            messagebox.showinfo("SFTP", "Connect SFTP first.")
-            return
-        sel = self._sftp_tree.selection()
-        if not sel:
-            messagebox.showinfo("SFTP", "Select a file to download.")
-            return
-        name, kind, size_str, *_ = self._sftp_tree.item(sel[0], "values")
-        if kind != "File":
-            messagebox.showinfo("SFTP", "Select a file, not a folder.")
-            return
-        base = self._sftp_path.get().strip().rstrip("/")
-        remote = f"{base}/{name}".replace("//", "/")
-        dest = filedialog.asksaveasfilename(initialfile=name, title="Save SFTP file locally")
-        if not dest:
-            return
-        try:
-            total = int(size_str) if size_str else 0
-        except ValueError:
-            total = 0
+    def _param_render_rows(self, rows: list[ParameterRow]) -> None:
+        self._param_rows = rows
+        for item in self._param_tree.get_children():
+            self._param_tree.delete(item)
+        for row in rows:
+            preview = row.value.replace("\n", " ")
+            if len(preview) > 120:
+                preview = preview[:117] + "..."
+            self._param_tree.insert("", tk.END, values=(row.name, row.type, row.version, preview))
+
+    def _param_load(self) -> None:
+        path = self._param_path_var.get().strip() or "/"
 
         def job():
-            self.after(0, lambda: self._show_transfer(f"SFTP {name}", total or None))
+            return list_parameters_under_path(path)
 
-            def progress(done: int, tot: int) -> None:
-                self.after(0, lambda: self._update_transfer(done, tot, f"SFTP {name}"))
+        def on_ok(rows: list[ParameterRow]):
+            self._param_render_rows(rows)
+            self._activity_line("OK", f"Loaded {len(rows)} parameters under {path}")
 
-            try:
-                return self._sftp.download(remote, dest, progress=progress if total else None)
-            finally:
-                self.after(0, self._hide_transfer)
+        self._run_async(f"Load parameters {path}", job, on_ok=on_ok)
 
-        def on_ok(nbytes: int):
-            self._activity_line("OK", f"SFTP downloaded {nbytes:,} bytes → {dest}")
+    def _param_save_selected(self) -> None:
+        name = self._param_name_var.get().strip()
+        if not name:
+            messagebox.showinfo("Parameter", "Select a parameter row to edit.")
+            return
+        value = self._param_value_box.get("1.0", tk.END).rstrip("\n")
+        ptype = "String"
+        for row in self._param_rows:
+            if row.name == name:
+                ptype = row.type
+                break
 
-        self._run_async(f"SFTP download {name}", job, on_ok=on_ok)
+        def job():
+            put_parameter(name, value, parameter_type=ptype, overwrite=True)
+            return name
+
+        def on_ok(saved: str):
+            self._activity_line("OK", f"Saved parameter {saved}")
+            self._param_load()
+
+        self._run_async(f"Save {name}", job, on_ok=on_ok)
+
+    def _param_create_dialog(self) -> None:
+        name = simpledialog.askstring("New parameter", "Full parameter name (must start with /):", parent=self)
+        if not name or not name.startswith("/"):
+            messagebox.showinfo("Parameter", "Name must start with /")
+            return
+        value = simpledialog.askstring("New parameter", "Value:", parent=self)
+        if value is None:
+            return
+        ptype = simpledialog.askstring(
+            "New parameter", "Type (String, StringList, SecureString):", initialvalue="String", parent=self
+        )
+        if not ptype:
+            return
+
+        def job():
+            create_parameter(name, value, parameter_type=ptype.strip())
+            return name
+
+        def on_ok(created: str):
+            self._activity_line("OK", f"Created parameter {created}")
+            self._param_path_var.set("/".join(created.split("/")[:2]) or "/")
+            self._param_load()
+
+        self._run_async(f"Create {name}", job, on_ok=on_ok)
 
     def _site_physical_path(self) -> str | None:
         row = self._selected_iis_row()
         if row and row[2]:
             return row[2]
-        name = self._log_site_var.get()
-        for site in self._iis_sites:
-            if site.get("Name") == name:
-                return site.get("PhysicalPath")
         return None
 
     def _tail_sm_log(self) -> None:
         path = self._site_physical_path()
         if not path:
-            messagebox.showinfo("Site required", "Select an IIS site or refresh the stack.")
+            messagebox.showinfo("Site required", "Select an IIS site on the Site Manager tab, then tail again.")
             return
         stack = self._current_stack()
-        sm = stack.host_by_role("sitemanager") if stack else None
-        if not sm:
+        content = stack.host_by_role("content") if stack else None
+        if not content:
+            messagebox.showinfo("Content host", "This stack has no content server in inventory.json.")
             return
         bases = shoplogic_path_candidates(path)
-        hosts: list[tuple[str, str]] = []
-        content = stack.host_by_role("content") if stack else None
-        if content:
-            hosts.append(("Content", content.instance_id))
-        hosts.append(("Site Manager", sm.instance_id))
-        script = ps_tail_shoplogic_debug_bases(bases, lines=120)
+        script = ps_tail_shoplogic_debug_bases(bases, lines=LOG_TAIL_LINES)
 
         def job():
-            combined: list[str] = []
-            for host_label, instance_id in hosts:
-                combined.append(f"--- {host_label} ---")
-                result = run_powershell(instance_id, [script], timeout_seconds=120)
-                combined.append(result.get("stdout") or result.get("stderr") or result["status"])
-                if "=== Log file:" in (result.get("stdout") or ""):
-                    break
-            return "\n".join(combined)
+            result = run_powershell(content.instance_id, [script], timeout_seconds=300)
+            ensure_ssm_ok(result)
+            return result.get("stdout") or result.get("stderr") or ""
 
         def on_ok(text: str):
-            self._show_log_view(text, title="ShopLogic log")
+            self._show_log_view(text, title="ShopLogic log (content server)")
 
         self._run_async("Tail ShopLogic", job, on_ok=on_ok)
 
     def _tail_toro_log(self) -> None:
         name = self._selected_toro_service()
         if not name:
+            messagebox.showinfo("Toronado", "Select a service on the Toronado tab.")
             return
         stack = self._current_stack()
         toro = stack.host_by_role("toronado") if stack else None
@@ -1631,12 +1702,16 @@ class OmsEngineApp(tk.Tk):
             return
 
         def job():
-            result = run_powershell(toro.instance_id, [ps_tail_toro_logs(name)], timeout_seconds=120)
+            result = run_powershell(
+                toro.instance_id,
+                [ps_tail_toro_logs(name, lines=LOG_TAIL_LINES)],
+                timeout_seconds=300,
+            )
             ensure_ssm_ok(result)
             return result["stdout"] or result["stderr"]
 
         def on_ok(text: str):
-            self._show_log_view(text, title=f"Toro log — {name}")
+            self._show_log_view(text, title=f"Toro log - {name}")
 
         self._run_async("Tail Toro log", job, on_ok=on_ok)
 
@@ -1659,11 +1734,14 @@ class OmsEngineApp(tk.Tk):
             messagebox.showinfo("Log group", "Select a CloudWatch log group.")
             return
 
+        window_label = self._cw_window_var.get() or "Last 24 hours"
+        lookback = SCAN_WINDOW_CHOICES.get(window_label, 24 * 60)
+
         def job():
-            return tail_log_group(group, limit=100)
+            return tail_log_group(group, limit=500, lookback_minutes=lookback)
 
         def on_ok(text: str):
-            self._show_log_view(text, title=f"CloudWatch — {group}")
+            self._show_log_view(text, title=f"CloudWatch - {group}")
 
         self._run_async("Tail CloudWatch", job, on_ok=on_ok)
 

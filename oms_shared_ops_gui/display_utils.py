@@ -9,9 +9,9 @@ def format_file_size(num_bytes: object) -> str:
     try:
         n = int(num_bytes or 0)
     except (TypeError, ValueError):
-        return "—"
+        return "-"
     if n < 0:
-        return "—"
+        return "-"
     if n < 1024:
         return f"{n} B"
     units = ("KB", "MB", "GB", "TB")
@@ -26,7 +26,7 @@ def format_file_size(num_bytes: object) -> str:
 def format_remote_timestamp(iso_text: object) -> str:
     text = str(iso_text or "").strip()
     if not text:
-        return "—"
+        return "-"
     try:
         if text.endswith("Z"):
             text = text[:-1] + "+00:00"

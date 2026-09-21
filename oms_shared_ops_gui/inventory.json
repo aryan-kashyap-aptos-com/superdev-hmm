@@ -6,14 +6,12 @@
       "id": "eom-core-shared-dev",
       "label": "EOM Core Shared Dev (multi-tenant Toro + Site Manager)",
       "description": "Toro on shared Toronado EC2. IIS on SM EC2; ShopLogic logs on content EC2 under D:\\content\\dev\\{env}\\sm (UNC in IIS points at the share).",
-      "sftp": {
-        "host": "oms-shared-dev-sftp.dev.eom.aptos.io",
-        "port": 22,
-        "domain": "omspod",
-        "path_roots": {
-          "sm": "/dev/{env}/sm",
-          "task": "/task/{env}/"
-        }
+      "ssm_parameter_prefix": "/",
+      "bastion": {
+        "label": "Bastion host",
+        "name_tag": "oms-shared-dev-BastionHost",
+        "instance_id": "i-09d67cca2bb3a28e8",
+        "public_ip": ""
       },
       "hosts": [
         {
@@ -43,14 +41,12 @@
       "id": "oms-pod2-dev",
       "label": "OMS Pod2 Dev (standalone stack)",
       "description": "Dedicated pod2-dev Toronado and Site Manager (poddev DB tier).",
-      "sftp": {
-        "host": "oms-pod2-dev-sftp-86bee7bd6535b74c.elb.us-east-1.amazonaws.com",
-        "port": 22,
-        "domain": "omspod",
-        "path_roots": {
-          "sm": "/dev/{env}/sm",
-          "task": "/task/{env}/"
-        }
+      "ssm_parameter_prefix": "/",
+      "bastion": {
+        "label": "Bastion host",
+        "name_tag": "oms-pod2-dev-BastionHost",
+        "instance_id": "i-0b489a48f31463d74",
+        "public_ip": "20.115.111.220"
       },
       "hosts": [
         {
@@ -73,6 +69,7 @@
       "id": "eom-core-perf15-qa",
       "label": "EOM Core Perf15 QA",
       "description": "Standalone perf15 QA Toronado (OMS-*-perf15qa-*) and Site Manager.",
+      "ssm_parameter_prefix": "/",
       "hosts": [
         {
           "role": "toronado",

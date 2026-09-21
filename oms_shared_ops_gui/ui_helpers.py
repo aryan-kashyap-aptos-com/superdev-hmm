@@ -26,7 +26,7 @@ def format_ssm_error(stderr: str, stdout: str, status: str) -> str:
         return "That path is not a file on the remote host."
 
     if "FILE_TOO_LARGE" in blob:
-        return "File exceeds the single-shot SSM limit. Use chunked download or SFTP for very large files."
+        return "File exceeds the single-shot SSM limit. Use Download (chunked) for very large files."
 
     lines = [ln.strip() for ln in blob.splitlines() if ln.strip()]
     noise = (

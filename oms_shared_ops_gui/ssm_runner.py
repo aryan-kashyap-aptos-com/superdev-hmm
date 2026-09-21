@@ -100,7 +100,7 @@ $pools = @(Get-IISAppPool | ForEach-Object {
 """.strip()
 
 
-def ps_tail_shoplogic_debug_bases(bases: list[str], lines: int = 120) -> str:
+def ps_tail_shoplogic_debug_bases(bases: list[str], lines: int = 1500) -> str:
     escaped_paths = [b.replace("'", "''") for b in bases]
     ps_list = ", ".join(f"'{p}'" for p in escaped_paths)
     return f"""
@@ -133,13 +133,13 @@ Get-Content -LiteralPath $file -Tail {lines} -ErrorAction Stop
 """.strip()
 
 
-def ps_tail_shoplogic_debug(physical_path: str, lines: int = 120) -> str:
+def ps_tail_shoplogic_debug(physical_path: str, lines: int = 1500) -> str:
     from path_candidates import shoplogic_path_candidates
 
     return ps_tail_shoplogic_debug_bases(shoplogic_path_candidates(physical_path), lines)
 
 
-def ps_tail_toro_logs(service_name: str, lines: int = 80) -> str:
+def ps_tail_toro_logs(service_name: str, lines: int = 1500) -> str:
     safe = service_name.replace("'", "''")
     return f"""
 $ErrorActionPreference = 'SilentlyContinue'
@@ -275,8 +275,8 @@ try {{
 """.strip()
 
 
-def ps_tail_text_file(path: str, tail_lines: int = 200, max_bytes: int = 524_288) -> str:
-    """Read tail of a text file on the remote host (for log/config preview)."""
+def ps_tail_text_file(path: str) -> str:
+    """Read the full text file on the remote host (no tail trimming)."""
     safe = path.replace("'", "''")
     return f"""
 $ErrorActionPreference = 'Stop'
@@ -284,11 +284,7 @@ $p = '{safe}'
 if (-not (Test-Path -LiteralPath $p -PathType Leaf)) {{ throw "NOT_A_FILE: $p" }}
 $len = (Get-Item -LiteralPath $p).Length
 Write-Output "=== $p ($len bytes) ==="
-if ($len -gt {max_bytes}) {{
-  Get-Content -LiteralPath $p -Tail {tail_lines} -ErrorAction Stop
-}} else {{
-  Get-Content -LiteralPath $p -ErrorAction Stop
-}}
+Get-Content -LiteralPath $p -ErrorAction Stop
 """.strip()
 
 

@@ -92,5 +92,5 @@ Why newer envs show up without a code change
 
 Stack selection
   • Pick the stack (shared dev, pod2, perf15) to choose Toro / SM / content instance IDs.
-  • Use Refresh EC2 IDs if instances were replaced in AWS.
+  • Use Refresh (toolbar) after replacing EC2 instances in AWS; instance IDs refresh from inventory.json + AWS.
 """
