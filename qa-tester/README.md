@@ -21,7 +21,7 @@ Status: **method, templates, helper script, and the visible-browser connector ar
 3. Write `summary.md` for a first-time reader, then `python qa-tester/testrun.py check <run>`.
 
 Result words used everywhere: **Verified**, **Issue found**, **Could not verify**, **Not tested**.
-Full steps: `method.md`.
+Full steps: `method.md`. A finished sample to copy from: `examples/chart-library-upgrade/`.
 
 ## Layout
 
@@ -34,6 +34,7 @@ qa-tester/
 ├── environments.md       example list of sites the tester may open (pushed)
 ├── environments.local.md the real list (private, not pushed)
 ├── templates/            test-plan.md, task-notes.md, test-summary.md
+├── examples/             a finished sample run with example values, to copy the shape from (pushed)
 ├── runs/                 one folder per piece of testing: plan, tasks, screenshots, summary (private, not pushed)
 ├── sites/                site maps written by the crawl (private, not pushed)
 └── tests/                stable cases saved as plain test files that rerun without AI
