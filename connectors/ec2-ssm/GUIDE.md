@@ -31,6 +31,17 @@ Without `--write`, the script allows only commands that read:
 
 To allow more read-only commands, the user can add them to `EC2_SSM_EXTRA_READ_COMMANDS` in `.env` (comma-separated).
 
+## Which AWS login to use (SSO)
+
+`list` and `run` only see the account and region of the active AWS login. For another account, run with `AWS_PROFILE=<profile>` in front.
+If the login expired, see "Which AWS login to use (SSO)" in `connectors/aws-rds/GUIDE.md`.
+
+## Tested on real servers
+
+- Linux: `uptime` ran fine. Windows: `Get-Service | Where-Object { $_.Status -eq 'Running' } | Select-Object -First 3 Name,Status` ran fine.
+- Write one pipeline, not two commands joined by `;`. In read-only mode `;` is refused by design.
+- Check the guard with the self-test (`python connectors/selftest.py`), not by sending blocked commands to a real server.
+
 ## Rules
 
 1. Run `list` first to find the right server. Check the name: production servers need extra care.

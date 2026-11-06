@@ -188,6 +188,111 @@ def test_search():
               "Partial refund" in out and "[verified]" in out and "template" not in out and "Login" not in out, out + r.stderr)
 
 
+GOOD_SYSTEM = """# System: Shipping service
+
+> Prepares and tracks every parcel.
+
+Status: verified · Updated: 2026-11-06 · Level 1
+
+## In plain words
+The shipping service takes an order that is ready, chooses a carrier, prints a label, and follows the parcel until it arrives at the customer's door.
+
+## Where it fits
+```
+Order service ──ready order──▶ Shipping service ──label──▶ Carrier
+```
+
+## How it works
+1. Receive a ready order.
+2. Choose a carrier.
+
+**Example:** Maria's order of 3 items goes to the carrier with the lowest price.
+
+## What can go wrong
+| Situation | What happens |
+|-----------|--------------|
+| Carrier is down | The order waits and is retried |
+
+## Evidence
+- Carrier choice: `shipping/choose.py` `pick_carrier`
+
+## Read next
+- [Place an order](../journeys/place-an-order.md) — the full flow
+"""
+
+GOOD_JOURNEY = """# Journey: Place an order
+
+> From checkout to delivery.
+
+Status: draft · Updated: 2026-11-06
+
+## In plain words
+A customer pays at checkout, the order is checked, then the shipping service sends the parcel and the customer gets a tracking link.
+
+## The example we follow
+Maria orders 3 items for delivery to Leeds.
+
+## The path
+```
+Customer ──▶ Order service ──▶ Shipping service
+```
+
+## Step by step, with the example
+1. **Checkout.** Maria pays.
+"""
+
+
+def test_lint():
+    with tempfile.TemporaryDirectory() as d:
+        prod = Path(d, "shop")
+        (prod / "systems").mkdir(parents=True)
+        (prod / "journeys").mkdir()
+        (prod / "systems" / "shipping.md").write_text(GOOD_SYSTEM, encoding="utf-8")
+        (prod / "journeys" / "place-an-order.md").write_text(GOOD_JOURNEY, encoding="utf-8")
+        (prod / "glossary.md").write_text("# Glossary\n", encoding="utf-8")
+        (prod / "MAP.md").write_text("# Map\n\n## Coverage\n\n| Area | Kind | Target level | Page | Status |\n"
+                                     "|---|---|---|---|---|\n| Shipping | system | 1 | systems/shipping.md | done |\n"
+                                     "| Orders | journey | 1 | journeys/place-an-order.md | in-progress |\n", encoding="utf-8")
+
+        def lint(extra=()):
+            r = subprocess.run([sys.executable, str(ROOT / "product-knowledge" / "lint.py"), "shop", "--dir", d, *extra],
+                               capture_output=True, text=True, encoding="utf-8")
+            return r.returncode, r.stdout
+
+        # the journey links nowhere yet and nothing links to the journey: only a warning
+        code, out = lint()
+        check("lint: a good product passes (orphan page is a warning)", code == 0 and "orphan" in out, out)
+
+        sysfile = prod / "systems" / "shipping.md"
+        sysfile.write_text(GOOD_SYSTEM.replace("../journeys/place-an-order.md", "../journeys/nope.md"), encoding="utf-8")
+        code, out = lint()
+        check("lint: broken link is an error", code == 1 and "broken link" in out, out)
+
+        sysfile.write_text(GOOD_SYSTEM.replace("- Carrier choice: `shipping/choose.py` `pick_carrier`", ""), encoding="utf-8")
+        code, out = lint()
+        check("lint: verified page without evidence is an error", code == 1 and "Evidence section is empty" in out, out)
+
+        sysfile.write_text(GOOD_SYSTEM.replace("## What can go wrong", "## Problems"), encoding="utf-8")
+        code, out = lint()
+        check("lint: missing required section is an error", code == 1 and "what can go wrong" in out, out)
+
+        sysfile.write_text(GOOD_SYSTEM.replace("Prepares and tracks every parcel.", "<One sentence: what it is>"), encoding="utf-8")
+        code, out = lint()
+        check("lint: template text left in is an error", code == 1 and "template text left in" in out, out)
+
+        sysfile.write_text(GOOD_SYSTEM.replace("The shipping service takes an order that is ready, chooses a carrier, prints a label, and follows "
+                                               "the parcel until it arrives at the customer's door.", "Ships things."), encoding="utf-8")
+        code, out = lint()
+        check("lint: 'In plain words' that explains nothing is an error", code == 1 and "too short" in out, out)
+
+        sysfile.write_text(GOOD_SYSTEM, encoding="utf-8")
+        (prod / "MAP.md").write_text((prod / "MAP.md").read_text(encoding="utf-8").replace("systems/shipping.md", "systems/ghost.md"), encoding="utf-8")
+        code, out = lint()
+        check("lint: map row pointing to a missing page is an error", code == 1 and "does not exist" in out, out)
+        code, _ = lint(["--strict"])
+        check("lint: --strict fails on warnings too", code == 1)
+
+
 # ---------------------------------------------------------------- mock server
 
 seen = []
@@ -351,7 +456,7 @@ def test_connectors_against_mock():
 
 def main():
     for test in (test_common, test_ec2_ssm, test_db_ssh, test_sumologic_time, test_msteams_webhook, test_search,
-                 test_connectors_against_mock):
+                 test_lint, test_connectors_against_mock):
         print(f"\n== {test.__name__[5:]}")
         test()
     print(f"\n{'All checks passed.' if not failures else f'{len(failures)} check(s) failed:'}")

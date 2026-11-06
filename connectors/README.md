@@ -8,6 +8,12 @@ One folder per system. Every connector has the same three files:
 
 `common.py` holds the code all connectors share. `results/` is created when an output is too big to print.
 
+## Official connector first
+
+If your AI tool is already connected to a system through an official connector (for example Atlassian), use that for everything it covers: Jira, Confluence, and any other Atlassian product.
+Do not test or set up our `jira` or `confluence` scripts then. They exist for tools that have no such connector.
+The same goes for any other system your tool already reaches. Use our scripts when there is no official connector.
+
 ## Which connector to use
 
 | Connector    | Use it to...                                                        | Can change data?          |

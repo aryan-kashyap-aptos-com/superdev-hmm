@@ -30,7 +30,7 @@ Open only the skill the task needs. Never load all of them.
 | You write for a person (message, email, doc, PR text)          | `skills/write-for-humans.md`  |
 | You write for an AI or a tool (prompt, tool doc, error text)   | `skills/write-for-ai.md`      |
 | Something is broken or failing                                 | `skills/fix-bugs.md`          |
-| The user wants a product explained, or all its scenarios listed | `skills/document-product.md` |
+| The user wants a product or system explained or documented (it asks how to split a big product first) | `skills/document-product.md` |
 | The chat is long, or the user says "save session"              | `skills/save-session.md`      |
 | The user says "continue", or `LATEST.md` names a file          | `skills/continue-session.md`  |
 | The user says "save what we learned"                           | `skills/save-to-knowledge.md` |
