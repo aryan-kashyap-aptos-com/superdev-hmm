@@ -14,7 +14,7 @@ A big product cannot be documented in one pass. `skills/document-product.md` sta
 product-knowledge/
 ├── writing-guide.md        how to write so a newcomer understands
 ├── search.py               ranked search over the pages
-├── lint.py                 checks a product's pages (links, sections, evidence, coverage)
+├── check-pages.py               checks a product's pages (links, sections, evidence, coverage)
 ├── templates/              copy these, do not edit them for a product
 └── <product>/              one folder per product, lowercase-with-dashes
     ├── MAP.md              the plan and the progress: which areas, which depth, what is done
@@ -49,7 +49,7 @@ Each area is documented only as deep as the plan says. A reader can stop at any 
 6. **Never delete history.** When a rule changes, mark the old line `(until YYYY-MM-DD)` and add the new line under it.
 7. **Search before you add.** Edit an existing page rather than creating a duplicate.
 8. **No secrets and no personal data.**
-9. **Check before you finish:** `python product-knowledge/lint.py <product>`.
+9. **Check before you finish:** `python product-knowledge/check-pages.py <product>`.
 
 ## How to find things fast
 

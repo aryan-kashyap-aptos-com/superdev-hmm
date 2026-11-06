@@ -1,6 +1,6 @@
 """Self-test for super-dev. No network, no credentials: pure checks plus a local mock server.
 
-    python connectors/selftest.py
+    python tests/selftest.py
 
 Exit code 0 means every check passed.
 """
@@ -19,9 +19,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent
-sys.path.insert(0, str(HERE))
+ROOT = Path(__file__).resolve().parent.parent
+CONNECTORS = ROOT / "connectors"
+sys.path.insert(0, str(CONNECTORS))
 import common as c  # noqa: E402
 
 failures = []
@@ -34,7 +34,7 @@ def check(label, ok, detail=""):
 
 
 def load(name):
-    spec = importlib.util.spec_from_file_location(name.replace("-", "_"), HERE / name / "run.py")
+    spec = importlib.util.spec_from_file_location(name.replace("-", "_"), CONNECTORS / name / "run.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
@@ -255,7 +255,7 @@ def test_lint():
                                      "| Orders | journey | 1 | journeys/place-an-order.md | in-progress |\n", encoding="utf-8")
 
         def lint(extra=()):
-            r = subprocess.run([sys.executable, str(ROOT / "product-knowledge" / "lint.py"), "shop", "--dir", d, *extra],
+            r = subprocess.run([sys.executable, str(ROOT / "product-knowledge" / "check-pages.py"), "shop", "--dir", d, *extra],
                                capture_output=True, text=True, encoding="utf-8")
             return r.returncode, r.stdout
 
@@ -395,10 +395,10 @@ def test_save_session():
     with tempfile.TemporaryDirectory() as d:
         sess = Path(d) / "chat-sessions"
         sess.mkdir()
-        shutil.copy(ROOT / "chat-sessions" / "save.py", sess / "save.py")
+        shutil.copy(ROOT / "chat-sessions" / "save-session.py", sess / "save-session.py")
 
         def save(*a):
-            r = subprocess.run([sys.executable, str(sess / "save.py"), *a], capture_output=True, text=True, encoding="utf-8")
+            r = subprocess.run([sys.executable, str(sess / "save-session.py"), *a], capture_output=True, text=True, encoding="utf-8")
             return r.returncode, r.stdout + r.stderr
 
         code, out = save("note", "--section", "Decisions", "--text", "x")
@@ -425,30 +425,152 @@ def test_save_session():
 
 def test_browser_helpers():
     b = load("browser")
+    core, player = b.core, b.player
     with tempfile.TemporaryDirectory() as d:   # a sample environments file, so the test needs no private file
         head = "| Name | Address | Kind | Login | Notes |\n|---|---|---|---|---|\n"
         (Path(d) / "environments.md").write_text(
-            head + "| demo | https://site.example.test/app/ | dev | `QA_DEMO_USER`, `QA_DEMO_PASSWORD` | sample |\n", encoding="utf-8")
-        b.QA = Path(d)
-        rows = b.sites()
+            head + "| demo | https://site.example.test/app/ | dev | `QA_DEMO_USER`, `QA_DEMO_PASSWORD` | login: sign-in.aspx; sample |\n", encoding="utf-8")
+        core.QA = Path(d)
+        rows = core.sites()
         check("browser: sites are read from the environments table",
               len(rows) == 1 and rows[0]["host"] == "site.example.test" and rows[0]["settings"] == ["QA_DEMO_USER", "QA_DEMO_PASSWORD"], str(rows))
-        check("browser: an unlisted site is refused", raises(b.check_allowed, "https://example.com/x"))
-        check("browser: a listed site is allowed", not raises(b.check_allowed, "https://site.example.test/app/login"))
+        check("browser: the sign-in page is read from the Notes column", rows[0]["login"] == "sign-in.aspx", str(rows))
+        check("browser: an unlisted site is refused", raises(core.check_allowed, "https://example.com/x"))
+        check("browser: a listed site is allowed", not raises(core.check_allowed, "https://site.example.test/app/login"))
+        check("browser: scenario paths resolve against the site",
+              core.absolute("reports/a.aspx?id=1", rows[0]) == "https://site.example.test/app/reports/a.aspx?id=1"
+              and core.absolute("/other", rows[0]) == "https://site.example.test/other")
         (Path(d) / "environments.local.md").write_text(
             head + "| mine | https://mine.example.test/ | dev | `A_USER`, `A_PASSWORD` | x |\n", encoding="utf-8")
-        check("browser: the private local file adds sites", {s["name"] for s in b.sites()} == {"demo", "mine"})
+        check("browser: the private local file adds sites", {s["name"] for s in core.sites()} == {"demo", "mine"})
         check("browser: task folders are runs/<run>/tasks/<task>/<kind>",
-              b.task_folder("r1", "t1", "screenshots") == Path(d) / "runs" / "r1" / "tasks" / "t1" / "screenshots"
-              and b.task_folder("r1", None, "screenshots") == Path(d) / "runs" / "r1" / "screenshots")
+              core.task_folder("r1", "t1", "screenshots") == Path(d) / "runs" / "r1" / "tasks" / "t1" / "screenshots"
+              and core.task_folder("r1", None, "screenshots") == Path(d) / "runs" / "r1" / "screenshots")
     check("browser: query values never shown, names are",
-          b.safe_url("https://h.com/p/x?token=SECRET&id=7", "h.com") == "/p/x?{token,id}")
-    check("browser: other hosts are shown with their name", b.safe_url("https://other.com/a?b=1", "h.com") == "other.com/a?{b}")
+          core.safe_url("https://h.com/p/x?token=SECRET&id=7", "h.com") == "/p/x?{token,id}")
+    check("browser: other hosts are shown with their name", core.safe_url("https://other.com/a?b=1", "h.com") == "other.com/a?{b}")
     os.environ["QA_TEST_PASSWORD"] = "Sup3r-Secret"
-    check("browser: passwords are redacted from page text", "Sup3r-Secret" not in b.redact("text: Sup3r-Secret end"))
-    check("browser: risky words in a click need --write", bool(b.RISKY.search("Delete order")) and not b.RISKY.search("Analytics"))
+    check("browser: passwords are redacted from page text", "Sup3r-Secret" not in core.redact("text: Sup3r-Secret end"))
+    check("browser: risky words in a click need --write", bool(core.RISKY.search("Delete order")) and not core.RISKY.search("Analytics"))
     check("browser: crawl skips logout, delete and exports",
-          all(b.SKIP_URL.search(u) for u in ("/a/logout.aspx", "/x?delete=1", "/f.csv", "javascript:void(0)")) and not b.SKIP_URL.search("/backadmin/orders.aspx"))
+          all(b.SKIP_URL.search(u) for u in ("/a/logout.aspx", "/x?delete=1", "/f.csv", "javascript:void(0)")) and not b.SKIP_URL.search("/app/orders.aspx"))
+    kinds = {t: len(core._makers(t)) for t in ("Sign in", "#save", ".btn", "css=svg", "role=button[name='Go']", "label=Email", "//div", "div.row")}
+    check("browser: plain words try several ways (button, link, label, placeholder, text)", kinds["Sign in"] == 5, str(kinds))
+    check("browser: selectors and label= are used as given", all(kinds[k] == 1 for k in kinds if k != "Sign in"), str(kinds))
+    hidden = {"exists": True, "count": 1, "visible": False, "hiddenWhy": "display: none", "enabled": True, "checked": None}
+    disabled = {"exists": True, "count": 1, "visible": True, "enabled": False, "ariaDisabled": True, "inView": True, "covered": "div.overlay", "checked": None}
+    check("browser: hidden elements say why", core.describe_state(hidden).startswith("hidden (display: none)"), core.describe_state(hidden))
+    check("browser: disabled and covered are described",
+          "disabled (aria-disabled)" in core.describe_state(disabled) and "covered by div.overlay" in core.describe_state(disabled), core.describe_state(disabled))
+    check("browser: missing elements are described", core.describe_state({"exists": False, "count": 0}) == "not on the page")
+
+
+def test_run_login():
+    """No .env is needed for a website test: the site and login come from the active run's plan.md."""
+    b = load("browser")
+    core = b.core
+    real_qa, real_run = core.QA, os.environ.pop("QA_RUN", None)
+    os.environ.pop("QA_RUN_PASSWORD", None)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            core.QA = Path(d)
+            (core.QA / "environments.md").write_text("| Name | Address | Kind | Login | Notes |\n|---|---|---|---|---|\n", encoding="utf-8")
+            check("browser: no run and no environments.md row is a clear error", raises(core.sites))
+
+            run = core.QA / "runs" / "2026-01-01-smoke-test"
+            run.mkdir(parents=True)
+            plan = ("# Test plan: x\n\n## Login\n\n| | |\n|---|---|\n"
+                    "| Site address | <the full address...> |\n| Sign-in page | <path...> |\n"
+                    "| Username | <the test account...> |\n| Password | <the test account...> |\n")
+            (run / "plan.md").write_text(plan, encoding="utf-8")
+            os.environ["QA_RUN"] = run.name
+            check("browser: a run with only placeholders has no usable site", core.run_login().get("site") is None, core.run_login())
+            check("browser: placeholders mean no site to test either", raises(core.sites))
+
+            plan = plan.replace("<the full address...>", "example.com/app").replace("<path...>", "login.aspx") \
+                       .replace("<the test account...>", "tester", 1).replace("<the test account...>", "Sup3r-Secret", 1)
+            (run / "plan.md").write_text(plan, encoding="utf-8")
+            info = core.run_login()
+            check("browser: a filled Login section gives a bare address https://, a sign-in page, and the account",
+                  info.get("site") == "example.com/app" and info.get("signin") == "login.aspx"
+                  and info.get("user") == "tester" and info.get("password") == "Sup3r-Secret", info)
+            check("browser: reading the run's login registers its password for redaction",
+                  os.environ.get("QA_RUN_PASSWORD") == "Sup3r-Secret")
+            rows = core.sites()
+            check("browser: the run's site is allowed, as https://, with its sign-in page",
+                  len(rows) == 1 and rows[0]["url"] == "https://example.com/app" and rows[0]["login"] == "login.aspx", str(rows))
+            check("browser: credentials() returns the run's account for that same site",
+                  core.credentials(rows[0]) == ("tester", "Sup3r-Secret"))
+            other = {"name": "other", "url": "https://other.test/", "host": "other.test", "settings": []}
+            check("browser: credentials() refuses to use the run's account on a different site", raises(core.credentials, other))
+            check("browser: the password never leaks into the page-text redactor's input",
+                  "Sup3r-Secret" not in core.redact("safe"))
+
+            (run / "plan.md").write_text(plan.replace("| Username | tester |", "| Username | none |")
+                                             .replace("| Password | Sup3r-Secret |", "| Password | none |"), encoding="utf-8")
+            check("browser: \"none\" means no login was given, not a literal account",
+                  core.run_login() == {"run": run.name, "site": "example.com/app", "signin": "login.aspx"}, core.run_login())
+    finally:
+        core.QA = real_qa
+        if real_run is None:
+            os.environ.pop("QA_RUN", None)
+        else:
+            os.environ["QA_RUN"] = real_run
+        os.environ.pop("QA_RUN_PASSWORD", None)
+
+
+def test_scenarios():
+    player = load("browser").player
+    good = {"name": "x", "cases": [{"id": "C1", "title": "t", "steps": [
+        {"do": "goto", "url": "/a"}, {"do": "fill", "target": "label=Password", "value": "$QA_X_PASSWORD"},
+        {"expect": "disabled", "target": "Save"}, {"expect": "no-failed-requests"}, {"expect": "count", "target": "css=tr", "value": ">=3"}]}]}
+    check("scenario: a correct file has no problems", player.validate(good) == [], str(player.validate(good)))
+    bad = {"cases": [{"id": "C1", "title": "t", "steps": [
+        {"do": "click"}, {"expect": "shiny", "target": "x"}, {"do": "goto"}, {"do": "fill", "target": "Password", "value": "hunter2"},
+        {"do": "click", "expect": "visible", "target": "x"}]}]}
+    errs = " | ".join(player.validate(bad))
+    check("scenario: missing target, unknown check, missing url are reported",
+          "needs a \"target\"" in errs and "unknown check \"shiny\"" in errs and "\"goto\" needs a \"url\"" in errs, errs)
+    check("scenario: a password written in the file is refused", "never the password itself" in errs, errs)
+    check("scenario: a step with both do and expect is refused", "exactly one of" in errs, errs)
+    check("scenario: an empty file is refused", player.validate({}) != [])
+    check("scenario: steps read as plain sentences",
+          player.describe({"expect": "disabled", "target": "Save"}) == '"Save" is disabled'
+          and player.describe({"expect": "visible", "target": "Save", "not": True}) == '"Save" is not visible'
+          and player.describe({"do": "fill", "target": "Password", "value": "$QA_X_PASSWORD"}) == 'type the value of QA_X_PASSWORD into "Password"'
+          and player.describe({"expect": "text", "target": "h1", "value": "Hi"}) == '"h1" contains "Hi"',
+          player.describe({"do": "fill", "target": "Password", "value": "$QA_X_PASSWORD"}))
+    check("scenario: count rules", player._compare_count(3, ">=3") and player._compare_count(0, "0") and not player._compare_count(2, ">2"))
+    os.environ["QA_X_PASSWORD"] = "pw-123456"
+    check("scenario: $SETTING values come from the environment and are marked secret", player.secret_value("$QA_X_PASSWORD") == ("pw-123456", True))
+    check("scenario: a missing $SETTING is a clear error", raises(player.secret_value, "$QA_NOT_SET_ANYWHERE"))
+    core, real_qa, real_run = player.core, player.core.QA, os.environ.pop("QA_RUN", None)
+    try:
+        check("scenario: $password with no active run is a clear error", raises(player.secret_value, "$password"))
+        with tempfile.TemporaryDirectory() as d:
+            core.QA = Path(d)
+            run = core.QA / "runs" / "r"
+            run.mkdir(parents=True)
+            (run / "plan.md").write_text("# Test plan: x\n\n## Login\n\n| | |\n|---|---|\n"
+                                          "| Site address | x.test |\n| Username | u |\n| Password | p-secret |\n", encoding="utf-8")
+            os.environ["QA_RUN"] = "r"
+            check("scenario: $password resolves to the active run's password, marked secret", player.secret_value("$password") == ("p-secret", True))
+            check("scenario: $user resolves to the active run's username, marked secret", player.secret_value("$user") == ("u", True))
+    finally:
+        core.QA = real_qa
+        if real_run is None:
+            os.environ.pop("QA_RUN", None)
+        else:
+            os.environ["QA_RUN"] = real_run
+        os.environ.pop("QA_RUN_PASSWORD", None)
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "s.json"
+        p.write_text("{not json", encoding="utf-8")
+        check("scenario: broken JSON is a clear error", raises(player.load, str(p)))
+        p.write_text(json.dumps(good), encoding="utf-8")
+        check("scenario: a good file loads", player.load(str(p))["cases"][0]["id"] == "C1")
+    template = ROOT / "qa-tester" / "templates" / "scenario.json"
+    check("scenario: the template is a valid scenario", template.exists() and player.validate(json.loads(template.read_text(encoding="utf-8"))) == [])
 
 
 def test_testrun():
@@ -456,7 +578,7 @@ def test_testrun():
         base = Path(d)
 
         def tr(*a):
-            r = subprocess.run([sys.executable, str(ROOT / "qa-tester" / "testrun.py"), "--base", d, *a],
+            r = subprocess.run([sys.executable, str(ROOT / "qa-tester" / "test-run.py"), "--base", d, *a],
                                capture_output=True, text=True, encoding="utf-8")
             return r.returncode, r.stdout + r.stderr
 
@@ -512,7 +634,7 @@ def test_connectors_against_mock():
         page.write_text("# Refunds\n\n- full within 30 days", encoding="utf-8")
 
         def run(label, args, expect, code=0, extra_env=None):
-            r = subprocess.run([sys.executable, str(HERE / args[0] / "run.py"), *args[1:]], capture_output=True,
+            r = subprocess.run([sys.executable, str(CONNECTORS / args[0] / "run.py"), *args[1:]], capture_output=True,
                                text=True, encoding="utf-8", env=dict(env, **(extra_env or {})))
             out = r.stdout + r.stderr
             check(label, r.returncode == code and all(x in out for x in expect), f"exit={r.returncode} output:\n{out}")
@@ -562,7 +684,7 @@ def test_connectors_against_mock():
 
 def main():
     for test in (test_common, test_ec2_ssm, test_db_ssh, test_sumologic_time, test_msteams_webhook, test_search,
-                 test_lint, test_save_session, test_browser_helpers, test_testrun, test_connectors_against_mock):
+                 test_lint, test_save_session, test_browser_helpers, test_run_login, test_scenarios, test_testrun, test_connectors_against_mock):
         print(f"\n== {test.__name__[5:]}")
         test()
     print(f"\n{'All checks passed.' if not failures else f'{len(failures)} check(s) failed:'}")

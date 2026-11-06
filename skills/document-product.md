@@ -71,7 +71,7 @@ Take the next `todo` area from `MAP.md` and write pages up to its target level. 
 
 ## Step 3: Check, then show the user
 After each area:
-1. Run `python product-knowledge/lint.py <product>`. Fix every error.
+1. Run `python product-knowledge/check-pages.py <product>`. Fix every error.
 2. Apply the newcomer test from `product-knowledge/writing-guide.md`: could someone who has never seen the product understand this page without asking you anything?
 3. Update `gaps.md` (from `templates/gaps.md`): scenarios with no evidence, scenarios with no test, code or rules that no page covers.
 4. Tell the user, in at most 6 lines: what you wrote, how many pages are verified vs draft, what you could not confirm, and which area is next.

@@ -13,3 +13,7 @@ qa-tester/runs/*
 qa-tester/.browser-profile/
 qa-tester/sites/
 qa-tester/environments.local.md
+# saved scenarios hold internal page paths: keep them private
+qa-tester/scenarios/*
+!qa-tester/scenarios/.gitkeep
+!qa-tester/scenarios/README.md

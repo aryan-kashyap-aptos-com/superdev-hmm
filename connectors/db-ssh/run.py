@@ -158,7 +158,7 @@ def open_db(write=False):
             conn, driver_error = _connect(db_engine, host, port, name, user, password, write)
         except ImportError:
             raise c.ConnectorError(f"The Python package for {db_engine} is not installed.",
-                                   "Run: pip install -r connectors/requirements.txt") from None
+                                   "Run: pip install -r requirements.txt") from None
         except Exception as e:
             raise c.ConnectorError(f"Cannot connect to the database: {str(e).strip()}",
                                    "Check DB_* settings, the VPN, and SSH_* settings if you use a tunnel.") from None

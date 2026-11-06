@@ -1,12 +1,20 @@
 # Connectors
 
-One folder per system. Every connector has the same three files:
+One folder per outside system. Every connector has the same three files:
 
 - `GUIDE.md`: when to use it, setup, commands, rules, examples.
-- `run.py`: the script you run.
+- `run.py`: the script you run. `python connectors/<name>/run.py --help` lists its commands.
 - `.env.example`: the settings it needs. The user copies it to `.env` and fills it in.
 
-`common.py` holds the code all connectors share. `results/` is created when an output is too big to print.
+Shared files:
+
+| File or folder | What it is |
+|----------------|------------|
+| `common.py` | Code every connector uses: reading `.env`, required settings, the `--write` guard, short tables and text, HTTP, `ERROR`/`HINT` output, the read-only SQL check. |
+| `results/` | Created when an output is too big to print. Private (gitignored). |
+
+The `browser` connector is bigger than the others, so its code is split into `run.py` (commands), `core.py` (plumbing),
+`panel.py` (the runner panel) and `player.py` (scenarios). Its `GUIDE.md` explains each.
 
 ## Official connector first
 
@@ -26,7 +34,7 @@ The same goes for any other system your tool already reaches. Use our scripts wh
 | `ec2-ssm`    | List AWS EC2 servers and run commands on them through SSM           | `--write`: any command    |
 | `db-ssh`     | Query PostgreSQL, MySQL/MariaDB, or SQL Server over the network, directly or through an SSH bastion | `--write`: change data |
 | `aws-rds`    | Query AWS Aurora (PostgreSQL or MySQL) through the AWS API          | `--write`: change data    |
-| `browser`    | Open a website in a visible Chrome window, log in, read pages, click, take screenshots (for QA) | `click` on risky words needs `--write` |
+| `browser`    | Test a website in a visible Chrome window with a Cypress-style runner panel: sign in, click, type, check what is visible, hidden or disabled, watch network calls, run saved scenarios | Risky clicks need `--write` |
 
 ### `db-ssh` or `aws-rds`?
 
@@ -61,7 +69,7 @@ Both run SQL. They reach the database in different ways:
 ## Setup (done once by the user)
 
 ```
-pip install -r connectors/requirements.txt     # only db-ssh, aws-rds, ec2-ssm and browser need this
+pip install -r requirements.txt                # only db-ssh, aws-rds, ec2-ssm and browser need this
 cp connectors/<name>/.env.example connectors/<name>/.env
 # edit .env, then:
 python connectors/<name>/run.py test

@@ -16,6 +16,16 @@ Status: draft | verified · Updated: YYYY-MM-DD · Level 1 · Part of: [<product
 
 **What it is not:** <The most common wrong guess, and what is true.>
 
+## Where it lives and how to sign in
+For testing (`qa-tester/`): the facts a test's plan.md needs to fill in its Login section automatically, so nobody
+has to rediscover them each time. **Never put a username, password, or token here** — this page is pushed to git.
+If the address itself must stay private, write "see environments.local.md" instead of the real one.
+
+- Address (or environment name): <e.g. https://example.com, or "see environments.local.md">
+- Sign-in page: <path, e.g. login.aspx, or "same as the address above">
+- How signing in behaves: <anything a tester should expect — a delay, a message after a wrong password, a sign-in
+  form served from another domain, multi-factor, and so on>
+
 ## What it owns
 The data and decisions that belong to this system and nobody else.
 - <Thing it owns, for example "the status of every shipment">

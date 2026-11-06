@@ -5,13 +5,13 @@ Goal: a short file, always current, that lets a new chat with any AI continue th
 
 ## Use the save command
 
-`chat-sessions/save.py` creates and edits the file for you. Run it from the toolkit folder.
+`chat-sessions/save-session.py` creates and edits the file for you. Run it from the toolkit folder.
 
 ```
-python chat-sessions/save.py start "Fix refund bug" --goal "Partial refunds double count tax" --product shop
-python chat-sessions/save.py note --section "Where we are" --replace --text "Cause found" --text "Fix in progress"
-python chat-sessions/save.py note --section "Decisions" --text "Round per line, because the spec says so"
-python chat-sessions/save.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
+python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" --product shop
+python chat-sessions/save-session.py note --section "Where we are" --replace --text "Cause found" --text "Fix in progress"
+python chat-sessions/save-session.py note --section "Decisions" --text "Round per line, because the spec says so"
+python chat-sessions/save-session.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
 ```
 
 - `start` makes `chat-sessions/YYYY-MM-DD-topic.md`, points `LATEST.md` at it, and rebuilds `INDEX.md` (one line per session).

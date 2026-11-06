@@ -1,10 +1,10 @@
 """Save chat sessions with one command. Standard library only.
 
-    python chat-sessions/save.py start "Fix refund bug" --goal "Partial refunds double count tax" [--product shop]
-    python chat-sessions/save.py note --section "Where we are" --replace --text "Found the cause" --text "Fix in progress"
-    python chat-sessions/save.py note --section "Decisions" --text "Use rounding at line level, because the spec says so"
-    python chat-sessions/save.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
-    python chat-sessions/save.py index          # rebuild INDEX.md: one line per saved session
+    python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" [--product shop]
+    python chat-sessions/save-session.py note --section "Where we are" --replace --text "Found the cause" --text "Fix in progress"
+    python chat-sessions/save-session.py note --section "Decisions" --text "Use rounding at line level, because the spec says so"
+    python chat-sessions/save-session.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
+    python chat-sessions/save-session.py index          # rebuild INDEX.md: one line per saved session
 
 `note` works on the session named in LATEST.md (or --file). It edits the newest "Session N" block.
 `--replace` swaps the whole section; without it the text is added to the end of the section.
@@ -78,7 +78,7 @@ def cmd_start(args):
 def cmd_note(args):
     path = ROOT / args.file if args.file else latest_file()
     if not path or not path.exists():
-        die("no session yet. Run: python chat-sessions/save.py start \"<topic>\" --goal \"<goal>\"")
+        die("no session yet. Run: python chat-sessions/save-session.py start \"<topic>\" --goal \"<goal>\"")
     wanted = next((s for s in SECTIONS if s.lower() == args.section.lower()), None)
     if not wanted:
         die(f"unknown section '{args.section}'. Use one of: {', '.join(SECTIONS)}")

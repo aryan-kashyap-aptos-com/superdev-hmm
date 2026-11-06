@@ -7,5 +7,5 @@ Open in this order:
 2. `tasks/`: one folder per task, each with `notes.md` (what we did, what we saw, the result).
 3. `summary.md`: written last, for someone who has never seen the product.
 
-Check it the way a real run is checked: `python qa-tester/testrun.py check qa-tester/examples/chart-library-upgrade`.
+Check it the way a real run is checked: `python qa-tester/test-run.py check qa-tester/examples/chart-library-upgrade`.
 Real runs go in `qa-tester/runs/`, which is private and never pushed.

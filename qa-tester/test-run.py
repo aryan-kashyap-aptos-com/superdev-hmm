@@ -1,14 +1,23 @@
 """Set up and check a QA test run. Standard library only.
 
-    python qa-tester/testrun.py new "Charts library upgrade" --ticket ABC-123 [--env site-name]
-        creates qa-tester/runs/<date>-<topic>/ with plan.md to fill in (do this FIRST, before touching the website)
-    python qa-tester/testrun.py task <run> "Open the report pages"
-        creates tasks/NN-<name>/ inside the run: notes.md, screenshots/, network/
-    python qa-tester/testrun.py check <run>
+    python qa-tester/test-run.py new "Charts library upgrade" --ticket ABC-123 \
+        [--site https://example.com] [--login login.aspx] [--user tester] [--password "..."]
+        creates qa-tester/runs/<date>-<topic>/ with plan.md to fill in (do this FIRST, before touching the website),
+        and makes this run the active one (see `use`, below). Any of --site/--login/--user/--password you give are
+        written into the plan's Login section; leave them out and fill in the placeholders by hand instead.
+    python qa-tester/test-run.py task <run> "Open the report pages"
+        creates tasks/NN-<name>/ inside the run: notes.md, screenshots/, network/. Also makes <run> the active one.
+    python qa-tester/test-run.py use <run>
+        makes <run> the active one, so the browser connector knows which site and login to use without --site/--run.
+    python qa-tester/test-run.py check <run>
         checks the plan, the tasks, and the final summary.md (sections, result words, evidence files)
 
 <run> is the folder name under qa-tester/runs/ (or a path).
 Result words: Verified, Issue found, Could not verify, Not tested.
+
+No .env file is needed for website testing: each run's plan.md carries its own site and login, in the Login
+section, because different tests target different websites with different accounts. qa-tester/runs/ is never
+pushed to git, so a real password in a plan.md stays private.
 """
 import argparse
 import datetime
@@ -40,6 +49,23 @@ def run_dir(name, base=RUNS):
     return p if p.is_absolute() or p.exists() else base / name
 
 
+LOGIN_ROW = {"site": "Site address", "login": "Sign-in page", "user": "Username", "password": "Password"}
+
+
+def fill_login(text, **values):
+    """Replace the placeholder cell of each given Login row ("site", "login", "user", "password") with its value."""
+    for key, value in values.items():
+        if value is None:
+            continue
+        label = LOGIN_ROW[key]
+        text = re.sub(rf"(\|\s*{re.escape(label)}\s*\|)[^\n|]*(\|)", lambda m: m.group(1) + f" {value} " + m.group(2), text, count=1)
+    return text
+
+
+def set_active(folder, base):
+    (base / "ACTIVE").write_text(folder.name, encoding="utf-8")
+
+
 def cmd_new(a):
     folder = a.base / f"{datetime.date.today().isoformat()}-{slug(a.topic)}"
     if folder.exists():
@@ -50,17 +76,28 @@ def cmd_new(a):
     text = text.replace("Date: YYYY-MM-DD", f"Date: {datetime.date.today().isoformat()}", 1)
     if a.ticket:
         text = text.replace("Source: <ticket ID or request>", f"Source: {a.ticket}", 1)
-    if a.env:
-        text = text.replace("Environment: <name from environments.md>", f"Environment: {a.env}", 1)
+    if a.environment:
+        text = text.replace("Environment: <dev / qa / uat / other, in plain words>", f"Environment: {a.environment}", 1)
+    text = fill_login(text, site=a.site, login=a.login, user=a.user, password=a.password)
     (folder / "plan.md").write_text(text, encoding="utf-8")
-    print(f"Created {folder}\nNext: fill in {folder / 'plan.md'}, then add a task folder for each task:\n"
-          f'  python qa-tester/testrun.py task {folder.name} "<what you do>"')
+    set_active(folder, a.base)
+    print(f"Created {folder} (now the active run)\nNext: fill in the rest of {folder / 'plan.md'} "
+          f"(the Login section first, unless you gave it above), then add a task folder for each task:\n"
+          f'  python qa-tester/test-run.py task {folder.name} "<what you do>"')
+
+
+def cmd_use(a):
+    folder = run_dir(a.run, a.base)
+    if not (folder / "plan.md").exists():
+        sys.exit(f"ERROR: {folder} has no plan.md, so it is not a run. Use `new` to create one.")
+    set_active(folder, a.base)
+    print(f"Active run: {folder.name}")
 
 
 def cmd_task(a):
     folder = run_dir(a.run, a.base)
     if not (folder / "plan.md").exists():
-        sys.exit(f"ERROR: {folder} has no plan.md. Create the run first: python qa-tester/testrun.py new \"<topic>\"")
+        sys.exit(f"ERROR: {folder} has no plan.md. Create the run first: python qa-tester/test-run.py new \"<topic>\"")
     n = len([p for p in (folder / "tasks").glob("*") if p.is_dir()]) + 1
     task = folder / "tasks" / f"{n:02d}-{slug(a.name, 4)}"
     (task / "screenshots").mkdir(parents=True)
@@ -68,6 +105,7 @@ def cmd_task(a):
     text = (TEMPLATES / "task-notes.md").read_text(encoding="utf-8")
     text = text.replace("# Task: <task name>", f"# Task: {a.name}", 1).replace("Date: YYYY-MM-DD", f"Date: {datetime.date.today().isoformat()}", 1)
     (task / "notes.md").write_text(text, encoding="utf-8")
+    set_active(folder, a.base)
     print(f"Created {task}\nUse it with the browser:  --run {folder.name} --task {task.name}")
 
 
@@ -87,9 +125,35 @@ def headings(text):
     return {m.group(1).strip().lower() for m in re.finditer(r"^#{1,6}\s+(.+?)\s*$", re.sub(r"```.*?```", "", text, flags=re.S), re.M)}
 
 
+def plan_password(plan_text):
+    """The Login section's password, or None if it is still a placeholder or "none"."""
+    m = re.search(r"^##\s+Login\s*$(.*?)(?=^##\s|\Z)", plan_text, re.M | re.S | re.I)
+    for line in (m.group(1).splitlines() if m else []):
+        cells = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(cells) >= 2 and cells[0].lower() == "password":
+            value = "|".join(cells[1:]).strip().strip("`").strip()
+            if value and not re.fullmatch(r"<.*>", value) and value.lower() not in ("none", "-", "n/a"):
+                return value
+    return None
+
+
+def leaked_password(folder, password):
+    """Files (other than plan.md) that contain the plain password. The password must never leave plan.md."""
+    hits = []
+    for p in folder.rglob("*"):
+        if p.is_file() and p.name != "plan.md" and p.suffix.lower() in (".md", ".txt", ".json", ".csv"):
+            try:
+                if password in p.read_text(encoding="utf-8", errors="ignore"):
+                    hits.append(str(p.relative_to(folder)))
+            except OSError:
+                continue
+    return hits
+
+
 def check(folder):
     errors, warnings = [], []
     plan = folder / "plan.md"
+    password = None
     if not plan.exists():
         errors.append("plan.md is missing (write the plan before testing)")
     else:
@@ -97,6 +161,7 @@ def check(folder):
         left = PLACEHOLDER.findall(re.sub(r"```.*?```", "", text, flags=re.S))
         if left:
             errors.append(f"plan.md still has template text ({left[0]} and {len(left) - 1} more)" if len(left) > 1 else f"plan.md still has template text ({left[0]})")
+        password = plan_password(text)
     tasks = sorted(p for p in (folder / "tasks").glob("*") if p.is_dir()) if (folder / "tasks").exists() else []
     if not tasks:
         warnings.append("no task folders yet")
@@ -110,6 +175,10 @@ def check(folder):
             errors.append(f"{t.name}: notes.md still has template text")
         if not any((t / d).glob("*.png") for d in ("screenshots", "pages")) and not list(t.glob("**/*.png")):
             warnings.append(f"{t.name}: no screenshots")
+    if password:
+        hits = leaked_password(folder, password)
+        if hits:
+            errors.append("the Login password from plan.md appears in: " + ", ".join(hits) + " (it must never leave plan.md)")
     summary = folder / "summary.md"
     if not summary.exists():
         warnings.append("summary.md is missing (compile it when the tasks are done)")
@@ -160,7 +229,16 @@ def main():
     p = argparse.ArgumentParser(description="Set up and check a QA test run.")
     p.add_argument("--base", type=Path, default=RUNS, help=argparse.SUPPRESS)   # used by tests
     sub = p.add_subparsers(dest="cmd", required=True)
-    n = sub.add_parser("new"); n.add_argument("topic"); n.add_argument("--ticket"); n.add_argument("--env"); n.set_defaults(fn=cmd_new)
+    n = sub.add_parser("new")
+    n.add_argument("topic")
+    n.add_argument("--ticket")
+    n.add_argument("--environment", help="dev / qa / uat / other, in plain words")
+    n.add_argument("--site", help="the site's address, for the Login section")
+    n.add_argument("--login", help="the sign-in page, for the Login section")
+    n.add_argument("--user", help="the test account's username, for the Login section")
+    n.add_argument("--password", help="the test account's password, for the Login section")
+    n.set_defaults(fn=cmd_new)
+    u = sub.add_parser("use"); u.add_argument("run"); u.set_defaults(fn=cmd_use)
     t = sub.add_parser("task"); t.add_argument("run"); t.add_argument("name"); t.set_defaults(fn=cmd_task)
     k = sub.add_parser("check"); k.add_argument("run"); k.set_defaults(fn=cmd_check)
     a = p.parse_args()

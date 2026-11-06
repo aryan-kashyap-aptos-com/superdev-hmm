@@ -7,7 +7,7 @@ Works for Linux (shell) and Windows (PowerShell) servers that have the SSM agent
 
 ## Setup
 
-1. `pip install -r connectors/requirements.txt`
+1. `pip install -r requirements.txt`
 2. Copy `.env.example` to `.env` and fill it in.
 3. Log in to AWS the way you normally do, then run `python connectors/ec2-ssm/run.py test`.
 
@@ -40,7 +40,7 @@ If the login expired, see "Which AWS login to use (SSO)" in `connectors/aws-rds/
 
 - Linux: `uptime` ran fine. Windows: `Get-Service | Where-Object { $_.Status -eq 'Running' } | Select-Object -First 3 Name,Status` ran fine.
 - Write one pipeline, not two commands joined by `;`. In read-only mode `;` is refused by design.
-- Check the guard with the self-test (`python connectors/selftest.py`), not by sending blocked commands to a real server.
+- Check the guard with the self-test (`python tests/selftest.py`), not by sending blocked commands to a real server.
 
 ## Rules
 

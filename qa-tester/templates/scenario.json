@@ -1,0 +1,28 @@
+{
+  "name": "Example: order search page",
+  "_comment": "Leave out \"site\" to use the active run (qa-tester/test-run.py use <run>). Name a site here only for one listed in environments(.local).md, reused across runs.",
+  "cases": [
+    {"id": "C1", "title": "A user can sign in", "steps": [
+      {"do": "login"},
+      {"expect": "visible", "target": "Orders"},
+      {"expect": "hidden", "target": "Sign out", "note": "the sign-out link stays hidden until the user menu opens"}
+    ]},
+    {"id": "C2", "title": "Search finds an order and shows its details", "steps": [
+      {"do": "goto", "url": "orders/search"},
+      {"expect": "disabled", "target": "role=button[name='Search']", "note": "Search is disabled until something is typed"},
+      {"do": "fill", "target": "label=Order number", "value": "1042"},
+      {"expect": "enabled", "target": "role=button[name='Search']"},
+      {"do": "click", "target": "role=button[name='Search']"},
+      {"expect": "request", "value": "/api/orders", "status": 200},
+      {"expect": "text", "target": "css=h1", "value": "Order 1042"},
+      {"do": "scroll", "to": "bottom"},
+      {"expect": "visible", "target": "Order total"},
+      {"expect": "no-failed-requests"},
+      {"expect": "no-console-errors"},
+      {"do": "screenshot", "name": "order-details"}
+    ]},
+    {"id": "C3", "title": "A user without rights cannot cancel", "steps": [
+      {"expect": "absent", "target": "role=button[name='Cancel order']"}
+    ]}
+  ]
+}

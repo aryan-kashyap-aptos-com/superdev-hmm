@@ -9,7 +9,7 @@ If you have AWS access but no network path to an Aurora database, use `aws-rds` 
 
 ## Setup
 
-1. `pip install -r connectors/requirements.txt`
+1. `pip install -r requirements.txt`
 2. Copy `.env.example` to `.env` and fill it in. Set `DB_ENGINE`.
 3. SSH tunnel:
    - OpenSSH key: connect once by hand (`ssh user@bastion`) to accept the host key.

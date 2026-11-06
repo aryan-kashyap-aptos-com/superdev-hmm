@@ -1,7 +1,7 @@
 """Check a product's knowledge pages. Standard library only.
 
-    python product-knowledge/lint.py <product>
-    python product-knowledge/lint.py <product> --strict     # warnings also fail
+    python product-knowledge/check-pages.py <product>
+    python product-knowledge/check-pages.py <product> --strict     # warnings also fail
 
 Errors (exit code 1): broken links, template text left in, missing required sections,
 verified pages without evidence, coverage map rows that point to missing pages.

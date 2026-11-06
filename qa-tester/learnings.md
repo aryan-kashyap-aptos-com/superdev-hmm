@@ -28,8 +28,20 @@ Keep it general: no customer names, accounts, or passwords here.
 - Odd values (negative durations, the same word in three spellings, a stray row of symbols) are worth listing as "needs an owner's answer", not as confirmed bugs.
 - A small browser window can switch a page to a narrow layout and give misleading screenshots. Use the connector's large window, and quit and restart the browser after changing it.
 
+## Typing and signing in
+- A form can re-draw while you type and drop characters (a username ended up cut off and the sign-in was refused). Confirm each field
+  holds the full value before pressing Sign in; the browser connector now does this and refuses to submit otherwise.
+- A site's base address may answer 403 instead of showing the sign-in page. Name the sign-in page in the environments row (`login: <path>`).
+- After one refused sign-in, stop and look (`elements`, `state "label=..."`) before trying again. Accounts lock.
+
+## Checking states
+- "Is it there" is not enough. Check visible or hidden (and why), enabled or disabled, in view, covered, clickable.
+- Image buttons (`input type=image`, such as an "Export To Excel" icon) are buttons; find them by their alt text.
+- Many menus keep their links in the page but hidden (for example a Sign Out link until the user menu opens). `hidden` is the right check.
+- Screenshots must not contain the tester's own overlays. Use the connector's outline (it fades and is removed before capture).
+
 ## Folders and sharing
-- One run folder per piece of testing, one task folder per task. Plan first, summary last, then run `testrun.py check`.
+- One run folder per piece of testing, one task folder per task. Plan first, summary last, then run `test-run.py check`.
 - The repository is public. Never push run folders, site maps, real addresses, screenshots of internal systems, or session notes. Real sites go in `environments.local.md`.
 
 ## Working with the user

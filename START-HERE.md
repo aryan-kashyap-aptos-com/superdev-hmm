@@ -20,8 +20,11 @@ All paths below are relative to the `super-dev/` folder.
 | `skills/`            | Step-by-step methods for specific tasks         | Only when the task matches (section 3)     |
 | `connectors/`        | Scripts for Jira, Confluence, AWS, databases... | Only when you need data from such a system |
 | `product-knowledge/` | How the products work, and all their scenarios  | Before you ask the user a product question |
-| `qa-tester/`         | Plans, runs, and reports for testing software   | When the user wants something tested       |
+| `qa-tester/`         | How to test software; every test run's files    | When the user wants something tested       |
 | `chat-sessions/`     | Saved summaries of past chats                   | Session start, and when saving a session   |
+| `tests/`             | `selftest.py`: checks this toolkit offline      | After you change any script here           |
+
+Every folder has a `README.md` that says what it holds. Read it before you add a file there.
 
 ## 3. Skills
 
@@ -40,7 +43,7 @@ Open only the skill the task needs. Never load all of them.
 
 ## 4. Connectors
 
-To get data from Jira, Confluence, Harness, Sumo Logic, MS Teams, AWS, or a database:
+To get data from Jira, Confluence, Harness, Sumo Logic, MS Teams, AWS, or a database, or to test a website (`browser`):
 
 1. Read `connectors/README.md`. It says which connector to use.
 2. Read only the `GUIDE.md` of that connector.
@@ -58,8 +61,8 @@ Connectors are read-only by default. Never use `--write` without the user's clea
 
 Do not wait for the user to say "save session". Keep the session file current, so the chat can end at any time:
 
-- After the first real task starts, run `python chat-sessions/save.py start "<topic>" --goal "<goal>"`.
-- After each finished step, decision, or failed attempt, run `python chat-sessions/save.py note ...`. One or two lines is enough.
+- After the first real task starts, run `python chat-sessions/save-session.py start "<topic>" --goal "<goal>"`.
+- After each finished step, decision, or failed attempt, run `python chat-sessions/save-session.py note ...`. One or two lines is enough.
   Details and examples: `skills/save-session.md`.
 - Keep it short. Rewrite "Where we are" and "Next steps"; do not keep adding history there.
 
@@ -88,4 +91,5 @@ Do this once per tool, and every chat will load the rules and save its session.
 
 - New skill: add `skills/<name>.md`, then add one row to section 3.
 - New connector: follow "Add a connector" in `connectors/README.md`.
-- Keep this file under 100 lines.
+- Where any other file goes: the table "Where does a new file go?" in `README.md`.
+- After a change, run `python tests/selftest.py`. Keep this file under 100 lines.

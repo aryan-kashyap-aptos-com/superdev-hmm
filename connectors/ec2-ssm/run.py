@@ -99,7 +99,7 @@ def _aws(service):
         import boto3
     except ImportError:
         raise c.ConnectorError("The boto3 package is not installed.",
-                               "Run: pip install -r connectors/requirements.txt") from None
+                               "Run: pip install -r requirements.txt") from None
     return boto3.client(service, region_name=c.setting("AWS_REGION"))
 
 

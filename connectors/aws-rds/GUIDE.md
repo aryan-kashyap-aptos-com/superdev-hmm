@@ -8,7 +8,7 @@ If you can reach the database over the network or through an SSH bastion, use `d
 
 ## Setup
 
-1. `pip install -r connectors/requirements.txt`
+1. `pip install -r requirements.txt`
 2. The cluster must have the Data API turned on. The database password must be stored in AWS Secrets Manager.
 3. Copy `.env.example` to `.env` and fill it in. Set `RDS_ENGINE` to `postgres` or `mysql`.
 4. Log in to AWS the way you normally do (profile or SSO), then run `python connectors/aws-rds/run.py test`.

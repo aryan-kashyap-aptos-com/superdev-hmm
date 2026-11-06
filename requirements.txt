@@ -1,4 +1,4 @@
-# Only db-ssh, aws-rds and ec2-ssm need packages. The other connectors use the Python standard library.
+# Optional packages. Only db-ssh, aws-rds, ec2-ssm and browser need them; everything else uses the Python standard library.
 # Install everything, or only the lines you need.
 psycopg[binary]>=3.1   # db-ssh: PostgreSQL
 PyMySQL>=1.1           # db-ssh: MySQL / MariaDB
