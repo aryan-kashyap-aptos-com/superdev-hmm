@@ -26,6 +26,7 @@ The same goes for any other system your tool already reaches. Use our scripts wh
 | `ec2-ssm`    | List AWS EC2 servers and run commands on them through SSM           | `--write`: any command    |
 | `db-ssh`     | Query PostgreSQL, MySQL/MariaDB, or SQL Server over the network, directly or through an SSH bastion | `--write`: change data |
 | `aws-rds`    | Query AWS Aurora (PostgreSQL or MySQL) through the AWS API          | `--write`: change data    |
+| `browser`    | Open a website in a visible Chrome window, log in, read pages, click, take screenshots (for QA) | `click` on risky words needs `--write` |
 
 ### `db-ssh` or `aws-rds`?
 
@@ -60,7 +61,7 @@ Both run SQL. They reach the database in different ways:
 ## Setup (done once by the user)
 
 ```
-pip install -r connectors/requirements.txt     # only db-ssh, aws-rds and ec2-ssm need this
+pip install -r connectors/requirements.txt     # only db-ssh, aws-rds, ec2-ssm and browser need this
 cp connectors/<name>/.env.example connectors/<name>/.env
 # edit .env, then:
 python connectors/<name>/run.py test

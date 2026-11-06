@@ -3,3 +3,13 @@
 connectors/results/
 __pycache__/
 *.pyc
+# saved chats stay on this machine
+chat-sessions/2*.md
+chat-sessions/INDEX.md
+chat-sessions/LATEST.md
+# QA runs hold screenshots and logs that can contain customer data
+qa-tester/runs/*
+!qa-tester/runs/.gitkeep
+qa-tester/.browser-profile/
+qa-tester/sites/
+qa-tester/environments.local.md

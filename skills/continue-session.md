@@ -5,7 +5,7 @@ Use at the start of a chat when `chat-sessions/LATEST.md` names a file, or when 
 ## Steps
 
 1. Open `chat-sessions/LATEST.md`. Read the `File:` line.
-   - If it says `(none)`, there is nothing to resume. Tell the user and wait for a task.
+   - If the file is missing or says `(none)`, there is nothing to resume. Tell the user and wait for a task.
 2. Open that session file. If it has several `## Session N` sections, read the last one fully and the others only for decisions.
 3. Do not open the files it mentions yet. Open them only when a next step needs them.
 4. Tell the user, in at most 5 lines:

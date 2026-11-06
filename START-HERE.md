@@ -9,6 +9,7 @@ All paths below are relative to the `super-dev/` folder.
 
 1. Read the three files in `rules/`. Follow them at all times.
 2. Open `chat-sessions/LATEST.md`. If it names a session file, follow `skills/continue-session.md`.
+   (If the file is missing, there is no earlier session. `chat-sessions/INDEX.md` lists all saved sessions.)
 3. Then do what the user asks.
 
 ## 2. What is in this folder
@@ -19,6 +20,7 @@ All paths below are relative to the `super-dev/` folder.
 | `skills/`            | Step-by-step methods for specific tasks         | Only when the task matches (section 3)     |
 | `connectors/`        | Scripts for Jira, Confluence, AWS, databases... | Only when you need data from such a system |
 | `product-knowledge/` | How the products work, and all their scenarios  | Before you ask the user a product question |
+| `qa-tester/`         | Plans, runs, and reports for testing software   | When the user wants something tested       |
 | `chat-sessions/`     | Saved summaries of past chats                   | Session start, and when saving a session   |
 
 ## 3. Skills
@@ -34,6 +36,7 @@ Open only the skill the task needs. Never load all of them.
 | The chat is long, or the user says "save session"              | `skills/save-session.md`      |
 | The user says "continue", or `LATEST.md` names a file          | `skills/continue-session.md`  |
 | The user says "save what we learned"                           | `skills/save-to-knowledge.md` |
+| The user wants a ticket, feature, API, or website tested       | `qa-tester/method.md`         |
 
 ## 4. Connectors
 
@@ -55,8 +58,9 @@ Connectors are read-only by default. Never use `--write` without the user's clea
 
 Do not wait for the user to say "save session". Keep the session file current, so the chat can end at any time:
 
-- After the first real task starts, create the session file (`skills/save-session.md`).
-- After each finished step, decision, or failed attempt, update that file. One or two lines is enough.
+- After the first real task starts, run `python chat-sessions/save.py start "<topic>" --goal "<goal>"`.
+- After each finished step, decision, or failed attempt, run `python chat-sessions/save.py note ...`. One or two lines is enough.
+  Details and examples: `skills/save-session.md`.
 - Keep it short. Rewrite "Where we are" and "Next steps"; do not keep adding history there.
 
 ## 7. Save tokens
@@ -72,7 +76,15 @@ Do not wait for the user to say "save session". Keep the session file current, s
 Ask the user to paste what you need: first `rules/`, then one skill.
 For connectors, give the user the exact command to run and ask them to paste the output.
 
-## 9. Changing this toolkit
+## 9. Make every chat load this toolkit (user, once)
+
+Nothing forces an AI to read this file. In the start-up file of each AI tool you use (the one it reads on every chat), add one line:
+
+> At the start of every chat, read `<full path to super-dev>/START-HERE.md` and follow it.
+
+Do this once per tool, and every chat will load the rules and save its session.
+
+## 10. Changing this toolkit
 
 - New skill: add `skills/<name>.md`, then add one row to section 3.
 - New connector: follow "Add a connector" in `connectors/README.md`.

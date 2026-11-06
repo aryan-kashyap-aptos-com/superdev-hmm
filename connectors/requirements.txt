@@ -4,3 +4,4 @@ psycopg[binary]>=3.1   # db-ssh: PostgreSQL
 PyMySQL>=1.1           # db-ssh: MySQL / MariaDB
 pymssql>=2.3           # db-ssh: SQL Server
 boto3>=1.28            # aws-rds, ec2-ssm
+playwright>=1.49       # browser: visible Chrome for QA testing

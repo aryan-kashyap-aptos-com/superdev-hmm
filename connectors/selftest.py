@@ -390,6 +390,112 @@ class Mock(BaseHTTPRequestHandler):
     do_GET = do_POST = do_PUT = do_DELETE = handle_any
 
 
+def test_save_session():
+    import shutil
+    with tempfile.TemporaryDirectory() as d:
+        sess = Path(d) / "chat-sessions"
+        sess.mkdir()
+        shutil.copy(ROOT / "chat-sessions" / "save.py", sess / "save.py")
+
+        def save(*a):
+            r = subprocess.run([sys.executable, str(sess / "save.py"), *a], capture_output=True, text=True, encoding="utf-8")
+            return r.returncode, r.stdout + r.stderr
+
+        code, out = save("note", "--section", "Decisions", "--text", "x")
+        check("save: note before start gives a clear error", code != 0 and "no session yet" in out, out)
+        code, out = save("start", "Fix refund bug", "--goal", "Partial refunds double count tax")
+        check("save: start creates the file and LATEST.md", code == 0 and "refund-bug" in (sess / "LATEST.md").read_text(encoding="utf-8"), out)
+        save("note", "--section", "Next steps", "--replace", "--text", "Run tests", "--text", "Open PR")
+        save("note", "--section", "Decisions", "--text", "Round per line")
+        save("note", "--section", "Decisions", "--text", "Use cents")
+        f = next(p for p in sess.glob("2*.md"))
+        text = f.read_text(encoding="utf-8")
+        check("save: numbered next steps", "1. Run tests" in text and "2. Open PR" in text, text)
+        check("save: notes are added, placeholder removed", "- Round per line" in text and "- Use cents" in text and "(none yet)" not in text.split("### Decisions")[1].split("###")[0], text)
+        save("note", "--section", "next steps", "--replace", "--text", "Only this")
+        text = f.read_text(encoding="utf-8")
+        check("save: replace swaps the section", "1. Only this" in text and "Open PR" not in text, text)
+        code, out = save("note", "--section", "Nonsense", "--text", "x")
+        check("save: unknown section is an error", code != 0 and "unknown section" in out, out)
+        save("start", "Fix refund bug", "--goal", "Second goal")
+        check("save: same topic on the same day adds Session 2", "## Session 2" in f.read_text(encoding="utf-8"))
+        index = (sess / "INDEX.md").read_text(encoding="utf-8")
+        check("save: INDEX lists the session with goal and next step", "Fix refund bug" in index and "Second goal" in index, index)
+
+
+def test_browser_helpers():
+    b = load("browser")
+    with tempfile.TemporaryDirectory() as d:   # a sample environments file, so the test needs no private file
+        head = "| Name | Address | Kind | Login | Notes |\n|---|---|---|---|---|\n"
+        (Path(d) / "environments.md").write_text(
+            head + "| demo | https://site.example.test/app/ | dev | `QA_DEMO_USER`, `QA_DEMO_PASSWORD` | sample |\n", encoding="utf-8")
+        b.QA = Path(d)
+        rows = b.sites()
+        check("browser: sites are read from the environments table",
+              len(rows) == 1 and rows[0]["host"] == "site.example.test" and rows[0]["settings"] == ["QA_DEMO_USER", "QA_DEMO_PASSWORD"], str(rows))
+        check("browser: an unlisted site is refused", raises(b.check_allowed, "https://example.com/x"))
+        check("browser: a listed site is allowed", not raises(b.check_allowed, "https://site.example.test/app/login"))
+        (Path(d) / "environments.local.md").write_text(
+            head + "| mine | https://mine.example.test/ | dev | `A_USER`, `A_PASSWORD` | x |\n", encoding="utf-8")
+        check("browser: the private local file adds sites", {s["name"] for s in b.sites()} == {"demo", "mine"})
+        check("browser: task folders are runs/<run>/tasks/<task>/<kind>",
+              b.task_folder("r1", "t1", "screenshots") == Path(d) / "runs" / "r1" / "tasks" / "t1" / "screenshots"
+              and b.task_folder("r1", None, "screenshots") == Path(d) / "runs" / "r1" / "screenshots")
+    check("browser: query values never shown, names are",
+          b.safe_url("https://h.com/p/x?token=SECRET&id=7", "h.com") == "/p/x?{token,id}")
+    check("browser: other hosts are shown with their name", b.safe_url("https://other.com/a?b=1", "h.com") == "other.com/a?{b}")
+    os.environ["QA_TEST_PASSWORD"] = "Sup3r-Secret"
+    check("browser: passwords are redacted from page text", "Sup3r-Secret" not in b.redact("text: Sup3r-Secret end"))
+    check("browser: risky words in a click need --write", bool(b.RISKY.search("Delete order")) and not b.RISKY.search("Analytics"))
+    check("browser: crawl skips logout, delete and exports",
+          all(b.SKIP_URL.search(u) for u in ("/a/logout.aspx", "/x?delete=1", "/f.csv", "javascript:void(0)")) and not b.SKIP_URL.search("/backadmin/orders.aspx"))
+
+
+def test_testrun():
+    with tempfile.TemporaryDirectory() as d:
+        base = Path(d)
+
+        def tr(*a):
+            r = subprocess.run([sys.executable, str(ROOT / "qa-tester" / "testrun.py"), "--base", d, *a],
+                               capture_output=True, text=True, encoding="utf-8")
+            return r.returncode, r.stdout + r.stderr
+
+        code, out = tr("new", "Chart upgrade", "--ticket", "ABC-1", "--env", "demo")
+        run = next(base.glob("*-chart-upgrade"), None)
+        check("testrun: new creates the run folder with plan.md",
+              code == 0 and run and (run / "plan.md").exists() and "ABC-1" in (run / "plan.md").read_text(encoding="utf-8"), out)
+        code, out = tr("check", run.name)
+        check("testrun: an unfilled plan is an error", code == 1 and "plan.md still has template text" in out, out)
+        code, out = tr("task", run.name, "Log in")
+        task = next((run / "tasks").glob("01-*"), None)
+        check("testrun: task creates notes.md, screenshots and network",
+              code == 0 and (task / "notes.md").exists() and (task / "screenshots").is_dir() and (task / "network").is_dir(), out)
+        (run / "plan.md").write_text("# Test plan: x\n\nStatus: done\n\n## Goal\nCheck it.\n", encoding="utf-8")
+        (task / "notes.md").write_text("# Task: Log in\n\n## Result\nVerified - ok\n", encoding="utf-8")
+        (task / "screenshots" / "a.png").write_bytes(b"png")
+        code, out = tr("check", run.name)
+        check("testrun: a finished plan and notes pass; a missing summary is only a warning", code == 0 and "summary.md is missing" in out, out)
+        summary = ("# T: test summary\n\n## In plain words\n" + "word " * 40 + "\n\n## The issue\nx\n\n## How it should work\nx\n\n"
+                   "## What we tested\n\n| ID | What we checked | Result | Evidence |\n|----|----|----|----|\n"
+                   "| C1 | login | Verified | tasks/01-log-in/screenshots/a.png |\n\n"
+                   "## What we found\nnothing\n\n## What we could not verify\nnothing\n\n## Conclusion\nok\n")
+        (run / "summary.md").write_text(summary, encoding="utf-8")
+        code, out = tr("check", run.name)
+        check("testrun: a complete summary passes", code == 0 and "0 errors" in out, out)
+        (run / "summary.md").write_text(summary.replace("| Verified |", "| Pass |"), encoding="utf-8")
+        code, out = tr("check", run.name)
+        check("testrun: pass/fail wording is an error", code == 1 and "pass/fail" in out and "is not one of" in out, out)
+        (run / "summary.md").write_text(summary.replace("a.png", "missing.png"), encoding="utf-8")
+        code, out = tr("check", run.name)
+        check("testrun: a missing evidence file is an error", code == 1 and "does not exist" in out, out)
+        (run / "summary.md").write_text(summary.replace("tasks/01-log-in/screenshots/a.png", ""), encoding="utf-8")
+        code, out = tr("check", run.name)
+        check("testrun: Verified without evidence is an error", code == 1 and "needs evidence" in out, out)
+        (run / "summary.md").write_text(summary.replace("word " * 40, "short"), encoding="utf-8")
+        code, out = tr("check", run.name)
+        check("testrun: a too-short 'In plain words' is an error", code == 1 and "too short" in out, out)
+
+
 def test_connectors_against_mock():
     srv = ThreadingHTTPServer(("127.0.0.1", 0), Mock)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
@@ -456,7 +562,7 @@ def test_connectors_against_mock():
 
 def main():
     for test in (test_common, test_ec2_ssm, test_db_ssh, test_sumologic_time, test_msteams_webhook, test_search,
-                 test_lint, test_connectors_against_mock):
+                 test_lint, test_save_session, test_browser_helpers, test_testrun, test_connectors_against_mock):
         print(f"\n== {test.__name__[5:]}")
         test()
     print(f"\n{'All checks passed.' if not failures else f'{len(failures)} check(s) failed:'}")
