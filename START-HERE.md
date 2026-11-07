@@ -40,6 +40,8 @@ Open only the skill the task needs. Never load all of them.
 | The user says "continue", or `LATEST.md` names a file          | `skills/continue-session.md`  |
 | The user says "save what we learned"                           | `skills/save-to-knowledge.md` |
 | The user wants a ticket, feature, API, or website tested       | `qa-tester/method.md`         |
+| Explain how a binary/app/website works, no source available   | `skills/reverse-engineer.md`  |
+| Answer a data question where definitions must be traceable    | `skills/query-with-ontology.md` |
 
 ## 4. Connectors
 

@@ -12,6 +12,8 @@ so it reads little and stays focused.
 | `save-session.md` | Saving the chat so a new one can continue (uses `chat-sessions/save-session.py`) |
 | `continue-session.md` | The user says "continue", or a saved session exists |
 | `save-to-knowledge.md` | Moving lasting facts from a chat into `product-knowledge/` |
+| `reverse-engineer.md` | Explaining how a binary, app, or website does something, with no source code |
+| `query-with-ontology.md` | Answering a business data question where the definitions must be traceable, not guessed |
 
 Testing software is bigger than one skill, so it has its own folder: `qa-tester/` (start with `qa-tester/method.md`).
 
