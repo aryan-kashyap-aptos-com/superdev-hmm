@@ -14,10 +14,12 @@ full panel first; tapping the rest of the pill (the "QA" label) brings the full 
 Because a real page reload wipes it, Panel keeps its own copy of everything shown (the plan, every result,
 every log line, the network rows) and replays that copy into a freshly (re)injected panel after navigation.
 
-Its Desktop/iPhone/Android/Tablet buttons work live, with no CLI command needed: a click just sets
-`window.top.__qa_pending_device`; the background helper (bridge.py, started by `start`) polls for that and
-does the actual device switch. A plain variable survives being read by many short-lived connections far more
-reliably than a CDP-exposed function call, which needs one single long-lived connection to answer it.
+Its Desktop/iPhone/Android/Tablet buttons, and its "Report" button, work live, with no CLI command needed:
+a click just sets `window.top.__qa_pending_device` or `window.top.__qa_report_requested`; the background
+helper (bridge.py, started by `start`) polls for those and does the actual work (switching device, or
+building report.html for the active run and opening it). A plain variable survives being read by many
+short-lived connections far more reliably than a CDP-exposed function call, which needs one single
+long-lived connection to answer it.
 """
 import json
 
@@ -52,57 +54,89 @@ CALL_JS = """([n, a]) => {
 }"""
 
 HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</title><style>
-:root{--bg:#171a26;--top:#1f2233;--line:#2c3047;--text:#d6d9e6;--dim:#7c829b;--green:#3fb950;--red:#f85149;--amber:#d9a521;--blue:#58a6ff}
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{font:13px/1.45 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text)}
+:root{
+  --bg:#0a0c12;--panel:rgba(255,255,255,.03);--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.09);--text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;
+  --green:#4ade80;--green-bg:rgba(74,222,128,.14);--green-bd:rgba(74,222,128,.32);
+  --red:#f87171;--red-bg:rgba(248,113,113,.14);--red-bd:rgba(248,113,113,.32);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,.14);--amber-bd:rgba(251,191,36,.32);
+  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.16);--accent-bd:rgba(125,211,252,.38);
+  --serif:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}
+body{font:13px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background-color:var(--bg);color:var(--text);
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.05) 1px,transparent 0);background-size:22px 22px}
 #shell{height:100%;display:flex;flex-direction:column}
 body.mini #shell{display:none}#mini{display:none}body.mini #mini{display:flex}
-#mini{position:absolute;inset:0;border-radius:20px;background:var(--top);color:var(--text);align-items:center;
-  gap:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px;border:1px solid var(--line);user-select:none}
-#mini .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
-#mini.has-issue .dot{background:var(--red)}#mini.has-pending .dot{background:var(--blue)}#mini.all-ok .dot{background:var(--green)}
+#mini{position:absolute;inset:0;border-radius:20px;background:#12151f;color:var(--text);align-items:center;
+  gap:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px;border:1px solid var(--border);user-select:none;
+  box-shadow:0 2px 10px rgba(0,0,0,.35)}
+#mini .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+#mini.has-issue .dot{background:var(--red)}#mini.has-pending .dot{background:var(--accent)}#mini.all-ok .dot{background:var(--green)}
 #mini .minidevs{display:flex;gap:3px}
-#mini .minidevs button{background:none;border:1px solid var(--line);color:var(--dim);border-radius:4px;padding:2px 5px;font:inherit;font-size:10px;cursor:pointer}
-#mini .minidevs button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
-#mini .label{margin-left:auto;flex:none}
-header{position:sticky;top:0;z-index:2;background:var(--top);border-bottom:1px solid var(--line);flex:none}
-.head{padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.headtext{min-width:0}h1{font-size:14px;margin:0;font-weight:600}.sub{color:var(--dim);font-size:12px;margin-top:2px}
-#collapseBtn{background:none;border:1px solid var(--line);color:var(--dim);border-radius:4px;padding:3px 7px;cursor:pointer;flex:none;font-size:12px}
-#collapseBtn:hover{color:var(--text);border-color:var(--dim)}
-.counts{display:flex;gap:12px;margin-top:6px;font-size:12px}.counts b{font-weight:600}
-.c-v{color:var(--green)}.c-i{color:var(--red)}.c-n{color:var(--amber)}.c-p{color:var(--dim)}
-.devices{display:flex;gap:4px;padding:6px 12px 0}
-.devices button{background:none;border:1px solid var(--line);color:var(--dim);border-radius:4px;padding:3px 8px;font:inherit;font-size:11px;cursor:pointer}
-.devices button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
-.devices button:hover:not(.on){color:var(--text);border-color:var(--dim)}
-nav{display:flex;padding:0 6px}nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:7px 10px;font:inherit;cursor:pointer}
-nav button.on{color:var(--text);border-color:var(--blue)}
-main{flex:1;overflow:auto;min-height:0}
-.case{border-bottom:1px solid var(--line)}.ct{display:flex;gap:8px;padding:8px 12px;align-items:flex-start;font-weight:600}
-.case.running>.ct{background:#22304d}.id{color:var(--dim);font-weight:400;flex:none}
-.ico{width:16px;flex:none;text-align:center;font-weight:700}
-.pending>.ct .ico,.pending .si{color:var(--dim)}.running>.ct .ico,.step.running .si{color:var(--blue)}
-.verified>.ct .ico,.step.verified .si{color:var(--green)}.issue>.ct .ico,.step.issue .si{color:var(--red)}
-.cnv>.ct .ico,.step.cnv .si{color:var(--amber)}.nt>.ct .ico,.step.nt .si{color:var(--dim)}
-.steps{padding:0 12px 8px 36px}.step{display:flex;gap:8px;padding:2px 0;color:var(--dim)}
+#mini .minidevs button{background:none;border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:2px 7px;font:inherit;font-size:10px;cursor:pointer}
+#mini .minidevs button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:700}
+#mini .label{margin-left:auto;flex:none;color:var(--dim)}
+header{position:sticky;top:0;z-index:2;background:var(--panel);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);flex:none}
+.head{padding:14px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.headtext{min-width:0}
+h1{font-family:var(--serif);font-size:16px;margin:0;font-weight:400;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{color:var(--dim);font-size:12px;margin-top:3px}
+.head-actions{display:flex;gap:6px;flex:none}
+#collapseBtn,#reportBtn{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:4px 10px;cursor:pointer;flex:none;font-size:12px;font-family:inherit}
+#collapseBtn:hover,#reportBtn:hover{color:var(--text);border-color:var(--faint)}
+#reportBtn{color:var(--accent);border-color:var(--accent-bd)}
+.counts{display:flex;gap:6px;margin-top:10px;font-size:11px;flex-wrap:wrap}
+.counts span{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:3px 10px}
+.counts b{font-weight:700}
+.c-v b{color:var(--green)}.c-i b{color:var(--red)}.c-n b{color:var(--amber)}.c-p b{color:var(--dim)}
+.devices{display:flex;gap:5px;padding:10px 14px 0}
+.devices button{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:4px 11px;font:inherit;font-size:11px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.devices button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:600}
+.devices button:hover:not(.on){color:var(--text);border-color:var(--faint)}
+nav{display:flex;padding:10px 10px 0;gap:2px}
+nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:7px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+nav button.on{color:var(--text);border-color:var(--accent)}
+main{flex:1;overflow:auto;min-height:0;padding:10px}
+.case{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.ct{display:flex;gap:8px;padding:9px 12px;align-items:flex-start;font-weight:600}
+.case.running>.ct{background:var(--accent-bg)}
+.id{color:var(--faint);font-weight:400;flex:none}
+.ico{width:16px;height:16px;flex:none;text-align:center;border-radius:50%;font-size:10px;font-weight:700;line-height:16px}
+.pending>.ct .ico,.pending .si{color:var(--faint)}
+.running>.ct .ico,.step.running .si{color:var(--accent);background:var(--accent-bg)}
+.verified>.ct .ico,.step.verified .si{color:var(--green);background:var(--green-bg)}
+.issue>.ct .ico,.step.issue .si{color:var(--red);background:var(--red-bg)}
+.cnv>.ct .ico,.step.cnv .si{color:var(--amber);background:var(--amber-bg)}
+.nt>.ct .ico,.step.nt .si{color:var(--faint)}
+.steps{padding:0 12px 10px 36px}
+.step{display:flex;gap:8px;padding:3px 0;color:var(--dim)}
 .step.running{color:var(--text);font-weight:600}.step.verified,.step.issue,.step.cnv{color:var(--text)}
-.si{width:14px;flex:none;text-align:center}.ms{margin-left:auto;color:var(--dim);font-size:11px;flex:none;padding-left:6px}
-.msg{font-size:12px;margin:1px 0 4px 22px;white-space:pre-wrap;word-break:break-word}.issue .msg{color:#ff9b95}.cnv .msg{color:#f0c96a}.verified .msg{color:var(--dim)}
+.si{width:16px;height:16px;flex:none;text-align:center;border-radius:50%;font-size:10px;line-height:16px}
+.ms{margin-left:auto;color:var(--faint);font-size:11px;flex:none;padding-left:6px}
+.msg{font-size:12px;margin:2px 0 4px 24px;white-space:pre-wrap;word-break:break-word;color:var(--dim)}
+.issue .msg{color:#ffb4ae}.cnv .msg{color:#ffd480}
 .spin{display:inline-block;animation:p 1s infinite}@keyframes p{50%{opacity:.25}}
-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}td{padding:3px 6px;border-bottom:1px solid var(--line);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-td.m{width:46px;color:var(--dim)}td.s{width:38px}td.t{width:62px;color:var(--dim)}td.ms{width:56px;text-align:right;color:var(--dim)}
+.nettbl{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 2px}
+table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;font-family:ui-monospace,Consolas,monospace}
+th{text-align:left;font:600 9.5px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:8px 8px;border-bottom:1px solid var(--border)}
+td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}
+tr:last-child td{border-bottom:none}
+td.m{width:40px}td.s{width:34px}td.t{width:54px}td.ms{width:50px;text-align:right}
 .ok{color:var(--green)}.bad{color:var(--red)}.mid{color:var(--amber)}
-.log{padding:6px 12px;border-bottom:1px solid var(--line);display:flex;gap:8px}.log .tm{color:var(--dim);font-size:11px;flex:none}
-.empty{color:var(--dim);padding:14px 12px}
+.log{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin-bottom:8px;display:flex;gap:8px}
+.log .tm{color:var(--faint);font-size:11px;flex:none}
+.empty{color:var(--dim);padding:14px 12px;text-align:center;font-size:12px}
 </style></head><body>
 <div id="shell"><header><div class="head"><div class="headtext"><h1 id="title">QA Runner</h1><div class="sub" id="sub">Waiting for a scenario. Single commands appear under Log.</div></div>
-<button id="collapseBtn" title="Collapse to a small pill">&#10095;&#10095;</button></div>
+<div class="head-actions"><button id="reportBtn" title="Build and open the full report.html for this run">Report &#8599;</button>
+<button id="collapseBtn" title="Collapse to a small pill">&#10095;&#10095;</button></div></div>
 <div class="counts" id="counts"></div>
 <div class="devices" id="devices" title="Resize the real window to a phone/tablet, or back">
 <button data-d="desktop" class="on">Desktop</button><button data-d="iphone">iPhone</button><button data-d="android">Android</button><button data-d="tablet">Tablet</button></div>
 <nav><button data-tab="tests" class="on">Tests</button><button data-tab="network">Network</button><button data-tab="log">Log</button></nav></header>
 <main><section id="tests"><div class="empty">No test cases yet.</div></section>
-<section id="network" hidden><table><tbody id="net"></tbody></table><div class="empty" id="netempty">No calls yet.</div></section>
+<section id="network" hidden><div class="nettbl"><table><tr><th class="m">Method</th><th class="s">Status</th><th class="t">Type</th><th>URL</th><th class="ms">Time</th></tr><tbody id="net"></tbody></table></div><div class="empty" id="netempty">No calls yet.</div></section>
 <section id="log" hidden><div class="empty" id="logempty">No commands yet.</div></section></main></div>
 <div id="mini" title="Switch device, or tap QA to reopen the runner"><span class="dot"></span>
 <div class="minidevs"><button data-d="desktop" class="on" title="Desktop">Dsk</button><button data-d="iphone" title="iPhone">iOS</button><button data-d="android" title="Android">And</button><button data-d="tablet" title="Tablet">Tab</button></div>
@@ -135,6 +169,7 @@ function toggle(mini){
 }
 document.getElementById('collapseBtn').onclick=()=>toggle(true);
 document.getElementById('mini').onclick=()=>toggle(false);
+document.getElementById('reportBtn').onclick=()=>{window.top.__qa_report_requested=true;};
 function setDevice(name){
   document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));
   window.top.__qa_pending_device=name;

@@ -1,23 +1,57 @@
-"""A tiny background helper so the runner panel's own device buttons (Desktop/iPhone/Android/Tablet) work
-live, with no CLI command needed. `start` launches it; `stop` ends it. It does nothing else: every real
-test command still connects and disconnects on its own, exactly as before.
+"""A tiny background helper so the runner panel's own buttons work live, with no CLI command needed:
+Desktop/iPhone/Android/Tablet, and "Report". `start` launches it; `stop` ends it. It does nothing else:
+every real test command still connects and disconnects on its own, exactly as before.
 
 It keeps one CDP connection open for as long as Chrome is open (a device resize needs that: see core.mobile)
-and just polls the page for `window.__qa_pending_device`, which a click in the panel sets. Polling a plain
-variable works from many short-lived connections at once; a CDP-exposed function bound by one connection was
-tried first and turned out not to reliably call back across separate connect_over_cdp() sessions.
+and just polls the page for `window.__qa_pending_device` and `window.__qa_report_requested`, which a click in
+the panel sets. Polling plain variables works from many short-lived connections at once; a CDP-exposed
+function bound by one connection was tried first and turned out not to reliably call back across separate
+connect_over_cdp() sessions.
 """
 import sys
 import time
+import webbrowser
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import core  # noqa: E402
 import panel as panel_mod  # noqa: E402
+import report as report_mod  # noqa: E402
 from playwright.sync_api import sync_playwright  # noqa: E402
 
-POLL_JS = """() => { const v = window.__qa_pending_device; window.__qa_pending_device = undefined; return v || null; }"""
+POLL_JS = """() => {
+  const d = window.__qa_pending_device; window.__qa_pending_device = undefined;
+  const r = !!window.__qa_report_requested; window.__qa_report_requested = false;
+  return {device: d || null, report: r};
+}"""
+
+
+def handle_device(browser, page, cdp, panel, spec):
+    try:
+        d = core.mobile(browser, page, spec, cdp=cdp)
+        panel.collapse(d is not None)
+        panel.device(spec if d else "desktop")
+        panel.log("Verified", f"mobile {spec}" if d else "mobile off",
+                  f"{d['width']}x{d['height']}" if d else "back to desktop size")
+    except Exception as e:
+        try:
+            panel.log("Issue found", f"mobile {spec}", str(e))
+        except Exception:
+            pass
+
+
+def handle_report(panel):
+    run = core.active_run()
+    if not run:
+        panel.log("Issue found", "view report", "No active run - nothing recorded to report yet.")
+        return
+    try:
+        path, events, _ = report_mod.build(run)
+        webbrowser.open(path.resolve().as_uri())
+        panel.log("Verified", "view report", f"{len(events)} recorded event(s): {path}")
+    except Exception as e:
+        panel.log("Issue found", "view report", str(e))
 
 
 def main():
@@ -31,23 +65,14 @@ def main():
                 page = core.app_page(context)
                 if page != current_page:
                     current_page, cdp = page, page.context.new_cdp_session(page)
-                spec = page.evaluate(POLL_JS)
+                flags = page.evaluate(POLL_JS)
             except Exception:
                 continue
-            if not spec:
-                continue
-            try:
-                d = core.mobile(browser, page, spec, cdp=cdp)
-                panel = panel_mod.Panel.existing(page)
-                panel.collapse(d is not None)
-                panel.device(spec if d else "desktop")
-                panel.log("Verified", f"mobile {spec}" if d else "mobile off",
-                          f"{d['width']}x{d['height']}" if d else "back to desktop size")
-            except Exception as e:
-                try:
-                    panel_mod.Panel.existing(page).log("Issue found", f"mobile {spec}", str(e))
-                except Exception:
-                    pass
+            panel = panel_mod.Panel.existing(page)
+            if flags.get("device"):
+                handle_device(browser, page, cdp, panel, flags["device"])
+            if flags.get("report"):
+                handle_report(panel)
 
 
 if __name__ == "__main__":
