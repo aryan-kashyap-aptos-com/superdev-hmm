@@ -57,9 +57,9 @@ HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</tit
 <script>document.documentElement.dataset.theme='dark';</script>
 <style>
 :root{
-  --bg:#1a1a1d;--panel:rgba(255,255,255,.03);--card:rgba(255,255,255,.05);--card-hov:rgba(255,255,255,.08);
-  --track:rgba(255,255,255,.06);--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.16);
-  --text:#f4f4f5;--dim:#a1a1aa;--faint:#71717a;--code-bg:rgba(255,255,255,.04);--mini-bg:#232327;--shadow:none;
+  --bg:#121214;--panel:rgba(255,255,255,.025);--card:rgba(255,255,255,.045);--card-hov:rgba(255,255,255,.075);
+  --track:rgba(255,255,255,.055);--border:rgba(255,255,255,.085);--border-strong:rgba(255,255,255,.15);
+  --text:#f4f4f5;--dim:#a1a1aa;--faint:#71717a;--code-bg:rgba(255,255,255,.035);--mini-bg:#1c1c1f;--shadow:none;
   --green:#34d399;--green-bg:rgba(52,211,153,.14);--green-bd:rgba(52,211,153,.3);
   --red:#fb7185;--red-bg:rgba(251,113,133,.14);--red-bd:rgba(251,113,133,.3);
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,.14);--amber-bd:rgba(251,191,36,.3);
@@ -110,7 +110,7 @@ h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em;white-space:now
 #themeBtn .moon{opacity:0;transform:rotate(90deg) scale(.5)}
 :root[data-theme="light"] #themeBtn .sun{opacity:0;transform:rotate(-90deg) scale(.5)}
 :root[data-theme="light"] #themeBtn .moon{opacity:1;transform:rotate(0) scale(1)}
-.counts{display:flex;gap:14px;margin-top:11px;font-size:12px}
+.counts{display:flex;gap:14px;margin-top:11px;padding:0 14px;font-size:12px}
 .counts b{font-weight:600;font-family:var(--mono)}
 .c-v b{color:var(--green)}.c-i b{color:var(--red)}.c-n b{color:var(--amber)}.c-p b{color:var(--dim)}
 .devices{display:flex;background:var(--track);border-radius:8px;padding:3px;margin:10px 14px 0;gap:2px}
