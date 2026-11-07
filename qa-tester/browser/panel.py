@@ -53,52 +53,78 @@ CALL_JS = """([n, a]) => {
   if (f && f.contentWindow && f.contentWindow.qa) f.contentWindow.qa[n](...a);
 }"""
 
-HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</title><style>
+HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</title>
+<script>(function(){try{
+var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;
+document.documentElement.dataset.theme=sysLight?'light':'dark';
+}catch(e){}})();</script>
+<style>
 :root{
   --bg:#0a0c12;--panel:rgba(255,255,255,.03);--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.06);
-  --border:rgba(255,255,255,.09);--text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;
+  --border:rgba(255,255,255,.09);--text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;--dot:rgba(255,255,255,.05);
+  --code-bg:rgba(0,0,0,.25);--mini-bg:#12151f;--shadow:none;
   --green:#4ade80;--green-bg:rgba(74,222,128,.14);--green-bd:rgba(74,222,128,.32);
   --red:#f87171;--red-bg:rgba(248,113,113,.14);--red-bd:rgba(248,113,113,.32);
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,.14);--amber-bd:rgba(251,191,36,.32);
-  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.16);--accent-bd:rgba(125,211,252,.38);
+  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.16);--accent-bd:rgba(125,211,252,.38);--accent-ink:#06222c;
   --serif:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+}
+:root[data-theme="light"]{
+  --bg:#f6f6f8;--panel:#ffffff;--card:#ffffff;--card-hov:#fafafb;
+  --border:rgba(16,24,40,.1);--text:#161922;--dim:#5c6273;--faint:#9499a8;--dot:rgba(16,24,40,.07);
+  --code-bg:rgba(16,24,40,.035);--mini-bg:#ffffff;--shadow:0 2px 10px rgba(16,24,40,.12);
+  --green:#15803d;--green-bg:rgba(21,128,61,.1);--green-bd:rgba(21,128,61,.28);
+  --red:#c0211d;--red-bg:rgba(192,33,29,.09);--red-bd:rgba(192,33,29,.28);
+  --amber:#b45309;--amber-bg:rgba(180,83,9,.1);--amber-bd:rgba(180,83,9,.28);
+  --accent:#0e7490;--accent-bg:rgba(14,116,144,.1);--accent-bd:rgba(14,116,144,.3);--accent-ink:#ffffff;
 }
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}
 body{font:13px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background-color:var(--bg);color:var(--text);
-  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.05) 1px,transparent 0);background-size:22px 22px}
+  background-image:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 0);background-size:22px 22px;
+  transition:background-color .2s ease,color .2s ease}
 #shell{height:100%;display:flex;flex-direction:column}
 body.mini #shell{display:none}#mini{display:none}body.mini #mini{display:flex}
-#mini{position:absolute;inset:0;border-radius:20px;background:#12151f;color:var(--text);align-items:center;
+#mini{position:absolute;inset:0;border-radius:20px;background:var(--mini-bg);color:var(--text);align-items:center;
   gap:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px;border:1px solid var(--border);user-select:none;
-  box-shadow:0 2px 10px rgba(0,0,0,.35)}
+  box-shadow:var(--shadow)}
 #mini .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
 #mini.has-issue .dot{background:var(--red)}#mini.has-pending .dot{background:var(--accent)}#mini.all-ok .dot{background:var(--green)}
 #mini .minidevs{display:flex;gap:3px}
 #mini .minidevs button{background:none;border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:2px 7px;font:inherit;font-size:10px;cursor:pointer}
-#mini .minidevs button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:700}
+#mini .minidevs button.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);font-weight:700}
 #mini .label{margin-left:auto;flex:none;color:var(--dim)}
 header{position:sticky;top:0;z-index:2;background:var(--panel);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);flex:none}
 .head{padding:14px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .headtext{min-width:0}
 h1{font-family:var(--serif);font-size:16px;margin:0;font-weight:400;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sub{color:var(--dim);font-size:12px;margin-top:3px}
-.head-actions{display:flex;gap:6px;flex:none}
+.head-actions{display:flex;gap:6px;flex:none;align-items:center}
 #collapseBtn,#reportBtn{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:4px 10px;cursor:pointer;flex:none;font-size:12px;font-family:inherit}
 #collapseBtn:hover,#reportBtn:hover{color:var(--text);border-color:var(--faint)}
 #reportBtn{color:var(--accent);border-color:var(--accent-bd)}
+#themeBtn{background:var(--card);border:1px solid var(--border);border-radius:50%;width:24px;height:24px;flex:none;
+  cursor:pointer;position:relative;padding:0}
+#themeBtn:hover{border-color:var(--faint)}
+#themeBtn svg{position:absolute;inset:0;margin:auto;width:13px;height:13px;color:var(--dim);
+  transition:opacity .2s ease,transform .3s cubic-bezier(.4,0,.2,1)}
+#themeBtn .sun{opacity:1;transform:rotate(0) scale(1)}
+#themeBtn .moon{opacity:0;transform:rotate(90deg) scale(.5)}
+:root[data-theme="light"] #themeBtn .sun{opacity:0;transform:rotate(-90deg) scale(.5)}
+:root[data-theme="light"] #themeBtn .moon{opacity:1;transform:rotate(0) scale(1)}
 .counts{display:flex;gap:6px;margin-top:10px;font-size:11px;flex-wrap:wrap}
 .counts span{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:3px 10px}
 .counts b{font-weight:700}
 .c-v b{color:var(--green)}.c-i b{color:var(--red)}.c-n b{color:var(--amber)}.c-p b{color:var(--dim)}
 .devices{display:flex;gap:5px;padding:10px 14px 0}
 .devices button{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;padding:4px 11px;font:inherit;font-size:11px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
-.devices button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:600}
+.devices button.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);font-weight:600}
 .devices button:hover:not(.on){color:var(--text);border-color:var(--faint)}
 nav{display:flex;padding:10px 10px 0;gap:2px}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--dim);padding:7px 10px;font:inherit;font-size:12.5px;cursor:pointer}
 nav button.on{color:var(--text);border-color:var(--accent)}
 main{flex:1;overflow:auto;min-height:0;padding:10px}
-.case{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.case{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;
+  box-shadow:var(--shadow);transition:background-color .2s ease,border-color .2s ease}
 .ct{display:flex;gap:8px;padding:9px 12px;align-items:flex-start;font-weight:600}
 .case.running>.ct{background:var(--accent-bg)}
 .id{color:var(--faint);font-weight:400;flex:none}
@@ -117,19 +143,23 @@ main{flex:1;overflow:auto;min-height:0;padding:10px}
 .msg{font-size:12px;margin:2px 0 4px 24px;white-space:pre-wrap;word-break:break-word;color:var(--dim)}
 .issue .msg{color:#ffb4ae}.cnv .msg{color:#ffd480}
 .spin{display:inline-block;animation:p 1s infinite}@keyframes p{50%{opacity:.25}}
-.nettbl{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 2px}
+.nettbl{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:0 2px}
 table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;font-family:ui-monospace,Consolas,monospace}
 th{text-align:left;font:600 9.5px/1 -apple-system,"Segoe UI",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:8px 8px;border-bottom:1px solid var(--border)}
 td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}
 tr:last-child td{border-bottom:none}
 td.m{width:40px}td.s{width:34px}td.t{width:54px}td.ms{width:50px;text-align:right}
 .ok{color:var(--green)}.bad{color:var(--red)}.mid{color:var(--amber)}
-.log{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin-bottom:8px;display:flex;gap:8px}
+.log{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin-bottom:8px;display:flex;gap:8px;box-shadow:var(--shadow)}
 .log .tm{color:var(--faint);font-size:11px;flex:none}
 .empty{color:var(--dim);padding:14px 12px;text-align:center;font-size:12px}
 </style></head><body>
 <div id="shell"><header><div class="head"><div class="headtext"><h1 id="title">QA Runner</h1><div class="sub" id="sub">Waiting for a scenario. Single commands appear under Log.</div></div>
 <div class="head-actions"><button id="reportBtn" title="Build and open the full report.html for this run">Report &#8599;</button>
+<button id="themeBtn" title="Switch between dark and light" aria-label="Switch between dark and light">
+<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+<svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
 <button id="collapseBtn" title="Collapse to a small pill">&#10095;&#10095;</button></div></div>
 <div class="counts" id="counts"></div>
 <div class="devices" id="devices" title="Resize the real window to a phone/tablet, or back">
@@ -170,6 +200,9 @@ function toggle(mini){
 document.getElementById('collapseBtn').onclick=()=>toggle(true);
 document.getElementById('mini').onclick=()=>toggle(false);
 document.getElementById('reportBtn').onclick=()=>{window.top.__qa_report_requested=true;};
+document.getElementById('themeBtn').onclick=()=>{
+  document.documentElement.dataset.theme=document.documentElement.dataset.theme==='light'?'dark':'light';
+};
 function setDevice(name){
   document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));
   window.top.__qa_pending_device=name;

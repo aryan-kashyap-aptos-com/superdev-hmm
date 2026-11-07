@@ -51,21 +51,45 @@ def _html(run, site, events, counts):
     env_bits = [f"Site: {site}" if site else None, f"Host: {platform.system()} {platform.release()}", "Runner: local"]
     env_line = " &middot; ".join(b for b in env_bits if b)
     return """<!doctype html><html><head><meta charset="utf-8"><title>QA report: """ + run + """</title>
+<script>(function(){try{var s=localStorage.getItem('qa_report_theme');
+var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;
+document.documentElement.dataset.theme=s||(sysLight?'light':'dark');}catch(e){}})();</script>
 <style>
 :root{
   --bg:#0a0c12;--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.055);--border:rgba(255,255,255,.09);
-  --text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;
+  --text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;--dot:rgba(255,255,255,.055);--code-bg:rgba(0,0,0,.25);
+  --shadow:none;--toggle-bg:rgba(255,255,255,.06);--hairline:rgba(255,255,255,.04);
   --green:#4ade80;--green-bg:rgba(74,222,128,.12);--green-bd:rgba(74,222,128,.3);
   --red:#f87171;--red-bg:rgba(248,113,113,.12);--red-bd:rgba(248,113,113,.3);
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,.12);--amber-bd:rgba(251,191,36,.3);
-  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.14);--accent-bd:rgba(125,211,252,.35);
+  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.14);--accent-bd:rgba(125,211,252,.35);--accent-ink:#06222c;
   --serif:Georgia,'Iowan Old Style','Palatino Linotype',serif;
   --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
+:root[data-theme="light"]{
+  --bg:#f6f6f8;--card:#ffffff;--card-hov:#fbfbfd;--border:rgba(16,24,40,.09);
+  --text:#161922;--dim:#5c6273;--faint:#9499a8;--dot:rgba(16,24,40,.07);--code-bg:rgba(16,24,40,.035);
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 2px 8px rgba(16,24,40,.06);--toggle-bg:#ffffff;--hairline:rgba(16,24,40,.06);
+  --green:#15803d;--green-bg:rgba(21,128,61,.1);--green-bd:rgba(21,128,61,.28);
+  --red:#c0211d;--red-bg:rgba(192,33,29,.09);--red-bd:rgba(192,33,29,.28);
+  --amber:#b45309;--amber-bg:rgba(180,83,9,.1);--amber-bd:rgba(180,83,9,.28);
+  --accent:#0e7490;--accent-bg:rgba(14,116,144,.1);--accent-bd:rgba(14,116,144,.3);--accent-ink:#ffffff;
+}
 *{box-sizing:border-box}
 body{margin:0;font:15px/1.6 var(--sans);background-color:var(--bg);color:var(--text);
-  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.055) 1px,transparent 0);background-size:26px 26px}
+  background-image:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 0);background-size:26px 26px;
+  transition:background-color .25s ease,color .25s ease}
 a{color:var(--accent)}
+.theme-toggle{position:fixed;top:24px;right:28px;width:40px;height:40px;border-radius:50%;z-index:50;
+  background:var(--toggle-bg);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.theme-toggle:hover{border-color:var(--faint)}
+.theme-toggle svg{position:absolute;width:18px;height:18px;color:var(--text);
+  transition:opacity .25s ease,transform .4s cubic-bezier(.4,0,.2,1)}
+.theme-toggle .sun{opacity:1;transform:rotate(0) scale(1)}
+.theme-toggle .moon{opacity:0;transform:rotate(90deg) scale(.5)}
+:root[data-theme="light"] .theme-toggle .sun{opacity:0;transform:rotate(-90deg) scale(.5)}
+:root[data-theme="light"] .theme-toggle .moon{opacity:1;transform:rotate(0) scale(1)}
 .wrap{max-width:860px;margin:0 auto;padding:64px 28px 120px}
 .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
 h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.25;margin:10px 0 6px;letter-spacing:-.01em}
@@ -73,7 +97,8 @@ h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.25;marg
 .meta{color:var(--dim);font-size:13px;margin-top:4px}
 .env{color:var(--faint);font-size:12px;margin-top:10px}
 .stats{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
-.stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px}
+.stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;
+  box-shadow:var(--shadow);transition:background-color .25s ease,border-color .25s ease}
 .stat b{display:block;font-family:var(--serif);font-size:30px;font-weight:400;line-height:1}
 .stat span{color:var(--dim);font-size:12px;margin-top:4px;display:block}
 .stat.ok b{color:var(--green)}.stat.bad b{color:var(--red)}.stat.mid b{color:var(--amber)}.stat.nt b{color:var(--dim)}
@@ -85,7 +110,7 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .filters button{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;
   padding:7px 16px;cursor:pointer;font:inherit;font-size:12.5px;transition:background .15s,color .15s,border-color .15s}
 .filters button:hover{color:var(--text);border-color:var(--faint)}
-.filters button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:600}
+.filters button.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);font-weight:600}
 .tagrow{display:flex;gap:8px;flex-wrap:wrap;margin:-20px 0 34px}
 .tagrow button{background:transparent;border:1px dashed var(--border);color:var(--faint);border-radius:999px;
   padding:5px 13px;cursor:pointer;font:inherit;font-size:11.5px}
@@ -95,7 +120,8 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .task-h{display:flex;align-items:center;gap:10px;margin:40px 0 16px}
 .task-h .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
 .task-h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600}
-.ev{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden}
+.ev{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden;
+  box-shadow:var(--shadow);transition:background-color .25s ease,border-color .25s ease}
 .ev:hover{background:var(--card-hov)}
 .ev-top{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;cursor:pointer;user-select:none}
 .chev{color:var(--faint);font-size:11px;flex:none;padding-top:5px;transition:transform .15s}
@@ -128,16 +154,20 @@ summary{cursor:pointer;color:var(--accent);font-size:12.5px;user-select:none;lis
 summary::-webkit-details-marker{display:none}
 summary:before{content:'\\25B8';display:inline-block;margin-right:6px;transition:transform .15s}
 details[open] summary:before{transform:rotate(90deg)}
-.nettbl{margin-top:10px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.nettbl{margin-top:10px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 table{border-collapse:collapse;font-size:12px;width:100%;table-layout:fixed;font-family:ui-monospace,Consolas,monospace}
 th{text-align:left;font:600 10px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
   padding:9px 10px;border-bottom:1px solid var(--border)}
-td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td{padding:6px 10px;border-bottom:1px solid var(--hairline);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 tr:last-child td{border-bottom:none}
 td.m{width:52px}td.s{width:46px}td.t{width:84px}td.ms{width:70px}
 .netbad{color:var(--red)}
 .empty{color:var(--dim);padding:40px 0;text-align:center;font-size:14px}
 </style></head><body>
+<button class="theme-toggle" id="themeToggle" title="Switch between dark and light" aria-label="Switch between dark and light">
+<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+<svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
 <div class="wrap">
 <div class="eyebrow">QA report</div>
 <h1>""" + run + """</h1>
@@ -237,4 +267,9 @@ function buildTags(){
   }
 }
 buildFilters(); buildTags(); render();
+document.getElementById('themeToggle').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('qa_report_theme', next); } catch (e) {}
+};
 </script></body></html>"""
