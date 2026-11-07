@@ -102,6 +102,8 @@ h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em;white-space:now
 .head-actions{display:flex;gap:4px;flex:none;align-items:center}
 #reportBtn{background:none;border:1px solid transparent;color:var(--accent);border-radius:6px;padding:4px 8px;cursor:pointer;flex:none;font-size:12px;font-weight:500;font-family:inherit;transition:background .15s}
 #reportBtn:hover{background:var(--accent-bg)}
+#reportBtn:disabled{color:var(--faint);cursor:not-allowed;opacity:.6}
+#reportBtn:disabled:hover{background:none}
 #collapseBtn,#themeBtn{background:none;border:1px solid transparent;color:var(--faint);border-radius:6px;width:26px;height:26px;flex:none;
   cursor:pointer;position:relative;padding:0;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
 #collapseBtn:hover,#themeBtn:hover{background:var(--card);color:var(--text)}
@@ -210,7 +212,10 @@ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=e=>{e.stopPropagation
 function counts(){const c={verified:0,issue:0,cnv:0,pending:0};for(const k of S.cases){if(k.status in c)c[k.status]++;else if(k.status!=='nt')c.pending++;}
   document.getElementById('counts').innerHTML=S.cases.length?`<span class="c-v"><b>${c.verified}</b> Verified</span><span class="c-i"><b>${c.issue}</b> Issue found</span><span class="c-n"><b>${c.cnv}</b> Could not verify</span><span class="c-p"><b>${c.pending}</b> to go</span>`:'';
   for(const id of ['mini','headerDot']){const m=document.getElementById(id);
-    m.classList.toggle('has-issue',c.issue>0);m.classList.toggle('has-pending',c.issue===0&&c.pending>0);m.classList.toggle('all-ok',c.issue===0&&c.pending===0&&S.cases.length>0);}}
+    m.classList.toggle('has-issue',c.issue>0);m.classList.toggle('has-pending',c.issue===0&&c.pending>0);m.classList.toggle('all-ok',c.issue===0&&c.pending===0&&S.cases.length>0);}
+  const stillRunning=S.cases.length>0&&c.pending>0;
+  const rb=document.getElementById('reportBtn');rb.disabled=stillRunning;
+  rb.title=stillRunning?`Finish all test cases first (${c.pending} still to go)`:'Build and open the full report.html for this run';}
 function render(){const el=document.getElementById('tests');
   if(!S.cases.length){el.innerHTML='<div class="empty">No test cases yet.</div>';counts();return;}
   el.innerHTML=S.cases.map(k=>`<div class="case ${k.status}"><div class="ct"><span class="ico">${k.status==='running'?'<span class="spin">'+ICON.running+'</span>':ICON[k.status]}</span><span class="id">${esc(k.id)}</span><span>${esc(k.title)}</span></div>
@@ -245,7 +250,17 @@ window.qa={
 
 
 def inject(page):
-    """Create the panel iframe if it is not already there. Cheap to call every time."""
+    """Create the panel iframe if it is not already there. Cheap to call every time.
+
+    A site with a strict Content-Security-Policy (no 'unsafe-inline' in script-src - draw.io is one)
+    silently blocks the panel's inline <script>, since a srcdoc iframe inherits its parent document's CSP.
+    The very first injection after `start` usually beats any CSP the page adds dynamically, but any later
+    (re)injection - after a real reload - does not. Bypassing CSP for this page before creating the iframe
+    means the panel keeps working regardless of what the site under test enforces for its own scripts."""
+    try:
+        page.context.new_cdp_session(page).send("Page.setBypassCSP", {"enabled": True})
+    except Exception:
+        pass
     page.evaluate(CREATE_JS, [HTML, EXPANDED_CSS])
 
 
@@ -290,12 +305,33 @@ class Panel:
                 if ready(self.page):
                     if self._cases or self._log or self._net or self._sub:
                         self._replay()
+                    else:
+                        self._hydrate()
                     return True
                 self.page.wait_for_timeout(100)
             return False
         except Exception:
             self.broken = True
             return False
+
+    def _hydrate(self):
+        """This process never ran the scenario that produced the current cases (a fresh CLI invocation,
+        or the page reloaded after the process that did run it already exited) - so there is nothing of
+        its own to replay. Rebuild the Tests tab from the durable event log instead, so it still shows
+        the real, current state rather than a blank "no test cases yet"."""
+        try:
+            run = core.active_run()
+            if not run:
+                return
+            import record
+            task, cases = record.hydrate_cases(run)
+            if not cases:
+                return
+            self._cases = cases
+            self._sub = f"Restored from the recorded run ({task or 'no task'})."
+            self._replay()
+        except Exception:
+            pass
 
     def _replay(self):
         try:

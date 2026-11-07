@@ -18,8 +18,11 @@ import record
 RESULTS = ["Verified", "Issue found", "Could not verify", "Not tested"]
 BADGE = {"Verified": "ok", "Issue found": "bad", "Could not verify": "mid", "Not tested": "nt"}
 OPEN_BY_DEFAULT = {"Issue found", "Could not verify"}
-DONUT_COLOR = {"Verified": "var(--green)", "Issue found": "var(--red)",
-               "Could not verify": "var(--amber)", "Not tested": "var(--faint)"}
+# A fixed status palette (not themed - same hex in light and dark), validated for contrast on both chart
+# surfaces. Used only for the pass-rate segmented bar: a status color on a colored block, not text on a
+# page, so its own light-surface contrast figure does not apply the way it would for body text.
+STATUS_COLOR = {"Verified": "#0ca30c", "Issue found": "#d03b3b", "Could not verify": "#fab219", "Not tested": "#898781"}
+STATUS_INK = {"Verified": "#ffffff", "Issue found": "#ffffff", "Could not verify": "#0b0b0b", "Not tested": "#ffffff"}
 _TS_FMT = "%Y-%m-%d %H:%M:%S"
 
 
@@ -37,19 +40,19 @@ def _duration(started, finished):
     return f"{h}h {m}m"
 
 
-def _donut_gradient(counts, total):
-    if not total:
-        return "var(--border)"
-    stops, cum = [], 0.0
+def _segments(counts, total):
+    """The pass-rate bar's blocks: one per non-zero result, widths proportional to its share. A tall
+    segmented bar reads a part-to-whole split more honestly than a donut (no angles to eyeball) - see the
+    dataviz skill's `choosing-a-form` guidance, which deprioritizes the donut for exactly this shape of
+    data (one whole, <=6 parts, read at a glance)."""
+    segs = []
     for w in RESULTS:
         n = counts.get(w, 0)
         if not n:
             continue
-        start, cum = cum, cum + 360 * n / total
-        stops.append(f"{DONUT_COLOR[w]} {start:.2f}deg {cum:.2f}deg")
-    if cum < 359.5:
-        stops.append(f"var(--border) {cum:.2f}deg 360deg")
-    return "conic-gradient(" + ", ".join(stops) + ")" if stops else "var(--border)"
+        pct = 100 * n / total if total else 0
+        segs.append({"label": w, "n": n, "pct": pct, "color": STATUS_COLOR[w], "ink": STATUS_INK[w]})
+    return segs
 
 
 def build(run, out_path=None):
@@ -80,9 +83,17 @@ def _html(run, site, events, counts):
     passed = counts.get("Verified", 0)
     rate = round(100 * passed / total) if total else 0
     duration = _duration(started, finished)
-    stats = "".join(f'<div class="stat {BADGE[w]}"><b>{counts.get(w, 0)}</b><span>{w}</span></div>' for w in RESULTS)
-    stats += f'<div class="stat dur"><b>{duration}</b><span>Duration</span></div>'
-    donut_bg = _donut_gradient(counts, total)
+    segs = _segments(counts, total)
+    seg_parts = []
+    for s in segs:
+        inline_label = f'{s["pct"]:.0f}%' if s["pct"] >= 8 else ""
+        seg_parts.append(
+            f'<div class="seg" style="flex:{s["pct"]:.2f} 0 0;background:{s["color"]};color:{s["ink"]}" '
+            f'title="{s["label"]}: {s["n"]} ({s["pct"]:.0f}%)">{inline_label}</div>')
+    segbar = "".join(seg_parts)
+    legend = "".join(
+        f'<div class="legend-item"><span class="legend-swatch" style="background:{s["color"]}"></span>'
+        f'{s["label"]}<b>{s["n"]}</b></div>' for s in segs)
     title_site = f'<a href="{site}" class="site">{site}</a>' if site else ""
     env_bits = [f"Site: {site}" if site else None, f"Host: {platform.system()} {platform.release()}", "Runner: local"]
     env_line = " &middot; ".join(b for b in env_bits if b)
@@ -130,18 +141,22 @@ h1{font-family:var(--sans);font-weight:700;font-size:24px;line-height:1.3;margin
 .site{font-size:16px;text-decoration:none;border-bottom:1px solid var(--accent-bd)}
 .meta{color:var(--dim);font-size:13px;margin-top:4px}
 .env{color:var(--faint);font-size:12px;margin-top:10px}
-.dash{display:flex;align-items:center;gap:28px;margin-top:32px;flex-wrap:wrap}
-.donut{width:116px;height:116px;border-radius:50%;flex:none;position:relative;transition:background .3s}
-.donut-hole{position:absolute;inset:13px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;transition:background-color .25s ease}
-.donut-hole b{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
-.donut-hole span{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-top:4px}
-.stats{flex:1;display:flex;gap:12px;margin-top:0;flex-wrap:wrap}
-.stat{flex:1;min-width:110px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;
+.dash{margin-top:32px}
+.dash-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.hero{display:flex;flex-direction:column;gap:3px}
+.hero b{font-family:var(--sans);font-weight:700;font-size:40px;line-height:1;color:var(--text)}
+.hero span{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 18px;
   box-shadow:var(--shadow);transition:background-color .25s ease,border-color .25s ease}
-.stat b{display:block;font-family:var(--mono);font-size:24px;font-weight:700;line-height:1}
-.stat span{color:var(--dim);font-size:11.5px;margin-top:5px;display:block}
-.stat.ok b{color:var(--green)}.stat.bad b{color:var(--red)}.stat.mid b{color:var(--amber)}.stat.nt b{color:var(--dim)}
+.stat b{display:block;font-family:var(--mono);font-size:20px;font-weight:700;line-height:1.3}
+.stat span{color:var(--dim);font-size:11.5px;display:block}
+.segbar{display:flex;gap:2px;height:28px;border-radius:4px;overflow:hidden;width:100%}
+.seg{display:flex;align-items:center;justify-content:center;border-radius:4px;
+  font:600 11px/1 var(--sans);white-space:nowrap;transition:background-color .25s ease}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--dim)}
+.legend-item b{color:var(--text);font-family:var(--mono);font-weight:700;margin-left:1px}
+.legend-swatch{width:9px;height:9px;border-radius:2px;flex:none}
 .rate{color:var(--dim);font-size:13px;margin-top:16px}
 .rate b{color:var(--text);font-weight:600}
 hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
@@ -215,8 +230,12 @@ td.m{width:52px}td.s{width:46px}td.t{width:84px}td.ms{width:70px}
 <div class="meta">Started """ + started + " &middot; finished " + finished + f" &middot; {total} recorded" + """</div>
 <div class="env">""" + env_line + """</div>
 <div class="dash">
-<div class="donut" style="background:""" + donut_bg + f""""><div class="donut-hole"><b>{rate}%</b><span>pass rate</span></div></div>
-<div class="stats">""" + stats + """</div>
+<div class="dash-top">
+<div class="hero"><b>""" + f"{rate}%" + """</b><span>pass rate</span></div>
+<div class="stat dur"><b>""" + duration + """</b><span>Duration</span></div>
+</div>
+<div class="segbar">""" + segbar + """</div>
+<div class="legend">""" + legend + """</div>
 </div>
 <div class="rate">""" + f"{passed} of {total} checks verified over {duration}" + """</div>
 """ + """<hr class="rule">

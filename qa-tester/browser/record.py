@@ -70,6 +70,42 @@ def read_events(run):
     return out
 
 
+STATUS = {"Verified": "verified", "Issue found": "issue", "Could not verify": "cnv", "Not tested": "nt"}
+
+
+def hydrate_cases(run, task=None):
+    """Reconstruct a panel-shaped case/step list from the durable event log, for redisplay after the live
+    panel has lost its in-browser state: a real page reload wipes the iframe, and since each CLI command is
+    its own process, there is no in-memory copy left anywhere to replay it from (Panel's own replay only
+    covers a reload mid-process, for example mid `play`). Reading it back from events.jsonl means the Tests
+    tab recovers regardless of why the state was lost. Returns (task, cases), or (None, None) if there is
+    nothing to show. Without `task`, uses whichever task the most recent step was recorded under."""
+    events = read_events(run)
+    steps = [e for e in events if e.get("kind") == "step" and e.get("case_id")]
+    if not steps:
+        return None, None
+    if task is None:
+        task = steps[-1].get("task")
+    steps = [e for e in steps if e.get("task") == task]
+    case_rows = {e["case_id"]: e for e in events if e.get("kind") == "case" and e.get("task") == task}
+    order, by_case = [], {}
+    for e in steps:
+        cid = e["case_id"]
+        if cid not in by_case:
+            by_case[cid] = []
+            order.append(cid)
+        by_case[cid].append(e)
+    cases = []
+    for cid in order:
+        case_steps = by_case[cid]
+        case_row = case_rows.get(cid, {})
+        status = STATUS.get(case_row.get("result")) or STATUS.get(case_steps[-1].get("result"), "pending")
+        cases.append({"id": cid, "title": case_row.get("text") or cid, "status": status,
+                      "steps": [{"text": s["text"], "status": STATUS.get(s.get("result"), "pending"),
+                                 "msg": s.get("msg") or "", "ms": s.get("ms")} for s in case_steps]})
+    return task, cases
+
+
 def rel_to_run(run, path):
     """A screenshot path, relative to the run folder, so report.html (which lives there) can show it
     with a plain relative <img src>, however deep inside tasks/ it actually sits."""

@@ -235,11 +235,36 @@ def bridge_stop():
         pass
 
 
+_HAS_PANEL_JS = ("() => { const f = document.getElementById('__qa_panel_frame'); "
+                 "return !!(f && f.contentWindow && f.contentWindow.qa); }")
+
+
 def app_page(context):
-    """The page under test: the newest tab that is not DevTools. The runner panel lives inside this
-    same page (a docked iframe), not in a tab of its own."""
+    """The page under test: the tab with the runner panel docked in it (the panel lives inside this same
+    page, as an iframe, not a tab of its own). Falls back to the newest tab on an allowed site, or failing
+    that the newest tab of any kind, not DevTools.
+
+    Picking "the newest tab" alone breaks as soon as any other tab exists - a report.html opened to view
+    it, a site link with target="_blank", devtools, a reload that has not re-injected the panel yet -
+    because that tab, not the one under test, becomes newest. Restricting to allowed-site tabs first, then
+    preferring whichever of those actually has the panel ready, keeps every command (and the live view)
+    pointed at the real page even then."""
     pages = [pg for pg in context.pages if not pg.url.startswith("devtools://")]
-    return pages[-1] if pages else context.new_page()
+    if not pages:
+        return context.new_page()
+    try:
+        hosts = allowed_hosts()
+    except Exception:
+        hosts = set()
+    on_site = [pg for pg in pages if urlsplit(pg.url).hostname in hosts] if hosts else []
+    candidates = on_site or pages
+    for pg in reversed(candidates):
+        try:
+            if pg.evaluate(_HAS_PANEL_JS):
+                return pg
+        except Exception:
+            continue
+    return candidates[-1]
 
 
 # ---------------------------------------------------------------- phone/tablet emulation
