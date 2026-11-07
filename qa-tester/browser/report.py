@@ -9,6 +9,7 @@ a short list of what went wrong plus a lot you can expand into if you want to).
 """
 import json
 import platform
+from datetime import datetime
 from pathlib import Path
 
 import core
@@ -17,6 +18,38 @@ import record
 RESULTS = ["Verified", "Issue found", "Could not verify", "Not tested"]
 BADGE = {"Verified": "ok", "Issue found": "bad", "Could not verify": "mid", "Not tested": "nt"}
 OPEN_BY_DEFAULT = {"Issue found", "Could not verify"}
+DONUT_COLOR = {"Verified": "var(--green)", "Issue found": "var(--red)",
+               "Could not verify": "var(--amber)", "Not tested": "var(--faint)"}
+_TS_FMT = "%Y-%m-%d %H:%M:%S"
+
+
+def _duration(started, finished):
+    try:
+        secs = int(round((datetime.strptime(finished, _TS_FMT) - datetime.strptime(started, _TS_FMT)).total_seconds()))
+    except ValueError:
+        return "—"
+    if secs < 60:
+        return f"{secs}s"
+    m, s = divmod(secs, 60)
+    if m < 60:
+        return f"{m}m {s}s"
+    h, m = divmod(m, 60)
+    return f"{h}h {m}m"
+
+
+def _donut_gradient(counts, total):
+    if not total:
+        return "var(--border)"
+    stops, cum = [], 0.0
+    for w in RESULTS:
+        n = counts.get(w, 0)
+        if not n:
+            continue
+        start, cum = cum, cum + 360 * n / total
+        stops.append(f"{DONUT_COLOR[w]} {start:.2f}deg {cum:.2f}deg")
+    if cum < 359.5:
+        stops.append(f"var(--border) {cum:.2f}deg 360deg")
+    return "conic-gradient(" + ", ".join(stops) + ")" if stops else "var(--border)"
 
 
 def build(run, out_path=None):
@@ -46,7 +79,10 @@ def _html(run, site, events, counts):
     started, finished = events[0]["ts"], events[-1]["ts"]
     passed = counts.get("Verified", 0)
     rate = round(100 * passed / total) if total else 0
+    duration = _duration(started, finished)
     stats = "".join(f'<div class="stat {BADGE[w]}"><b>{counts.get(w, 0)}</b><span>{w}</span></div>' for w in RESULTS)
+    stats += f'<div class="stat dur"><b>{duration}</b><span>Duration</span></div>'
+    donut_bg = _donut_gradient(counts, total)
     title_site = f'<a href="{site}" class="site">{site}</a>' if site else ""
     env_bits = [f"Site: {site}" if site else None, f"Host: {platform.system()} {platform.release()}", "Runner: local"]
     env_line = " &middot; ".join(b for b in env_bits if b)
@@ -55,15 +91,15 @@ def _html(run, site, events, counts):
 document.documentElement.dataset.theme=s||'dark';}catch(e){}})();</script>
 <style>
 :root{
-  --bg:#0a0c12;--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.055);--border:rgba(255,255,255,.09);
-  --text:#eef0f4;--dim:#8d93a6;--faint:#5b6177;--dot:rgba(255,255,255,.055);--code-bg:rgba(0,0,0,.25);
-  --shadow:none;--toggle-bg:rgba(255,255,255,.06);--hairline:rgba(255,255,255,.04);
-  --green:#4ade80;--green-bg:rgba(74,222,128,.12);--green-bd:rgba(74,222,128,.3);
-  --red:#f87171;--red-bg:rgba(248,113,113,.12);--red-bd:rgba(248,113,113,.3);
-  --amber:#fbbf24;--amber-bg:rgba(251,191,36,.12);--amber-bd:rgba(251,191,36,.3);
-  --accent:#7dd3fc;--accent-bg:rgba(125,211,252,.14);--accent-bd:rgba(125,211,252,.35);--accent-ink:#06222c;
-  --serif:Georgia,'Iowan Old Style','Palatino Linotype',serif;
-  --sans:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --bg:#121214;--card:rgba(255,255,255,.045);--card-hov:rgba(255,255,255,.075);--border:rgba(255,255,255,.085);
+  --text:#f4f4f5;--dim:#a1a1aa;--faint:#71717a;--dot:rgba(255,255,255,.055);--code-bg:rgba(255,255,255,.035);
+  --shadow:none;--toggle-bg:rgba(255,255,255,.06);--hairline:rgba(255,255,255,.06);
+  --green:#34d399;--green-bg:rgba(52,211,153,.14);--green-bd:rgba(52,211,153,.3);
+  --red:#fb7185;--red-bg:rgba(251,113,133,.14);--red-bd:rgba(251,113,133,.3);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,.14);--amber-bd:rgba(251,191,36,.3);
+  --accent:#818cf8;--accent-bg:rgba(129,140,248,.16);--accent-bd:rgba(129,140,248,.4);--accent-ink:#ffffff;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"JetBrains Mono",Consolas,Menlo,monospace;
 }
 :root[data-theme="light"]{
   --bg:#f6f6f8;--card:#ffffff;--card-hov:#fbfbfd;--border:rgba(16,24,40,.09);
@@ -72,11 +108,10 @@ document.documentElement.dataset.theme=s||'dark';}catch(e){}})();</script>
   --green:#15803d;--green-bg:rgba(21,128,61,.1);--green-bd:rgba(21,128,61,.28);
   --red:#c0211d;--red-bg:rgba(192,33,29,.09);--red-bd:rgba(192,33,29,.28);
   --amber:#b45309;--amber-bg:rgba(180,83,9,.1);--amber-bd:rgba(180,83,9,.28);
-  --accent:#0e7490;--accent-bg:rgba(14,116,144,.1);--accent-bd:rgba(14,116,144,.3);--accent-ink:#ffffff;
+  --accent:#4f46e5;--accent-bg:rgba(79,70,229,.1);--accent-bd:rgba(79,70,229,.3);--accent-ink:#ffffff;
 }
 *{box-sizing:border-box}
 body{margin:0;font:15px/1.6 var(--sans);background-color:var(--bg);color:var(--text);
-  background-image:radial-gradient(circle at 1px 1px,var(--dot) 1px,transparent 0);background-size:26px 26px;
   transition:background-color .25s ease,color .25s ease}
 a{color:var(--accent)}
 .theme-toggle{position:fixed;top:24px;right:28px;width:40px;height:40px;border-radius:50%;z-index:50;
@@ -91,17 +126,23 @@ a{color:var(--accent)}
 :root[data-theme="light"] .theme-toggle .moon{opacity:1;transform:rotate(0) scale(1)}
 .wrap{max-width:860px;margin:0 auto;padding:64px 28px 120px}
 .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
-h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.25;margin:10px 0 6px;letter-spacing:-.01em}
+h1{font-family:var(--sans);font-weight:700;font-size:24px;line-height:1.3;margin:10px 0 6px;letter-spacing:-.01em}
 .site{font-size:16px;text-decoration:none;border-bottom:1px solid var(--accent-bd)}
 .meta{color:var(--dim);font-size:13px;margin-top:4px}
 .env{color:var(--faint);font-size:12px;margin-top:10px}
-.stats{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
-.stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;
+.dash{display:flex;align-items:center;gap:28px;margin-top:32px;flex-wrap:wrap}
+.donut{width:116px;height:116px;border-radius:50%;flex:none;position:relative;transition:background .3s}
+.donut-hole{position:absolute;inset:13px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;transition:background-color .25s ease}
+.donut-hole b{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.donut-hole span{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.stats{flex:1;display:flex;gap:12px;margin-top:0;flex-wrap:wrap}
+.stat{flex:1;min-width:110px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;
   box-shadow:var(--shadow);transition:background-color .25s ease,border-color .25s ease}
-.stat b{display:block;font-family:var(--serif);font-size:30px;font-weight:400;line-height:1}
-.stat span{color:var(--dim);font-size:12px;margin-top:4px;display:block}
+.stat b{display:block;font-family:var(--mono);font-size:24px;font-weight:700;line-height:1}
+.stat span{color:var(--dim);font-size:11.5px;margin-top:5px;display:block}
 .stat.ok b{color:var(--green)}.stat.bad b{color:var(--red)}.stat.mid b{color:var(--amber)}.stat.nt b{color:var(--dim)}
-.rate{color:var(--dim);font-size:13px;margin-top:14px}
+.rate{color:var(--dim);font-size:13px;margin-top:16px}
 .rate b{color:var(--text);font-weight:600}
 hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px}
@@ -119,13 +160,13 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .task-h{display:flex;align-items:center;gap:10px;margin:40px 0 16px}
 .task-h .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
 .task-h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600}
-.ev{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden;
+.ev{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;
   box-shadow:var(--shadow);transition:background-color .25s ease,border-color .25s ease}
 .ev:hover{background:var(--card-hov)}
 .ev-top{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;cursor:pointer;user-select:none}
 .chev{color:var(--faint);font-size:11px;flex:none;padding-top:5px;transition:transform .15s}
 .ev.open .chev{transform:rotate(90deg)}
-.seq{color:var(--faint);font-size:11.5px;flex:none;padding-top:3px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.seq{color:var(--faint);font-size:11.5px;flex:none;padding-top:3px;font-family:var(--mono);letter-spacing:.02em}
 .ev-head{flex:1;min-width:0}
 .txt{font-weight:500;font-size:14.5px}
 .txt b{color:var(--accent);font-weight:600}
@@ -139,7 +180,7 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .badge.bad{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
 .badge.mid{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bd)}
 .badge.nt{background:var(--card);color:var(--dim);border-color:var(--border)}
-.ms{color:var(--faint);font-size:11px;font-variant-numeric:tabular-nums}
+.ms{color:var(--faint);font-size:11px;font-family:var(--mono)}
 .ev-detail{display:none;padding:0 20px 20px 46px}
 .ev.open .ev-detail{display:block}
 .thumbs{margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
@@ -153,8 +194,8 @@ summary{cursor:pointer;color:var(--accent);font-size:12.5px;user-select:none;lis
 summary::-webkit-details-marker{display:none}
 summary:before{content:'\\25B8';display:inline-block;margin-right:6px;transition:transform .15s}
 details[open] summary:before{transform:rotate(90deg)}
-.nettbl{margin-top:10px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-table{border-collapse:collapse;font-size:12px;width:100%;table-layout:fixed;font-family:ui-monospace,Consolas,monospace}
+.nettbl{margin-top:10px;background:var(--code-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+table{border-collapse:collapse;font-size:12px;width:100%;table-layout:fixed;font-family:var(--mono)}
 th{text-align:left;font:600 10px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
   padding:9px 10px;border-bottom:1px solid var(--border)}
 td{padding:6px 10px;border-bottom:1px solid var(--hairline);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -173,8 +214,11 @@ td.m{width:52px}td.s{width:46px}td.t{width:84px}td.ms{width:70px}
 """ + (f'<div class="meta">{title_site}</div>' if site else "") + """
 <div class="meta">Started """ + started + " &middot; finished " + finished + f" &middot; {total} recorded" + """</div>
 <div class="env">""" + env_line + """</div>
-<div class="stats">""" + stats + f"""</div>
-<div class="rate">Pass rate: <b>{rate}%</b> ({passed} of {total} verified)</div>
+<div class="dash">
+<div class="donut" style="background:""" + donut_bg + f""""><div class="donut-hole"><b>{rate}%</b><span>pass rate</span></div></div>
+<div class="stats">""" + stats + """</div>
+</div>
+<div class="rate">""" + f"{passed} of {total} checks verified over {duration}" + """</div>
 """ + """<hr class="rule">
 <div class="toolbar">
   <div class="filters" id="filters"></div>
