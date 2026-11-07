@@ -307,9 +307,20 @@ def mobile(browser, page, spec, cdp=None):
     cdp.send("Emulation.setTouchEmulationEnabled", {"enabled": True})
     if d.get("ua"):
         cdp.send("Network.setUserAgentOverride", {"userAgent": d["ua"]})
+    win_w, win_h = d["width"] + 16, d["height"] + 140
+    try:
+        avail = page.evaluate("() => ({w: window.screen.availWidth, h: window.screen.availHeight})")
+        # Shrink to fit first (a screen shorter than the device height can't show it at full height
+        # no matter where the window sits - e.g. the taskbar eating into availHeight), then reposition
+        # what's left so the window stays fully on screen.
+        win_w, win_h = min(win_w, avail["w"]), min(win_h, avail["h"])
+        left = max(0, min(left, avail["w"] - win_w))
+        top = max(0, min(top, avail["h"] - win_h))
+    except Exception:
+        pass
     browser_cdp.send("Browser.setWindowBounds", {"windowId": wid, "bounds": {"windowState": "normal"}})
     browser_cdp.send("Browser.setWindowBounds", {"windowId": wid,
-                     "bounds": {"left": left, "top": top, "width": d["width"] + 16, "height": d["height"] + 140}})
+                     "bounds": {"left": left, "top": top, "width": win_w, "height": win_h}})
     return d
 
 
