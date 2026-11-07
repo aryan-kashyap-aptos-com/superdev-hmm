@@ -56,7 +56,8 @@ Connectors are read-only by default. Never use `--write` without the user's clea
 ## 5. Product knowledge
 
 - Before you ask the user about a product, search: `python product-knowledge/search.py "<words>"`.
-  Add `--sessions` to also search saved chats. Then open only the files it lists.
+  This already reads the private `product-knowledge-local/` folder too (real sites/systems) -
+  nothing extra to run. Add `--sessions` for saved chats, or `--related <path>` for linked pages.
 - When you learn a lasting fact about a product, add it there (see `product-knowledge/README.md`).
 
 ## 6. Keep the session saved as you go
