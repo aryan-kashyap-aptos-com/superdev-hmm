@@ -40,6 +40,7 @@ def main():
                 d = core.mobile(browser, page, spec, cdp=cdp)
                 panel = panel_mod.Panel.existing(page)
                 panel.collapse(d is not None)
+                panel.device(spec if d else "desktop")
                 panel.log("Verified", f"mobile {spec}" if d else "mobile off",
                           f"{d['width']}x{d['height']}" if d else "back to desktop size")
             except Exception as e:

@@ -27,8 +27,10 @@ STATUS = {"Verified": "verified", "Issue found": "issue", "Could not verify": "c
 
 EXPANDED_CSS = ("position:fixed;right:0;top:0;width:360px;height:100%;border:none;z-index:2147483647;"
                 "box-shadow:-2px 0 14px rgba(0,0,0,.35)")
-MINI_CSS = ("position:fixed;right:14px;top:14px;width:236px;height:36px;border:none;border-radius:20px;"
-            "z-index:2147483647;box-shadow:0 2px 12px rgba(0,0,0,.45);background:transparent")
+_MINI_BASE = ("position:fixed;right:14px;width:236px;height:36px;border:none;border-radius:20px;"
+              "z-index:2147483647;box-shadow:0 2px 12px rgba(0,0,0,.45);background:transparent")
+MINI_CSS_TOP = _MINI_BASE + ";top:14px"
+MINI_CSS_BOTTOM = _MINI_BASE + ";bottom:14px"
 
 CREATE_JS = """([html, css]) => {
   if (document.getElementById("__qa_panel_frame")) return;
@@ -106,7 +108,8 @@ td.m{width:46px;color:var(--dim)}td.s{width:38px}td.t{width:62px;color:var(--dim
 <div class="minidevs"><button data-d="desktop" class="on" title="Desktop">Dsk</button><button data-d="iphone" title="iPhone">iOS</button><button data-d="android" title="Android">And</button><button data-d="tablet" title="Tablet">Tab</button></div>
 <span class="label">QA</span></div>
 <script>
-const MINI_CSS=""" + json.dumps(MINI_CSS) + """;
+const MINI_TOP=""" + json.dumps(MINI_CSS_TOP) + """;
+const MINI_BOTTOM=""" + json.dumps(MINI_CSS_BOTTOM) + """;
 const EXP_CSS=""" + json.dumps(EXPANDED_CSS) + """;
 const ICON={pending:'○',running:'▶',verified:'✓',issue:'✗',cnv:'!',nt:'–'};
 const S={cases:[],net:[],log:[]};
@@ -114,10 +117,21 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 function tab(n){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===n));
   for(const id of ['tests','network','log'])document.getElementById(id).hidden=id!==n;}
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+function freeCorner(f){
+  try{
+    const w=window.top.innerWidth,h=window.top.innerHeight,doc=window.top.document;
+    const prev=f.style.pointerEvents; f.style.pointerEvents='none';
+    const topEl=doc.elementFromPoint(w-20,20), botEl=doc.elementFromPoint(w-20,h-20);
+    f.style.pointerEvents=prev;
+    const busy=el=>el&&el!==doc.body&&el!==doc.documentElement&&(el.closest('button,a,nav,header,[role="button"],[onclick]'));
+    if(busy(topEl)&&!busy(botEl))return 'bottom';
+    return 'top';
+  }catch(e){return 'top';}
+}
 function toggle(mini){
   document.body.classList.toggle('mini',mini);
   const f=window.frameElement; if(!f)return;
-  f.style.cssText=mini?MINI_CSS:EXP_CSS;
+  f.style.cssText=mini?(freeCorner(f)==='bottom'?MINI_BOTTOM:MINI_TOP):EXP_CSS;
 }
 document.getElementById('collapseBtn').onclick=()=>toggle(true);
 document.getElementById('mini').onclick=()=>toggle(false);
@@ -148,6 +162,7 @@ window.qa={
   log(st,text,msg){S.log.push({st,text,msg,t:new Date().toLocaleTimeString()});if(S.log.length>300)S.log.shift();renderLog();},
   done(text){document.getElementById('sub').textContent=text;},
   collapse(mini){toggle(!!mini);},
+  markDevice(name){document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));},
   restore(state){
     if(state.title!=null)document.getElementById('title').textContent=state.title;
     if(state.sub!=null)document.getElementById('sub').textContent=state.sub;
@@ -272,6 +287,12 @@ class Panel:
 
     def collapse(self, mini=True):
         self._call("collapse", mini)
+
+    def device(self, name):
+        """Highlight the right button in the Desktop/iPhone/Android/Tablet row. Needed after a device
+        switch that didn't originate from a click inside the panel (the `mobile` CLI command), since
+        only a click updates that highlight on its own."""
+        self._call("markDevice", name)
 
     def flash_network(self, page, ms=1100):
         """Open the Network tab for a moment so the user sees the calls, then go back to Tests."""

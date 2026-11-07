@@ -122,10 +122,12 @@ def cmd_mobile(a):
         if d is None:
             print("Back to desktop size.")
             p.collapse(False)
+            p.device("desktop")
             p.log("Verified", "mobile off", "back to desktop size")
         else:
             print(f"Window resized to {d['width']}x{d['height']}.")
             p.collapse(True)
+            p.device(a.device)
             p.log("Verified", f"mobile {a.device}", f"{d['width']}x{d['height']}, panel collapsed to a circle")
 
 
