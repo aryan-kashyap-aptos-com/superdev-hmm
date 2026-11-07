@@ -21,6 +21,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import core
+import record
 from core import c
 from panel import Panel
 
@@ -438,7 +439,8 @@ def run(path, args):
                     word, msg = "Could not verify", f"{type(e).__name__}: {str(e).splitlines()[0][:200]}"
                 ms = int((time.time() - t0) * 1000)
                 new_rows = net.since(mark)
-                panel.net(core.net_rows_for_panel(new_rows, urlsplit(page.url).hostname))
+                panel_rows = core.net_rows_for_panel(new_rows, urlsplit(page.url).hostname)
+                panel.net(panel_rows)
                 if word != "Verified":
                     try:
                         files += core.capture(page, shots / f"{next_shot():02d}-{case['id']}-step{si + 1}-{word.split()[0].lower()}.png", full=False)
@@ -452,6 +454,8 @@ def run(path, args):
                 rel = [str(Path(f).relative_to(core.QA / "runs" / run_name)).replace("\\", "/") for f in files]
                 evidence += rel
                 steps_out.append({"step": text, "result": word, "detail": msg, "ms": ms, "evidence": rel})
+                record.record(run_name, args.task, "step", text, word, msg, ms=ms, net=panel_rows,
+                              screenshot=rel or None, case_id=case["id"])
                 print(f"   {'+' if word == 'Verified' else '!'} {word:16} {text}" + (f"  -> {msg}" if msg and word != "Verified" else ""))
                 page.wait_for_timeout(args.slow)
             try:
@@ -461,6 +465,9 @@ def run(path, args):
                 pass
             result = next((s["result"] for s in steps_out if s["result"] != "Verified"), "Verified")
             panel.case(ci, result)
+            record.record(run_name, args.task, "case", case["title"], result,
+                          f"{sum(1 for s in steps_out if s['result'] == 'Verified')}/{len(steps_out)} step(s) verified",
+                          case_id=case["id"])
             cases_out.append({"id": case["id"], "title": case["title"], "result": result, "steps": steps_out, "evidence": evidence})
         totals = {w: sum(1 for k in cases_out if k["result"] == w) for w in RESULTS}
         panel.done("Finished: " + ", ".join(f"{n} {w}" for w, n in totals.items() if n))

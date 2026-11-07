@@ -24,6 +24,15 @@ Network and storage
     cookies                 cookies and browser storage, values hidden
     crawl [--max 30]        follow links read-only and record every page
 
+Review afterwards (once the browser, or the whole demo, is done)
+    python qa-tester/browser/run.py report [--run NAME] [--open]
+        Every ad hoc command, scenario step, and crawled page is appended, in order, with a run-wide
+        sequential id, to qa-tester/runs/NAME/events.jsonl as it happens - the panel only shows what is
+        running right now and loses it (network calls included) when the browser closes; this does not.
+        `report` turns that into one standalone qa-tester/runs/NAME/report.html: summary counts, every
+        recorded step in order with its result, timing, screenshot and network calls, filterable by result.
+        Open the file directly - no server, no Chrome, no Playwright needed.
+
 Options for goto/click/fill/select/press/login/scroll: --run NAME --task TASK (save a full-page screenshot and the
 network calls into qa-tester/runs/NAME/tasks/TASK/), --viewport (only the visible part), --all-net, --max-wait MS.
 How to name an element ("<target>"): see GUIDE.md.
@@ -49,16 +58,20 @@ sys.path.insert(0, str(HERE))
 import core  # noqa: E402
 import panel as panel_mod  # noqa: E402
 import player  # noqa: E402
+import record  # noqa: E402
+import report as report_mod  # noqa: E402
 from core import c  # noqa: E402
 
 
 # ---------------------------------------------------------------- helpers for single commands
 
 class Step:
-    """Wraps one hand-run command: records network and console, waits for the page, logs to the panel, saves evidence."""
+    """Wraps one hand-run command: records network and console, waits for the page, logs to the panel, saves
+    evidence, and appends a durable event (record.py) so it shows up in `report` later - including the
+    network calls it made, which the live panel only ever shows, never saves, on its own."""
 
     def __init__(self, page, a, label):
-        self.page, self.a, self.label = page, a, label
+        self.page, self.a, self.label, self.t0 = page, a, label, time.time()
         self.net, self.console = core.Net(page), []
         page.on("console", lambda m: self.console.append(m.text[:200]) if m.type == "error" else None)
         self.panel = panel_mod.Panel.existing(page)
@@ -73,12 +86,17 @@ class Step:
             for m in self.console[:5]:
                 print(f"  - {m}")
         core.net_summary(self.net, self.page, self.a, self.label)
-        core.step_shot(self.page, self.a, self.label, self.net)
+        shots = core.step_shot(self.page, self.a, self.label, self.net)
         self.panel.log(result, text, msg)
         rows = self.net.current()
-        self.panel.net(core.net_rows_for_panel(rows, urlsplit(self.page.url).hostname))
+        panel_rows = core.net_rows_for_panel(rows, urlsplit(self.page.url).hostname)
+        self.panel.net(panel_rows)
         if any(r["type"] in ("document", "xhr", "fetch") for r in rows):
             self.panel.flash_network(self.page)
+        run = getattr(self.a, "run", None) or core.active_run()
+        record.record(run, getattr(self.a, "task", None), "command", text, result, msg,
+                      ms=int((time.time() - self.t0) * 1000), net=panel_rows,
+                      screenshot=[record.rel_to_run(run, p) for p in shots] if run else None)
 
 
 def target_of(page, target):
@@ -124,11 +142,14 @@ def cmd_mobile(a):
             p.collapse(False)
             p.device("desktop")
             p.log("Verified", "mobile off", "back to desktop size")
+            record.record(core.active_run(), None, "command", "mobile off", "Verified", "back to desktop size")
         else:
             print(f"Window resized to {d['width']}x{d['height']}.")
             p.collapse(True)
             p.device(a.device)
-            p.log("Verified", f"mobile {a.device}", f"{d['width']}x{d['height']}, panel collapsed to a circle")
+            msg = f"{d['width']}x{d['height']}, panel collapsed to a circle"
+            p.log("Verified", f"mobile {a.device}", msg)
+            record.record(core.active_run(), None, "command", f"mobile {a.device}", "Verified", msg)
 
 
 def cmd_status(a):
@@ -218,7 +239,10 @@ def cmd_state(a):
             keys = ["count", "tag", "type", "visible", "hiddenWhy", "enabled", "disabledAttr", "ariaDisabled", "fieldsetDisabled",
                     "checked", "editable", "readonly", "required", "inView", "covered", "clickable", "ariaHidden", "text", "value"]
             c.show_table([[k, s.get(k, "")] for k in keys if k in s], ["property", "value"], "state")
-        panel_mod.Panel.existing(page).log("Verified" if s["exists"] else "Issue found", f'state of "{a.target}"', core.describe_state(s))
+        word = "Verified" if s["exists"] else "Issue found"
+        panel_mod.Panel.existing(page).log(word, f'state of "{a.target}"', core.describe_state(s))
+        record.record(getattr(a, "run", None) or core.active_run(), getattr(a, "task", None), "command",
+                      f'state of "{a.target}"', word, core.describe_state(s))
     core.with_page(look)
 
 
@@ -338,6 +362,7 @@ def cmd_expect(a):
                 core.show(loc.first, page)
         print(f"{word}: {player.describe(step)}" + (f"\n  {msg}" if msg else ""))
         panel_mod.Panel.existing(page).log(word, player.describe(step), msg if word != "Verified" else "")
+        record.record(core.active_run(), None, "command", player.describe(step), word, msg)
         return word
     word = core.with_page(run)
     sys.exit(0 if word == "Verified" else 1)
@@ -477,10 +502,16 @@ def cmd_crawl(a):
                 if info["textLength"] < 20:
                     row["error"] = "page looks blank"
                 name = f"{len(results) + 1:03d}-{re.sub(r'[^a-z0-9]+', '-', urlsplit(page.url).path.lower()).strip('-')[-40:]}.png"
-                row["shots"] = [p.name for p in core.capture(page, folder / "pages" / name, full=not a.viewport, net=net)]
-                panel.net(core.net_rows_for_panel(reqs, home["host"]))
-                panel.log("Issue found" if row["error"] or row["failed"] else "Verified", f"crawl: {row['title'][:60]}",
-                          row["error"] or (f"{len(row['failed'])} failed call(s)" if row["failed"] else ""))
+                shot_paths = core.capture(page, folder / "pages" / name, full=not a.viewport, net=net)
+                row["shots"] = [p.name for p in shot_paths]
+                panel_rows = core.net_rows_for_panel(reqs, home["host"])
+                panel.net(panel_rows)
+                word = "Issue found" if row["error"] or row["failed"] else "Verified"
+                detail = row["error"] or (f"{len(row['failed'])} failed call(s)" if row["failed"] else "")
+                panel.log(word, f"crawl: {row['title'][:60]}", detail)
+                record.record(run_name, a.task, "crawl", f"crawl: {row['title'][:60] or url}", word, detail,
+                              ms=row.get("ready_ms"), net=panel_rows,
+                              screenshot=[record.rel_to_run(run_name, p) for p in shot_paths])
                 for link in info["links"]:
                     h = link["h"].split("#")[0]
                     u = urlsplit(h)
@@ -498,6 +529,22 @@ def cmd_crawl(a):
             page.wait_for_timeout(a.pause)
     core.with_page(crawl)
     write_crawl_report(folder, run_name, home, results)
+
+
+def cmd_report(a):
+    run = a.run or core.active_run()
+    if not run:
+        raise c.ConnectorError("No run given and no active run.", "Pass --run NAME, or set one active with "
+                               "qa-tester/test-run.py use.")
+    path, events, counts = report_mod.build(run)
+    print(f"Report: {path}")
+    print(f"{len(events)} recorded event(s).")
+    for w in report_mod.RESULTS:
+        if counts.get(w):
+            print(f"  {counts[w]} {w}")
+    if a.open:
+        import webbrowser
+        webbrowser.open(path.resolve().as_uri())
 
 
 def write_crawl_report(folder, run_name, home, results):
@@ -638,6 +685,9 @@ def main():
     cr.add_argument("--max-wait", type=int, default=25000)
     cr.add_argument("--pause", type=int, default=800, help="ms between pages so the user can follow")
     cr.add_argument("--viewport", action="store_true", help="capture only the visible part of each page")
+    rp = add("report", cmd_report, "build a standalone report.html of everything recorded for a run")
+    rp.add_argument("--run", help="defaults to the active run")
+    rp.add_argument("--open", action="store_true", help="open it in the default browser once built")
     args = p.parse_args()
     args.fn(args)
 

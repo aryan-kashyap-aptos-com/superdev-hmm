@@ -792,12 +792,15 @@ def next_step_file(run, label, ext, task=None):
 
 
 def step_shot(page, a, label, net=None):
-    """With --run: save a numbered screenshot of the whole page (or only the visible part with --viewport)."""
-    if getattr(a, "run", None):
-        paths = capture(page, next_step_file(a.run, label, "png", getattr(a, "task", None)),
-                        full=not getattr(a, "viewport", False), net=net)
-        for p in paths:
-            print(f"Screenshot: {p}")
+    """With --run: save a numbered screenshot of the whole page (or only the visible part with --viewport).
+    Returns the saved paths (empty without --run)."""
+    if not getattr(a, "run", None):
+        return []
+    paths = capture(page, next_step_file(a.run, label, "png", getattr(a, "task", None)),
+                    full=not getattr(a, "viewport", False), net=net)
+    for p in paths:
+        print(f"Screenshot: {p}")
+    return paths
 
 
 def stamp():
