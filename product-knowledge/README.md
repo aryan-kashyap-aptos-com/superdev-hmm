@@ -55,9 +55,20 @@ Each area is documented only as deep as the plan says. A reader can stop at any 
 
 - Search: `python product-knowledge/search.py "<words>" [--product <name>] [--sessions]`.
   It ranks files by match (titles count more) and shows a snippet, the path, and the status. Open only the files you need.
+- Related pages: `python product-knowledge/search.py --related <path-or-words>` follows the relative
+  links every page already has (Rule 3) one hop out and one hop in — no extra syntax to maintain, the
+  existing `[Link](../path.md)` links are the graph.
 - Start with `<product>/overview.md`. It says what to read next.
 - `<product>/MAP.md` shows what is documented and what is not.
 - `<product>/gaps.md` shows what is still unknown.
+
+## Real facts vs. example facts
+
+This folder is public and stays generic/example-only (see `templates/`). When a page would have to
+name a real host, a real customer, or an internal system, it goes instead in the sibling
+`product-knowledge-local/` folder — same layout, same rules, gitignored, same reason as
+`qa-tester/environments.local.md`. `search.py` reads both folders together; you never point it at
+one or the other by hand.
 
 ## How knowledge gets here
 

@@ -17,3 +17,5 @@ qa-tester/environments.local.md
 qa-tester/scenarios/*
 !qa-tester/scenarios/.gitkeep
 !qa-tester/scenarios/README.md
+# real product facts (real sites, real systems): keep them private, same reason as environments.local.md
+product-knowledge-local/
