@@ -1,7 +1,9 @@
-# Connector: browser
+# The browser engine (qa-tester/browser/)
 
-Test a website the way a person does, in a real Chrome window the user can watch, with a **runner panel** beside it
-that works like Cypress: it lists every test case and step before it runs, then marks each one as it happens.
+Test a website the way a person does, in one real Chrome window the user can watch, with a **runner panel**
+docked inside that same window that works like Cypress: it lists every test case and step before it runs, then
+marks each one as it happens. It is the QA tester's own engine, not a general-purpose connector, so it lives
+under `qa-tester/` rather than `connectors/` — everything QA-testing-related is in one place.
 Used by `qa-tester/method.md`. Only two kinds of sites can be opened: the one named in the **active test run's**
 `plan.md` (its Login section), and any reusable site listed in `qa-tester/environments.md` or the private
 `environments.local.md`. **No `.env` file with a site's login is needed**: different tests target different

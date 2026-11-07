@@ -1,21 +1,23 @@
-"""Browser connector: test a website in a visible Chrome window, with a Cypress-style runner panel beside it.
+"""Browser engine: test a website in one visible Chrome window, with a Cypress-style runner panel
+docked inside it (not a second window).
 
 Start and look around
-    python connectors/browser/run.py start [url] [--devtools] [--no-panel]   open Chrome and the runner panel
-    python connectors/browser/run.py status | stop | panel
-    python connectors/browser/run.py goto <url>          open a page and wait until it has really finished
-    python connectors/browser/run.py snapshot            the page as text (headings, labels, buttons, tables)
-    python connectors/browser/run.py elements            every button, link and field, with visible/hidden/disabled
-    python connectors/browser/run.py state "<target>"    everything about one element (visible, disabled, covered, ...)
-    python connectors/browser/run.py scroll down|up|top|bottom | --to "<target>"
-    python connectors/browser/run.py screenshot [--viewport]   the whole page by default (it scrolls through it first)
+    python qa-tester/browser/run.py start [url] [--devtools] [--no-panel]   open Chrome, panel docked right
+    python qa-tester/browser/run.py status | stop | panel
+    python qa-tester/browser/run.py mobile iphone|android|tablet|WIDTHxHEIGHT|off   switch the live page's viewport
+    python qa-tester/browser/run.py goto <url>          open a page and wait until it has really finished
+    python qa-tester/browser/run.py snapshot            the page as text (headings, labels, buttons, tables)
+    python qa-tester/browser/run.py elements            every button, link and field, with visible/hidden/disabled
+    python qa-tester/browser/run.py state "<target>"    everything about one element (visible, disabled, covered, ...)
+    python qa-tester/browser/run.py scroll down|up|top|bottom | --to "<target>"
+    python qa-tester/browser/run.py screenshot [--viewport]   the whole page by default (it scrolls through it first)
 
 Act and check (one step at a time)
     login | click "<target>" | fill "<target>" "<value>" | select "<target>" "<option>" | press <Key> | hover "<target>"
     expect <check> ["<target>"] [--value V] [--not]       for example: expect disabled "Export"
 
 Run a whole scenario (test cases, live in the panel, results saved)
-    python connectors/browser/run.py play <scenario.json> --run <run> [--task <task>]
+    python qa-tester/browser/run.py play <scenario.json> --run <run> [--task <task>]
 
 Network and storage
     watch [--seconds 30]    record the calls while the user clicks by hand
@@ -29,6 +31,10 @@ How to name an element ("<target>"): see GUIDE.md.
 No .env file is needed. The site and login come from the Login section of the active test run's plan.md
 (qa-tester/test-run.py new / use), or from qa-tester/environments(.local).md for a site used again and again.
 Only those sites can be opened.
+
+The runner panel is a docked overlay inside the one Chrome window, not a window of its own: a header button
+(and `mobile` mode automatically) collapses it to a small floating circle so it never covers what you are
+testing; tap the circle to bring it back.
 """
 import argparse
 import datetime
@@ -94,21 +100,38 @@ def cmd_start(a):
         core.launch(url, devtools=a.devtools)
         print(f"Opened a visible browser window on {url}." + (" DevTools is open in each tab." if a.devtools else ""))
     if not a.no_panel:
-        with core.session() as (browser, page):
-            ok = panel_mod.Panel.open(browser, page).pg is not None
-        print("Runner panel open on the left." if ok else "Could not open the runner panel; tests still work.")
+        with core.session() as (_, page):
+            ok = panel_mod.Panel.open(page).ok
+        print("Runner panel docked on the right." if ok else "Could not open the runner panel; tests still work.")
+        core.bridge_start()
+        print("The panel's Desktop/iPhone/Android/Tablet buttons are live." if core.bridge_alive() else
+              "Could not start the panel's device buttons; the `mobile` command still works.")
 
 
 def cmd_panel(a):
+    with core.session() as (_, page):
+        ok = panel_mod.Panel.open(page).ok
+    print("Runner panel docked on the right." if ok else "Could not open the runner panel.")
+
+
+def cmd_mobile(a):
     with core.session() as (browser, page):
-        p = panel_mod.Panel.open(browser, page)
-        if p.pg is not None:
-            panel_mod.arrange(browser, page, p.pg)
-    print("Runner panel open and placed on the left.")
+        core.check_allowed(page.url)
+        d = core.mobile(browser, page, a.device)
+        p = panel_mod.Panel.existing(page)
+        if d is None:
+            print("Back to desktop size.")
+            p.collapse(False)
+            p.log("Verified", "mobile off", "back to desktop size")
+        else:
+            print(f"Window resized to {d['width']}x{d['height']}.")
+            p.collapse(True)
+            p.log("Verified", f"mobile {a.device}", f"{d['width']}x{d['height']}, panel collapsed to a circle")
 
 
 def cmd_status(a):
     print(f"Browser open: {'yes' if core.alive() else 'no'} (port {core.PORT})")
+    print(f"Panel device buttons live: {'yes' if core.bridge_alive() else 'no'}")
     run = core.active_run()
     if run:
         info = core.run_login(run)
@@ -123,6 +146,7 @@ def cmd_status(a):
 
 
 def cmd_stop(a):
+    core.bridge_stop()
     if not core.alive():
         print("No browser is open.")
         return
@@ -541,7 +565,9 @@ def main():
     s.add_argument("--no-panel", action="store_true", help="do not open the runner panel")
     add("status", cmd_status, "is the browser open; which sites are allowed")
     add("stop", cmd_stop, "quit the browser")
-    add("panel", cmd_panel, "open the runner panel and place it on the left")
+    add("panel", cmd_panel, "make sure the runner panel is docked on the right")
+    m = add("mobile", cmd_mobile, "switch the live page to a phone/tablet viewport, or back to desktop")
+    m.add_argument("device", nargs="?", default="iphone", help="iphone, android, tablet, WIDTHxHEIGHT, or off (default: iphone)")
     g = add("goto", cmd_goto, "open a page and wait until it has finished", [step])
     g.add_argument("url")
     add("snapshot", cmd_snapshot, "the page as text")

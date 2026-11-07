@@ -174,7 +174,7 @@ def secret_value(raw):
             raise c.ConnectorError(f"The run's {name} is not filled in.", f"Fill it in the Login section of {where}.")
         return info[name], True
     if not os.environ.get(name):
-        raise c.ConnectorError(f"The setting {name} is missing.", "Add it to connectors/browser/.env.")
+        raise c.ConnectorError(f"The setting {name} is missing.", "Add it to qa-tester/browser/.env.")
     return os.environ[name], True
 
 
@@ -402,10 +402,10 @@ def run(path, args):
 
     cases_out = []
     started = datetime.datetime.now()
-    with core.session() as (browser, page):
+    with core.session() as (_, page):
         net, console = core.Net(page), []
         page.on("console", lambda m: console.append(m.text[:200]) if m.type == "error" else None)
-        panel = Panel.open(browser, page)
+        panel = Panel.open(page)
         panel.plan(scenario.get("name", Path(path).stem), f"{home['name']} - {len(scenario['cases'])} test case(s)",
                    [{"id": k["id"], "title": k["title"], "steps": [describe(s) for s in k["steps"]]} for k in scenario["cases"]])
         page.wait_for_timeout(800)

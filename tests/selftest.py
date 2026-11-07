@@ -26,6 +26,9 @@ import common as c  # noqa: E402
 
 failures = []
 
+# "browser" is the QA tester's own engine, not a connector: it lives under qa-tester/, not connectors/.
+MODULE_DIR = {"browser": ROOT / "qa-tester" / "browser"}
+
 
 def check(label, ok, detail=""):
     print(("PASS " if ok else "FAIL ") + label + ("" if ok else f"\n     {detail}"))
@@ -34,7 +37,8 @@ def check(label, ok, detail=""):
 
 
 def load(name):
-    spec = importlib.util.spec_from_file_location(name.replace("-", "_"), CONNECTORS / name / "run.py")
+    folder = MODULE_DIR.get(name, CONNECTORS / name)
+    spec = importlib.util.spec_from_file_location(name.replace("-", "_"), folder / "run.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod

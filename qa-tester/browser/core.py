@@ -1,9 +1,10 @@
-"""Shared browser plumbing for the browser connector.
+"""Shared browser plumbing for the browser engine.
 
-Used by run.py (the commands), panel.py (the runner sidebar) and player.py (the scenario runner).
-Holds: the list of allowed sites, starting and attaching to Chrome, finding elements (also inside frames),
-reading an element's state (visible, hidden, disabled, covered...), waiting until a page has really finished,
-recording network calls, scrolling, and screenshots that include the whole page.
+Used by run.py (the commands), panel.py (the runner sidebar, docked in the same window) and player.py
+(the scenario runner). Holds: the list of allowed sites, starting and attaching to Chrome, finding elements
+(also inside frames), reading an element's state (visible, hidden, disabled, covered...), waiting until a
+page has really finished, recording network calls, scrolling, screenshots that include the whole page, and
+switching the live page into phone/tablet emulation.
 """
 import contextlib
 import datetime
@@ -19,16 +20,16 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urljoin, urlsplit
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent))
+ROOT = HERE.parent.parent
+sys.path.insert(0, str(ROOT / "connectors"))
 import common as c  # noqa: E402
 
 c.load_env(HERE)
 
-QA = HERE.parent.parent / "qa-tester"
+QA = HERE.parent
 PROFILE = QA / ".browser-profile"
 PORT = int(os.environ.get("QA_BROWSER_PORT", "9333"))
 CDP = f"http://127.0.0.1:{PORT}"
-PANEL_MARK = "#qa-runner"
 CHROME_PATHS = [
     os.environ.get("QA_CHROME_PATH", ""),
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -162,14 +163,14 @@ def find_chrome():
     for p in CHROME_PATHS:
         if p and Path(p).exists():
             return p
-    raise c.ConnectorError("Chrome or Edge was not found.", "Set QA_CHROME_PATH in connectors/browser/.env to the browser's program file.")
+    raise c.ConnectorError("Chrome or Edge was not found.", "Set QA_CHROME_PATH in qa-tester/browser/.env to the browser's program file.")
 
 
 def launch(url, devtools=False):
-    """Start a visible Chrome with its own profile. It stays open after this program ends."""
+    """Start a visible Chrome with its own profile, filling the screen. It stays open after this program ends."""
     PROFILE.mkdir(parents=True, exist_ok=True)
     cmd = [find_chrome(), f"--remote-debugging-port={PORT}", f"--user-data-dir={PROFILE}", "--no-first-run",
-           "--no-default-browser-check", "--new-window", "--window-size=1500,1000", "--window-position=420,0"]
+           "--no-default-browser-check", "--new-window", "--start-maximized"]
     if devtools:
         cmd.append("--auto-open-devtools-for-tabs")
     cmd.append(url)
@@ -182,14 +183,134 @@ def launch(url, devtools=False):
     raise c.ConnectorError("The browser did not start.", f"Check that port {PORT} is free, or set QA_BROWSER_PORT in .env.")
 
 
-def is_panel(pg):
-    return pg.url.endswith(PANEL_MARK)
+# ---------------------------------------------------------------- the panel's background helper
+
+BRIDGE_SCRIPT = HERE / "bridge.py"
+BRIDGE_PID_FILE = PROFILE / "bridge.pid"
+
+
+def bridge_alive():
+    if not BRIDGE_PID_FILE.exists():
+        return False
+    try:
+        pid = int(BRIDGE_PID_FILE.read_text(encoding="utf-8").strip())
+    except ValueError:
+        return False
+    if os.name == "nt":
+        out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True)
+        return str(pid) in out.stdout
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def bridge_start():
+    """Start the background helper that keeps the panel's device buttons working while Chrome is open
+    (it holds one CDP connection open; every CLI command keeps using its own short-lived one). Safe to call
+    again: does nothing if it is already running."""
+    if bridge_alive():
+        return
+    PROFILE.mkdir(parents=True, exist_ok=True)
+    flags = 0x00000008 | 0x00000200 if os.name == "nt" else 0
+    p = subprocess.Popen([sys.executable, str(BRIDGE_SCRIPT)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
+    BRIDGE_PID_FILE.write_text(str(p.pid), encoding="utf-8")
+
+
+def bridge_stop():
+    if not BRIDGE_PID_FILE.exists():
+        return
+    try:
+        pid = int(BRIDGE_PID_FILE.read_text(encoding="utf-8").strip())
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)
+        else:
+            os.kill(pid, 15)
+    except Exception:
+        pass
+    try:
+        BRIDGE_PID_FILE.unlink()
+    except OSError:
+        pass
 
 
 def app_page(context):
-    """The page under test: the newest tab that is not DevTools and not the runner panel."""
-    pages = [pg for pg in context.pages if not pg.url.startswith("devtools://") and not is_panel(pg)]
+    """The page under test: the newest tab that is not DevTools. The runner panel lives inside this
+    same page (a docked iframe), not in a tab of its own."""
+    pages = [pg for pg in context.pages if not pg.url.startswith("devtools://")]
     return pages[-1] if pages else context.new_page()
+
+
+# ---------------------------------------------------------------- phone/tablet emulation
+
+DEVICES = {
+    "iphone": {"width": 390, "height": 844, "scale": 3,
+               "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) "
+                     "Version/17.0 Mobile/15E148 Safari/604.1"},
+    "android": {"width": 412, "height": 915, "scale": 2.6,
+                "ua": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/120.0.0.0 Mobile Safari/537.36"},
+    "tablet": {"width": 820, "height": 1180, "scale": 2,
+               "ua": "Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) "
+                     "Version/17.0 Mobile/15E148 Safari/604.1"},
+}
+DEVICE_SIZE = re.compile(r"^(\d+)x(\d+)$")
+_ORIGINAL_UA = None
+
+
+def _window_id(browser_cdp, page):
+    target = page.context.new_cdp_session(page).send("Target.getTargetInfo")["targetInfo"]["targetId"]
+    return browser_cdp.send("Browser.getWindowForTarget", {"targetId": target})["windowId"]
+
+
+def mobile(browser, page, spec, cdp=None):
+    """Switch to a phone/tablet (one of DEVICES, or WIDTHxHEIGHT), or back to desktop with spec None/"off".
+    Really resizes the Chrome window (keeping wherever it currently sits on screen, only changing its
+    width/height) so the page's own real width shrinks. This is more robust than overriding just the
+    rendered viewport size and leaving the window itself alone: without a device-toolbar-style frame to draw
+    the rest of the canvas, that left a blank gap and made a flat, low-contrast circle easy to miss against
+    it. The CDP mobile/touch/user-agent flags are set too (0x0 in the size fields is the documented way to
+    set them without also asking CDP to resize the viewport, since the window resize already does that), so
+    sites that branch on those signals see them. Returns the device used, or None.
+
+    Clearing an override later must reuse the same CDP session that set it (a different, new session cannot
+    clear it: each session has its own override state). The background bridge (started by `start`) keeps one
+    session open and passes it in as `cdp` for exactly this reason. A one-off caller that omits `cdp` gets a
+    fresh session each time, fine for a single set-then-done call but unable to later clear what it set."""
+    global _ORIGINAL_UA
+    cdp = cdp or page.context.new_cdp_session(page)
+    browser_cdp = browser.new_browser_cdp_session()
+    wid = _window_id(browser_cdp, page)
+    bounds = browser_cdp.send("Browser.getWindowBounds", {"windowId": wid})["bounds"]
+    left, top = bounds.get("left", 60), bounds.get("top", 40)
+    if _ORIGINAL_UA is None:
+        try:
+            _ORIGINAL_UA = page.evaluate("() => navigator.userAgent")
+        except Exception:
+            _ORIGINAL_UA = ""
+    if not spec or spec in ("off", "desktop"):
+        cdp.send("Emulation.clearDeviceMetricsOverride")
+        cdp.send("Emulation.setTouchEmulationEnabled", {"enabled": False})
+        if _ORIGINAL_UA:
+            cdp.send("Network.setUserAgentOverride", {"userAgent": _ORIGINAL_UA})
+        browser_cdp.send("Browser.setWindowBounds", {"windowId": wid, "bounds": {"windowState": "maximized"}})
+        return None
+    d = DEVICES.get(spec.lower())
+    if d is None:
+        m = DEVICE_SIZE.match(spec)
+        if not m:
+            raise c.ConnectorError(f"Unknown device '{spec}'.",
+                                   "Use one of: " + ", ".join(DEVICES) + ", a WIDTHxHEIGHT, or off.")
+        d = {"width": int(m.group(1)), "height": int(m.group(2)), "scale": 2, "ua": None}
+    cdp.send("Emulation.setDeviceMetricsOverride", {"width": 0, "height": 0, "deviceScaleFactor": 0, "mobile": True})
+    cdp.send("Emulation.setTouchEmulationEnabled", {"enabled": True})
+    if d.get("ua"):
+        cdp.send("Network.setUserAgentOverride", {"userAgent": d["ua"]})
+    browser_cdp.send("Browser.setWindowBounds", {"windowId": wid, "bounds": {"windowState": "normal"}})
+    browser_cdp.send("Browser.setWindowBounds", {"windowId": wid,
+                     "bounds": {"left": left, "top": top, "width": d["width"] + 16, "height": d["height"] + 140}})
+    return d
 
 
 @contextlib.contextmanager
@@ -393,6 +514,7 @@ HIGHLIGHT_JS = """el => {
 OVERLAYS_JS = """hide => {
   for (const el of document.querySelectorAll('.__qa_hl')) el.remove();
   const d = document.getElementById('__qa_cursor'); if (d) d.style.display = hide ? 'none' : '';
+  const p = document.getElementById('__qa_panel_frame'); if (p) p.style.visibility = hide ? 'hidden' : '';
 }"""
 
 
