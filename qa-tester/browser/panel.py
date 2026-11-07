@@ -57,9 +57,9 @@ HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</tit
 <script>document.documentElement.dataset.theme='dark';</script>
 <style>
 :root{
-  --bg:#0a0a0b;--panel:rgba(255,255,255,.025);--card:rgba(255,255,255,.04);--card-hov:rgba(255,255,255,.065);
-  --track:rgba(255,255,255,.05);--border:rgba(255,255,255,.08);--border-strong:rgba(255,255,255,.14);
-  --text:#f4f4f5;--dim:#a1a1aa;--faint:#71717a;--code-bg:rgba(255,255,255,.03);--mini-bg:#18181b;--shadow:none;
+  --bg:#1a1a1d;--panel:rgba(255,255,255,.03);--card:rgba(255,255,255,.05);--card-hov:rgba(255,255,255,.08);
+  --track:rgba(255,255,255,.06);--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.16);
+  --text:#f4f4f5;--dim:#a1a1aa;--faint:#71717a;--code-bg:rgba(255,255,255,.04);--mini-bg:#232327;--shadow:none;
   --green:#34d399;--green-bg:rgba(52,211,153,.14);--green-bd:rgba(52,211,153,.3);
   --red:#fb7185;--red-bg:rgba(251,113,133,.14);--red-bd:rgba(251,113,133,.3);
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,.14);--amber-bd:rgba(251,191,36,.3);
