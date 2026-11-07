@@ -4,8 +4,11 @@ test id, its own observation, timing, a screenshot where one was taken, and the 
 
 Open the file directly (no server, no Chrome, no Playwright needed) any time after the run is over - that
 is the point of it: a reviewable record of the whole session, for yourself later or for showing someone else.
+Every entry is collapsible (open by default only for Issue found / Could not verify, so a long run reads as
+a short list of what went wrong plus a lot you can expand into if you want to).
 """
 import json
+import platform
 from pathlib import Path
 
 import core
@@ -13,6 +16,7 @@ import record
 
 RESULTS = ["Verified", "Issue found", "Could not verify", "Not tested"]
 BADGE = {"Verified": "ok", "Issue found": "bad", "Could not verify": "mid", "Not tested": "nt"}
+OPEN_BY_DEFAULT = {"Issue found", "Could not verify"}
 
 
 def build(run, out_path=None):
@@ -22,12 +26,6 @@ def build(run, out_path=None):
             f"No recorded events for run '{run}' yet.",
             "Events are written by ad hoc commands, `play`, and `crawl` while this run is active (--run "
             f"{run}, or make it the active run with qa-tester/test-run.py use).")
-    tasks, seen = [], set()
-    for e in events:
-        t = e.get("task") or "(no task)"
-        if t not in seen:
-            seen.add(t)
-            tasks.append(t)
     counts = {}
     for e in events:
         if e.get("result"):
@@ -50,6 +48,8 @@ def _html(run, site, events, counts):
     rate = round(100 * passed / total) if total else 0
     stats = "".join(f'<div class="stat {BADGE[w]}"><b>{counts.get(w, 0)}</b><span>{w}</span></div>' for w in RESULTS)
     title_site = f'<a href="{site}" class="site">{site}</a>' if site else ""
+    env_bits = [f"Site: {site}" if site else None, f"Host: {platform.system()} {platform.release()}", "Runner: local"]
+    env_line = " &middot; ".join(b for b in env_bits if b)
     return """<!doctype html><html><head><meta charset="utf-8"><title>QA report: """ + run + """</title>
 <style>
 :root{
@@ -71,6 +71,7 @@ a{color:var(--accent)}
 h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.25;margin:10px 0 6px;letter-spacing:-.01em}
 .site{font-size:16px;text-decoration:none;border-bottom:1px solid var(--accent-bd)}
 .meta{color:var(--dim);font-size:13px;margin-top:4px}
+.env{color:var(--faint);font-size:12px;margin-top:10px}
 .stats{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
 .stat{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px}
 .stat b{display:block;font-family:var(--serif);font-size:30px;font-weight:400;line-height:1}
@@ -79,21 +80,33 @@ h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.25;marg
 .rate{color:var(--dim);font-size:13px;margin-top:14px}
 .rate b{color:var(--text);font-weight:600}
 hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:34px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
 .filters button{background:var(--card);border:1px solid var(--border);color:var(--dim);border-radius:999px;
   padding:7px 16px;cursor:pointer;font:inherit;font-size:12.5px;transition:background .15s,color .15s,border-color .15s}
 .filters button:hover{color:var(--text);border-color:var(--faint)}
 .filters button.on{color:#06222c;background:var(--accent);border-color:var(--accent);font-weight:600}
+.tagrow{display:flex;gap:8px;flex-wrap:wrap;margin:-20px 0 34px}
+.tagrow button{background:transparent;border:1px dashed var(--border);color:var(--faint);border-radius:999px;
+  padding:5px 13px;cursor:pointer;font:inherit;font-size:11.5px}
+.tagrow button.on{color:var(--accent);border-color:var(--accent-bd);border-style:solid;background:var(--accent-bg)}
+.expandall{background:none;border:none;color:var(--faint);cursor:pointer;font:inherit;font-size:12px;text-decoration:underline;text-underline-offset:2px}
+.expandall:hover{color:var(--accent)}
 .task-h{display:flex;align-items:center;gap:10px;margin:40px 0 16px}
 .task-h .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
 .task-h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600}
-.ev{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:12px}
+.ev{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden}
 .ev:hover{background:var(--card-hov)}
-.ev-top{display:flex;align-items:flex-start;gap:12px}
+.ev-top{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;cursor:pointer;user-select:none}
+.chev{color:var(--faint);font-size:11px;flex:none;padding-top:5px;transition:transform .15s}
+.ev.open .chev{transform:rotate(90deg)}
 .seq{color:var(--faint);font-size:11.5px;flex:none;padding-top:3px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.ev-body{flex:1;min-width:0}
+.ev-head{flex:1;min-width:0}
 .txt{font-weight:500;font-size:14.5px}
 .txt b{color:var(--accent);font-weight:600}
+.chips{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.chip{font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);border:1px solid var(--border);
+  border-radius:999px;padding:2px 8px}
 .msg{color:var(--dim);font-size:13px;margin-top:4px;white-space:pre-wrap;word-break:break-word}
 .side{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .badge{font-size:11px;border-radius:999px;padding:4px 11px;border:1px solid;white-space:nowrap}
@@ -102,13 +115,15 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:40px 0 28px}
 .badge.mid{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bd)}
 .badge.nt{background:var(--card);color:var(--dim);border-color:var(--border)}
 .ms{color:var(--faint);font-size:11px;font-variant-numeric:tabular-nums}
-.thumbs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.ev-detail{display:none;padding:0 20px 20px 46px}
+.ev.open .ev-detail{display:block}
+.thumbs{margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
 .thumb-wrap{display:flex;flex-direction:column;gap:5px}
 .thumb-wrap img{width:260px;height:170px;object-fit:cover;object-position:top;border-radius:10px;
   border:1px solid var(--border);cursor:zoom-in;display:block;transition:border-color .15s}
 .thumb-wrap img:hover{border-color:var(--accent-bd)}
 .thumb-cap{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-details{margin-top:14px}
+details{margin-top:4px}
 summary{cursor:pointer;color:var(--accent);font-size:12.5px;user-select:none;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary:before{content:'\\25B8';display:inline-block;margin-right:6px;transition:transform .15s}
@@ -128,17 +143,23 @@ td.m{width:52px}td.s{width:46px}td.t{width:84px}td.ms{width:70px}
 <h1>""" + run + """</h1>
 """ + (f'<div class="meta">{title_site}</div>' if site else "") + """
 <div class="meta">Started """ + started + " &middot; finished " + finished + f" &middot; {total} recorded" + """</div>
+<div class="env">""" + env_line + """</div>
 <div class="stats">""" + stats + f"""</div>
 <div class="rate">Pass rate: <b>{rate}%</b> ({passed} of {total} verified)</div>
 """ + """<hr class="rule">
-<div class="filters" id="filters"></div>
+<div class="toolbar">
+  <div class="filters" id="filters"></div>
+  <button class="expandall" id="expandall">Expand all</button>
+</div>
+<div class="tagrow" id="tagrow"></div>
 <div id="list"></div>
 </div>
 <script>
 const EVENTS = """ + json.dumps(events) + """;
 const BADGE = """ + json.dumps(BADGE) + """;
+const OPEN_BY_DEFAULT = """ + json.dumps(sorted(OPEN_BY_DEFAULT)) + """;
 const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let activeFilter = null;
+let activeFilter = null, activeTag = null, allOpen = false;
 function netTable(rows){
   if(!rows || !rows.length) return '';
   const body = rows.map(r=>`<tr><td class="m">${esc(r.m)}</td><td class="s ${r.f||(r.s&&r.s>=400)?'netbad':''}">${r.f?'ERR':esc(r.s??'...')}</td><td class="t">${esc(r.t)}</td><td class="ms">${r.ms!=null?r.ms+' ms':''}</td><td title="${esc(r.u)}">${esc(r.u)}</td></tr>`).join('');
@@ -151,28 +172,49 @@ function render(){
   let html = '', lastTask = null;
   for (const e of EVENTS){
     if (activeFilter && e.result !== activeFilter) continue;
+    if (activeTag && !(e.tags||[]).includes(activeTag)) continue;
     const task = e.task || '(no task)';
     if (task !== lastTask){ html += `<div class="task-h"><span class="dot"></span><span>${esc(task)}</span></div>`; lastTask = task; }
     const cls = BADGE[e.result] || 'nt';
     const shots = Array.isArray(e.screenshot) ? e.screenshot : (e.screenshot ? [e.screenshot] : []);
-    html += `<div class="ev"><div class="ev-top"><div class="seq">#${String(e.seq).padStart(3,'0')}</div><div class="ev-body">
-      <div class="txt">${e.case_id ? `<b>${esc(e.case_id)}</b> &middot; ` : ''}${esc(e.text)}</div>
-      ${e.msg ? `<div class="msg">${esc(e.msg)}</div>` : ''}
-      ${shots.length ? `<div class="thumbs">${shots.map(s=>`<div class="thumb-wrap"><img src="${esc(s)}" onclick="window.open(this.src)"><span class="thumb-cap">Click to enlarge</span></div>`).join('')}</div>` : ''}
-      ${netTable(e.net)}
+    const hasDetail = !!(e.msg || shots.length || (e.net && e.net.length));
+    const openDefault = allOpen || OPEN_BY_DEFAULT.includes(e.result);
+    const tags = (e.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+    html += `<div class="ev ${hasDetail && openDefault ? 'open':''}" data-seq="${e.seq}">
+      <div class="ev-top" onclick="${hasDetail ? `toggle(${e.seq})` : ''}">
+        <span class="chev">${hasDetail ? '\\u25B8' : ''}</span>
+        <div class="seq">#${String(e.seq).padStart(3,'0')}</div>
+        <div class="ev-head">
+          <div class="txt">${e.case_id ? `<b>${esc(e.case_id)}</b> &middot; ` : ''}${esc(e.text)}</div>
+          ${tags ? `<div class="chips">${tags}</div>` : ''}
+        </div>
+        <div class="side">${e.result ? `<div class="badge ${cls}">${esc(e.result)}</div>` : ''}${e.ms!=null?`<span class="ms">${e.ms} ms</span>`:''}</div>
       </div>
-      <div class="side">${e.result ? `<div class="badge ${cls}">${esc(e.result)}</div>` : ''}${e.ms!=null?`<span class="ms">${e.ms} ms</span>`:''}</div>
-    </div></div>`;
+      ${hasDetail ? `<div class="ev-detail">
+        ${e.msg ? `<div class="msg">${esc(e.msg)}</div>` : ''}
+        ${shots.length ? `<div class="thumbs">${shots.map(s=>`<div class="thumb-wrap"><img src="${esc(s)}" onclick="event.stopPropagation();window.open(this.src)"><span class="thumb-cap">Click to enlarge</span></div>`).join('')}</div>` : ''}
+        ${netTable(e.net)}
+      </div>` : ''}
+    </div>`;
   }
   list.innerHTML = html || '<div class="empty">No events match this filter.</div>';
 }
+function toggle(seq){
+  const el = document.querySelector(`.ev[data-seq="${seq}"]`);
+  if (el) el.classList.toggle('open');
+}
+document.getElementById('expandall').onclick = () => {
+  allOpen = !allOpen;
+  document.getElementById('expandall').textContent = allOpen ? 'Collapse all' : 'Expand all';
+  render();
+};
 function buildFilters(){
   const counts = {};
   for (const e of EVENTS) if (e.result) counts[e.result] = (counts[e.result]||0) + 1;
   const f = document.getElementById('filters');
   const mk = (label, val) => {
     const b = document.createElement('button');
-    b.textContent = label; b.dataset.val = val === null ? '' : val;
+    b.textContent = label;
     b.onclick = () => { activeFilter = val; [...f.children].forEach(x=>x.classList.toggle('on', x===b)); render(); };
     return b;
   };
@@ -181,5 +223,18 @@ function buildFilters(){
   for (const w of Object.keys(BADGE)) if (counts[w]) f.appendChild(mk(`${w} ${counts[w]}`, w));
   all.classList.add('on');
 }
-buildFilters(); render();
+function buildTags(){
+  const counts = {};
+  for (const e of EVENTS) for (const t of (e.tags||[])) counts[t] = (counts[t]||0) + 1;
+  const names = Object.keys(counts);
+  if (!names.length) return;
+  const row = document.getElementById('tagrow');
+  for (const t of names.sort()){
+    const b = document.createElement('button');
+    b.textContent = `#${t} ${counts[t]}`;
+    b.onclick = () => { activeTag = activeTag === t ? null : t; [...row.children].forEach(x=>x.classList.toggle('on', x===b && activeTag===t)); render(); };
+    row.appendChild(b);
+  }
+}
+buildFilters(); buildTags(); render();
 </script></body></html>"""

@@ -35,7 +35,7 @@ def next_seq(run):
     return n
 
 
-def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screenshot=None, case_id=None):
+def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screenshot=None, case_id=None, tags=None):
     """Append one event. Safe to call often and never raises: a demo must not break because logging a
     line failed. `run` may be None (nothing to attach the record to, e.g. no active run) - then it is
     simply skipped, exactly like the rest of this tool behaves without an active run."""
@@ -44,7 +44,7 @@ def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screen
     try:
         row = {"seq": next_seq(run), "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "task": task or "", "kind": kind,
                "case_id": case_id, "text": text, "result": result, "msg": core.redact(msg or ""),
-               "ms": ms, "net": net or [], "screenshot": screenshot}
+               "ms": ms, "net": net or [], "screenshot": screenshot, "tags": tags or []}
         d = _run_dir(run)
         d.mkdir(parents=True, exist_ok=True)
         with open(d / "events.jsonl", "a", encoding="utf-8") as fh:

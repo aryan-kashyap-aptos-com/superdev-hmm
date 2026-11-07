@@ -3,7 +3,7 @@
 A scenario is a JSON file (template: qa-tester/templates/scenario.json):
 
     {"name": "...", "site": "<name from environments>", "cases": [
-       {"id": "C1", "title": "...", "steps": [
+       {"id": "C1", "title": "...", "tags": ["smoke"], "steps": [
           {"do": "goto", "url": "/path/page"},
           {"do": "click", "target": "Sign in"},
           {"expect": "disabled", "target": "role=button[name='Export']"},
@@ -11,6 +11,8 @@ A scenario is a JSON file (template: qa-tester/templates/scenario.json):
 
 Each step is either an action ("do") or a check ("expect"). Checks retry until they hold or the timeout ends,
 like Cypress. A case stops at its first step that is not Verified; its remaining steps are "Not tested".
+"tags" is optional (a list of short labels, e.g. ["smoke", "checkout"]) - `report` shows them as chips and
+lets you filter by one, the same idea as Cucumber's @tags.
 """
 import datetime
 import json
@@ -455,7 +457,7 @@ def run(path, args):
                 evidence += rel
                 steps_out.append({"step": text, "result": word, "detail": msg, "ms": ms, "evidence": rel})
                 record.record(run_name, args.task, "step", text, word, msg, ms=ms, net=panel_rows,
-                              screenshot=rel or None, case_id=case["id"])
+                              screenshot=rel or None, case_id=case["id"], tags=case.get("tags"))
                 print(f"   {'+' if word == 'Verified' else '!'} {word:16} {text}" + (f"  -> {msg}" if msg and word != "Verified" else ""))
                 page.wait_for_timeout(args.slow)
             try:
@@ -467,7 +469,7 @@ def run(path, args):
             panel.case(ci, result)
             record.record(run_name, args.task, "case", case["title"], result,
                           f"{sum(1 for s in steps_out if s['result'] == 'Verified')}/{len(steps_out)} step(s) verified",
-                          case_id=case["id"])
+                          case_id=case["id"], tags=case.get("tags"))
             cases_out.append({"id": case["id"], "title": case["title"], "result": result, "steps": steps_out, "evidence": evidence})
         totals = {w: sum(1 for k in cases_out if k["result"] == w) for w in RESULTS}
         panel.done("Finished: " + ", ".join(f"{n} {w}" for w, n in totals.items() if n))

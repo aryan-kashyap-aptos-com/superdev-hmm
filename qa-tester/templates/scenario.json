@@ -2,7 +2,7 @@
   "name": "Example: order search page",
   "_comment": "Leave out \"site\" to use the active run (qa-tester/test-run.py use <run>). Name a site here only for one listed in environments(.local).md, reused across runs.",
   "cases": [
-    {"id": "C1", "title": "A user can sign in", "steps": [
+    {"id": "C1", "title": "A user can sign in", "tags": ["smoke"], "steps": [
       {"do": "login"},
       {"expect": "visible", "target": "Orders"},
       {"expect": "hidden", "target": "Sign out", "note": "the sign-out link stays hidden until the user menu opens"}
