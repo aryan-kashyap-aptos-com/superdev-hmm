@@ -284,6 +284,13 @@ def mobile(browser, page, spec, cdp=None):
     wid = _window_id(browser_cdp, page)
     bounds = browser_cdp.send("Browser.getWindowBounds", {"windowId": wid})["bounds"]
     left, top = bounds.get("left", 60), bounds.get("top", 40)
+    try:
+        # Read the real screen size before any mobile emulation goes on - once Emulation.mobile is set,
+        # window.screen.* reports the emulated device's metrics instead of the physical screen, which
+        # fed back into a shrinking window on every repeated switch.
+        avail = page.evaluate("() => ({w: window.screen.availWidth, h: window.screen.availHeight})")
+    except Exception:
+        avail = None
     if _ORIGINAL_UA is None:
         try:
             _ORIGINAL_UA = page.evaluate("() => navigator.userAgent")
@@ -308,19 +315,23 @@ def mobile(browser, page, spec, cdp=None):
     if d.get("ua"):
         cdp.send("Network.setUserAgentOverride", {"userAgent": d["ua"]})
     win_w, win_h = d["width"] + 16, d["height"] + 140
-    try:
-        avail = page.evaluate("() => ({w: window.screen.availWidth, h: window.screen.availHeight})")
+    if avail:
         # Shrink to fit first (a screen shorter than the device height can't show it at full height
         # no matter where the window sits - e.g. the taskbar eating into availHeight), then reposition
         # what's left so the window stays fully on screen.
         win_w, win_h = min(win_w, avail["w"]), min(win_h, avail["h"])
         left = max(0, min(left, avail["w"] - win_w))
         top = max(0, min(top, avail["h"] - win_h))
-    except Exception:
-        pass
     browser_cdp.send("Browser.setWindowBounds", {"windowId": wid, "bounds": {"windowState": "normal"}})
     browser_cdp.send("Browser.setWindowBounds", {"windowId": wid,
                      "bounds": {"left": left, "top": top, "width": win_w, "height": win_h}})
+    try:
+        # Let the site's own responsive layout (nav collapsing to a hamburger, icons moving, etc.)
+        # settle before the panel checks which corner is free - checking right after the resize can
+        # catch the old, wider-layout positions still in place.
+        page.wait_for_timeout(300)
+    except Exception:
+        pass
     return d
 
 
