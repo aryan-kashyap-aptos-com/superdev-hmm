@@ -54,10 +54,7 @@ CALL_JS = """([n, a]) => {
 }"""
 
 HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</title>
-<script>(function(){try{
-var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;
-document.documentElement.dataset.theme=sysLight?'light':'dark';
-}catch(e){}})();</script>
+<script>document.documentElement.dataset.theme='dark';</script>
 <style>
 :root{
   --bg:#0a0c12;--panel:rgba(255,255,255,.03);--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.06);

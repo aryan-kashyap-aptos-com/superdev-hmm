@@ -52,8 +52,7 @@ def _html(run, site, events, counts):
     env_line = " &middot; ".join(b for b in env_bits if b)
     return """<!doctype html><html><head><meta charset="utf-8"><title>QA report: """ + run + """</title>
 <script>(function(){try{var s=localStorage.getItem('qa_report_theme');
-var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;
-document.documentElement.dataset.theme=s||(sysLight?'light':'dark');}catch(e){}})();</script>
+document.documentElement.dataset.theme=s||'dark';}catch(e){}})();</script>
 <style>
 :root{
   --bg:#0a0c12;--card:rgba(255,255,255,.035);--card-hov:rgba(255,255,255,.055);--border:rgba(255,255,255,.09);
