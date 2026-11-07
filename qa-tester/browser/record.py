@@ -41,6 +41,7 @@ def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screen
     simply skipped, exactly like the rest of this tool behaves without an active run."""
     if not run:
         return
+    core.touch_run(run)
     try:
         row = {"seq": next_seq(run), "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "task": task or "", "kind": kind,
                "case_id": case_id, "text": text, "result": result, "msg": core.redact(msg or ""),

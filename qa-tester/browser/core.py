@@ -199,6 +199,42 @@ def launch(url, devtools=False):
 
 BRIDGE_SCRIPT = HERE / "bridge.py"
 BRIDGE_PID_FILE = PROFILE / "bridge.pid"
+LAST_PLAY_FILE = PROFILE / "last-play.json"
+LAST_TOUCHED_FILE = PROFILE / "last-touched-run.json"
+
+
+def touch_run(run):
+    """Remember the run most recently written to by record.record() - ad hoc command or formal scenario
+    alike - so the Report button (and `report` with no --run) reflects whatever was actually just tested,
+    not a `test-run.py use` pointer from an earlier, unrelated session that happens to still be active."""
+    try:
+        LAST_TOUCHED_FILE.write_text(json.dumps({"run": run}), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def last_touched_run():
+    try:
+        run = json.loads(LAST_TOUCHED_FILE.read_text(encoding="utf-8")).get("run")
+        return run if run and (QA / "runs" / run).exists() else None
+    except (OSError, ValueError):
+        return None
+
+
+def save_last_play(argv):
+    """Remember a `play` invocation's exact CLI arguments, so the panel's Re-run button (via bridge.py)
+    can start the same scenario again later without the user re-typing the command."""
+    try:
+        LAST_PLAY_FILE.write_text(json.dumps(argv), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def load_last_play():
+    try:
+        return json.loads(LAST_PLAY_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
 
 
 def bridge_alive():
@@ -703,7 +739,7 @@ def safe_url(url, home_host):
 
 def net_rows_for_panel(rows, home_host):
     return [{"m": r["method"], "s": r["status"] or (0 if r["failed"] else None), "t": r["type"], "ms": r["ms"],
-             "u": safe_url(r["url"], home_host), "f": r["failed"]} for r in rows]
+             "u": safe_url(r["url"], home_host), "f": r["failed"], "t0": r["t0"]} for r in rows]
 
 
 def net_summary(net, page, a, label):

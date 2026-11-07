@@ -387,6 +387,7 @@ def cmd_login(a):
 
 
 def cmd_play(a):
+    core.save_last_play(sys.argv[1:])
     cases = player.run(a.scenario, a)
     sys.exit(0 if all(k["result"] == "Verified" for k in cases) else 1)
 
@@ -538,7 +539,7 @@ def cmd_crawl(a):
 
 
 def cmd_report(a):
-    run = a.run or core.active_run()
+    run = a.run or core.last_touched_run() or core.active_run()
     if not run:
         raise c.ConnectorError("No run given and no active run.", "Pass --run NAME, or set one active with "
                                "qa-tester/test-run.py use.")

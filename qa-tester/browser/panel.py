@@ -102,6 +102,8 @@ header{position:sticky;top:0;z-index:2;background:var(--panel);backdrop-filter:b
 h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sub{color:var(--dim);font-size:12px;margin-top:3px;margin-left:15px}
 .head-actions{display:flex;gap:4px;flex:none;align-items:center}
+.kbd{font:600 9px/1 var(--mono);background:var(--track);border:1px solid var(--border-strong);border-radius:4px;
+  padding:2px 5px;color:var(--dim)}
 #reportBtn{background:none;border:1px solid transparent;color:var(--accent);border-radius:6px;padding:4px 8px;cursor:pointer;flex:none;font-size:12px;font-weight:500;font-family:inherit;transition:background .15s}
 #reportBtn:hover{background:var(--accent-bg)}
 #reportBtn:disabled{color:var(--faint);cursor:not-allowed;opacity:.6}
@@ -118,9 +120,11 @@ h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em;white-space:now
 .counts b{font-weight:600;font-family:var(--mono)}
 .c-v b{color:var(--green)}.c-i b{color:var(--red)}.c-n b{color:var(--amber)}.c-p b{color:var(--dim)}
 .devices{display:flex;background:var(--track);border-radius:8px;padding:3px;margin:10px 14px 0;gap:2px}
-.devices button{flex:1;background:none;border:none;color:var(--dim);border-radius:6px;padding:5px 0;font:inherit;font-size:11px;cursor:pointer;transition:background .15s,color .15s}
+.devices button{flex:1;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--dim);border-radius:6px;padding:5px 0;font:inherit;font-size:11px;cursor:pointer;transition:background .15s,color .15s}
 .devices button.on{color:var(--text);background:var(--card-hov);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .devices button:hover:not(.on){color:var(--text)}
+.devicon{width:12px;height:12px;margin-right:4px;flex:none}
+.devmeta{display:flex;justify-content:space-between;padding:6px 15px 0;font-size:10.5px;color:var(--faint);font-family:var(--mono)}
 nav{display:flex;padding:12px 14px 0;gap:4px;border-bottom:1px solid var(--border)}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--faint);padding:0 2px 9px;margin-right:16px;font:inherit;font-size:12.5px;font-weight:500;cursor:pointer;transition:color .15s}
 nav button.on{color:var(--text);border-color:var(--accent-solid)}
@@ -153,9 +157,36 @@ td{padding:5px 8px;border-bottom:1px solid var(--border);overflow:hidden;text-ov
 tr:last-child td{border-bottom:none}
 td.m{width:40px}td.s{width:34px}td.t{width:54px}td.ms{width:50px;text-align:right}
 .ok{color:var(--green)}.bad{color:var(--red)}.mid{color:var(--amber)}
+tr.net-row{cursor:pointer}
+tr.net-row:hover td{background:var(--card-hov)}
+tr.netdetail td{padding:11px 12px;background:var(--card);cursor:default;white-space:normal}
+.nd-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.nd-pill{font:700 10px/1 var(--mono);padding:3px 7px;border-radius:5px;flex:none}
+.nd-pill.ok{color:var(--green);background:var(--green-bg)}
+.nd-pill.bad{color:var(--red);background:var(--red-bg)}
+.nd-pill.mid{color:var(--amber);background:var(--amber-bg)}
+.nd-url{font-family:var(--mono);font-size:11px;word-break:break-all;color:var(--text);margin-bottom:9px}
+.nd-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:11.5px;margin-bottom:9px}
+.nd-grid span:nth-child(odd){color:var(--faint)}
+.nd-grid span:nth-child(even){color:var(--text);font-family:var(--mono)}
+.nd-copy{background:var(--card-hov);border:1px solid var(--border-strong);color:var(--text);border-radius:6px;
+  padding:4px 9px;font:inherit;font-size:11px;cursor:pointer}
+.nd-copy:hover{background:var(--track)}
+.nd-copy.copied{color:var(--green);border-color:var(--green-bd)}
 .log{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:6px;display:flex;gap:8px;box-shadow:var(--shadow)}
 .log .tm{color:var(--faint);font-size:11px;flex:none;font-family:var(--mono)}
 .empty{color:var(--faint);padding:14px 12px;text-align:center;font-size:12px}
+#footbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 14px;
+  border-top:1px solid var(--border);background:var(--panel)}
+.foot-hints{display:flex;gap:2px}
+.hintbtn{display:flex;align-items:center;gap:6px;background:none;border:1px solid transparent;color:var(--dim);
+  border-radius:6px;padding:4px 7px;font:inherit;font-size:11.5px;cursor:pointer;transition:background .15s,color .15s}
+.hintbtn:hover:not(:disabled){background:var(--card);color:var(--text)}
+.hintbtn:disabled{opacity:.4;cursor:not-allowed}
+#runBtn{display:flex;align-items:center;gap:6px;background:var(--accent-solid);color:var(--accent-ink);border:none;
+  border-radius:7px;padding:5px 11px;cursor:pointer;flex:none;font:600 12.5px/1.2 inherit;transition:opacity .15s}
+#runBtn:disabled{opacity:.4;cursor:not-allowed}
+#runBtn:not(:disabled):hover{opacity:.85}
 </style></head><body>
 <div id="shell"><header><div class="head"><div class="headtext"><div class="title-row"><span class="hdot" id="headerDot"></span><h1 id="title">QA Runner</h1></div><div class="sub" id="sub">Waiting for a scenario. Single commands appear under Log.</div></div>
 <div class="head-actions"><button id="reportBtn" title="Build and open the full report.html for this run">Report &#8599;</button>
@@ -166,11 +197,20 @@ td.m{width:40px}td.s{width:34px}td.t{width:54px}td.ms{width:50px;text-align:righ
 <button id="collapseBtn" title="Collapse to a small pill">&#10095;&#10095;</button></div></div>
 <div class="counts" id="counts"></div>
 <div class="devices" id="devices" title="Resize the real window to a phone/tablet, or back">
-<button data-d="desktop" class="on">Desktop</button><button data-d="iphone">iPhone</button><button data-d="android">Android</button><button data-d="tablet">Tablet</button></div>
+<button data-d="desktop" class="on"><svg class="devicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>Desktop</button>
+<button data-d="iphone"><svg class="devicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>iPhone</button>
+<button data-d="android"><svg class="devicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="9.5" cy="8" r=".6" fill="currentColor" stroke="none"/><circle cx="14.5" cy="8" r=".6" fill="currentColor" stroke="none"/><path d="M9 14h6"/></svg>Android</button>
+<button data-d="tablet"><svg class="devicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 18h.01"/></svg>Tablet</button></div>
+<div class="devmeta" id="devmeta"><span id="devmetaLeft">&mdash;</span><span id="devmetaRight">Last run: &ndash;</span></div>
 <nav><button data-tab="tests" class="on">Tests</button><button data-tab="network">Network</button><button data-tab="log">Log</button></nav></header>
 <main><section id="tests"><div class="empty">No test cases yet.</div></section>
 <section id="network" hidden><div class="nettbl"><table><tr><th class="m">Method</th><th class="s">Status</th><th class="t">Type</th><th>URL</th><th class="ms">Time</th></tr><tbody id="net"></tbody></table></div><div class="empty" id="netempty">No calls yet.</div></section>
-<section id="log" hidden><div class="empty" id="logempty">No commands yet.</div></section></main></div>
+<section id="log" hidden><div class="empty" id="logempty">No commands yet.</div></section></main>
+<footer id="footbar"><div class="foot-hints">
+<button class="hintbtn" id="hintRun" title="Run the last scenario again"><span class="kbd">R</span>Run</button>
+<button class="hintbtn" id="hintMin" title="Minimise the panel"><span class="kbd">\\</span>Minimise</button></div>
+<button id="runBtn" disabled title="Nothing recorded yet to run again"><span>&#8635;</span><span id="runLabel">Run</span></button>
+</footer></div>
 <div id="mini" title="Switch device, or tap QA to reopen the runner"><span class="dot"></span>
 <div class="minidevs"><button data-d="desktop" class="on" title="Desktop">Dsk</button><button data-d="iphone" title="iPhone">iOS</button><button data-d="android" title="Android">And</button><button data-d="tablet" title="Tablet">Tab</button></div>
 <span class="label">QA</span></div>
@@ -203,6 +243,39 @@ function toggle(mini){
 document.getElementById('collapseBtn').onclick=()=>toggle(true);
 document.getElementById('mini').onclick=()=>toggle(false);
 document.getElementById('reportBtn').onclick=()=>{window.top.__qa_report_requested=true;};
+document.getElementById('runBtn').onclick=()=>{
+  const b=document.getElementById('runBtn'); if(b.disabled)return;
+  window.top.__qa_rerun_requested=true;
+};
+document.getElementById('hintRun').onclick=()=>document.getElementById('runBtn').click();
+document.getElementById('hintMin').onclick=()=>toggle(true);
+function uaInfo(){
+  try{
+    const ua=(window.top.navigator||navigator).userAgent;
+    const pick=['Edg','Chrome','Firefox','Safari'].map(n=>ua.match(new RegExp(n+'/([\\d.]+)'))).find(Boolean);
+    return pick?`${pick[0].split('/')[0].replace('Edg','Edge')} ${pick[1].split('.')[0]}`:'';
+  }catch(e){return '';}
+}
+function updateDevMeta(){
+  try{
+    const w=window.top.innerWidth,h=window.top.innerHeight,ua=uaInfo();
+    document.getElementById('devmetaLeft').textContent=`${w} x ${h}`+(ua?` · ${ua}`:'');
+  }catch(e){}
+}
+let lastRunAt=null;
+function markRunNow(){
+  lastRunAt=new Date();
+  document.getElementById('devmetaRight').textContent='Last run: '+lastRunAt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+updateDevMeta();setInterval(updateDevMeta,2000);
+try{
+  const isEditable=el=>el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+  (window.top.document||document).addEventListener('keydown',e=>{
+    if(e.metaKey||e.ctrlKey||e.altKey||isEditable(e.target))return;
+    if(e.key==='r'||e.key==='R'){const b=document.getElementById('runBtn');if(!b.disabled){b.click();e.preventDefault();}}
+    else if(e.key==='\\\\'){toggle(!document.body.classList.contains('mini'));e.preventDefault();}
+  });
+}catch(e){}
 document.getElementById('themeBtn').onclick=()=>{
   document.documentElement.dataset.theme=document.documentElement.dataset.theme==='light'?'dark':'light';
 };
@@ -216,6 +289,12 @@ function counts(){const c={verified:0,issue:0,cnv:0,pending:0};for(const k of S.
   for(const id of ['mini','headerDot']){const m=document.getElementById(id);
     m.classList.toggle('has-issue',c.issue>0);m.classList.toggle('has-pending',c.issue===0&&c.pending>0);m.classList.toggle('all-ok',c.issue===0&&c.pending===0&&S.cases.length>0);}
   const stillRunning=S.cases.length>0&&c.pending>0;
+  const runb=document.getElementById('runBtn');
+  runb.disabled=stillRunning||!S.cases.length;
+  runb.title=stillRunning?'Wait for the current run to finish':(S.cases.length?'Run the last scenario again':'Nothing recorded yet to run again');
+  document.getElementById('runLabel').textContent=S.cases.length?'Re-run':'Run';
+  document.getElementById('hintRun').disabled=runb.disabled;
+  document.getElementById('hintRun').title=runb.title;
   const rb=document.getElementById('reportBtn');rb.disabled=stillRunning;
   rb.title=stillRunning?`Finish all test cases first (${c.pending} still to go)`:'Build and open the full report.html for this run';}
 function render(){const el=document.getElementById('tests');
@@ -223,9 +302,45 @@ function render(){const el=document.getElementById('tests');
   el.innerHTML=S.cases.map(k=>`<div class="case ${k.status}"><div class="ct"><span class="ico">${k.status==='running'?'<span class="spin">'+ICON.running+'</span>':ICON[k.status]}</span><span class="id">${esc(k.id)}</span><span>${esc(k.title)}</span></div>
    <div class="steps">${k.steps.map(s=>`<div class="step ${s.status}"><span class="si">${s.status==='running'?'<span class="spin">'+ICON.running+'</span>':ICON[s.status]}</span><span>${esc(s.text)}</span>${s.ms!=null?`<span class="ms">${(s.ms/1000).toFixed(1)}s</span>`:''}</div>${s.msg&&s.status!=='pending'?`<div class="step ${s.status}"><div class="msg">${esc(s.msg)}</div></div>`:''}`).join('')}</div></div>`).join('');
   counts();const r=el.querySelector('.step.running')||el.querySelector('.case.running');if(r)r.scrollIntoView({block:'center'});}
+function statusCls(r){return r.f||r.s>=400?'bad':r.s>=300?'mid':'ok';}
+function startedMs(r,minT0){return (r.t0!=null&&minT0!=null)?Math.max(0,Math.round((r.t0-minT0)*1000)):null;}
+function netDetailHtml(r,minT0){
+  const cls=statusCls(r),started=startedMs(r,minT0),label={ok:'OK',mid:'REDIRECT',bad:r.f?'FAILED':'ERROR'}[cls];
+  return `<tr class="netdetail"><td colspan="5">
+    <div class="nd-head"><span class="nd-pill ${cls}">${r.f?'ERR':esc(r.s??'...')}</span><span style="font-size:11px;color:var(--dim)">${esc(label)}</span></div>
+    <div class="nd-url">${esc(r.u)}</div>
+    <div class="nd-grid">
+      <span>Method</span><span>${esc(r.m)}</span>
+      <span>Status</span><span>${r.f?'Failed: '+esc(r.f):esc(r.s??'pending')}</span>
+      <span>Type</span><span>${esc(r.t)}</span>
+      ${started!=null?`<span>Started</span><span>+${started} ms</span>`:''}
+      <span>Duration</span><span>${r.ms!=null?r.ms+' ms':'-'}</span>
+    </div>
+    <button class="nd-copy">Copy URL</button>
+  </td></tr>`;
+}
 function renderNet(){const tb=document.getElementById('net');document.getElementById('netempty').hidden=S.net.length>0;
-  tb.innerHTML=S.net.slice().reverse().map(r=>{const cls=r.f||r.s>=400?'bad':r.s>=300?'mid':'ok';
-   return `<tr><td class="m">${esc(r.m)}</td><td class="s ${cls}">${r.f?'ERR':esc(r.s??'...')}</td><td class="t">${esc(r.t)}</td><td title="${esc(r.u)}">${esc(r.u)}</td><td class="ms">${r.ms!=null?r.ms+' ms':''}</td></tr>`}).join('');}
+  const rows=S.net.slice().reverse();
+  const t0s=S.net.map(r=>r.t0).filter(x=>x!=null);
+  const minT0=t0s.length?Math.min(...t0s):null;
+  tb.innerHTML=rows.map((r,i)=>{const cls=statusCls(r);
+   return `<tr class="net-row" data-i="${i}"><td class="m">${esc(r.m)}</td><td class="s ${cls}">${r.f?'ERR':esc(r.s??'...')}</td><td class="t">${esc(r.t)}</td><td title="${esc(r.u)}">${esc(r.u)}</td><td class="ms">${r.ms!=null?r.ms+' ms':''}</td></tr>`}).join('');
+  tb.querySelectorAll('tr.net-row').forEach(tr=>{
+    tr.onclick=()=>{
+      const next=tr.nextElementSibling;
+      if(next&&next.classList.contains('netdetail')){next.remove();return;}
+      tb.querySelectorAll('.netdetail').forEach(d=>d.remove());
+      const r=rows[+tr.dataset.i];
+      tr.insertAdjacentHTML('afterend',netDetailHtml(r,minT0));
+      const btn=tr.nextElementSibling.querySelector('.nd-copy');
+      btn.onclick=e=>{e.stopPropagation();
+        try{(window.top.navigator||navigator).clipboard.writeText(r.u);}catch(err){}
+        btn.textContent='Copied';btn.classList.add('copied');
+        setTimeout(()=>{btn.textContent='Copy URL';btn.classList.remove('copied');},1200);
+      };
+    };
+  });
+}
 function renderLog(){const el=document.getElementById('log');if(!S.log.length)return;
   el.innerHTML=S.log.slice().reverse().map(l=>`<div class="log step ${l.st}"><span class="si">${ICON[l.st]||''}</span><div><div>${esc(l.text)}</div>${l.msg?`<div class="msg" style="margin-left:0">${esc(l.msg)}</div>`:''}</div><span class="tm">${l.t}</span></div>`).join('');}
 window.qa={
@@ -236,7 +351,7 @@ window.qa={
   net(rows){S.net=S.net.concat(rows).slice(-400);renderNet();},
   log(st,text,msg){S.log.push({st,text,msg,t:new Date().toLocaleTimeString()});if(S.log.length>300)S.log.shift();renderLog();},
   activity(text){document.getElementById('sub').textContent=text;document.getElementById('headerDot').classList.add('live');},
-  done(text){document.getElementById('sub').textContent=text;document.getElementById('headerDot').classList.remove('live');},
+  done(text){document.getElementById('sub').textContent=text;document.getElementById('headerDot').classList.remove('live');markRunNow();},
   collapse(mini){toggle(!!mini);},
   markDevice(name){document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));},
   restore(state){

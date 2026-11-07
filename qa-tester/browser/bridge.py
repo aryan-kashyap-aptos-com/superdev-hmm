@@ -1,13 +1,15 @@
 """A tiny background helper so the runner panel's own buttons work live, with no CLI command needed:
-Desktop/iPhone/Android/Tablet, and "Report". `start` launches it; `stop` ends it. It does nothing else:
-every real test command still connects and disconnects on its own, exactly as before.
+Desktop/iPhone/Android/Tablet, "Report", and "Re-run". `start` launches it; `stop` ends it. It does
+nothing else: every real test command still connects and disconnects on its own, exactly as before.
 
 It keeps one CDP connection open for as long as Chrome is open (a device resize needs that: see core.mobile)
-and just polls the page for `window.__qa_pending_device` and `window.__qa_report_requested`, which a click in
-the panel sets. Polling plain variables works from many short-lived connections at once; a CDP-exposed
-function bound by one connection was tried first and turned out not to reliably call back across separate
-connect_over_cdp() sessions.
+and just polls the page for `window.__qa_pending_device`, `window.__qa_report_requested`, and
+`window.__qa_rerun_requested`, which a click in the panel sets. Polling plain variables works from many
+short-lived connections at once; a CDP-exposed function bound by one connection was tried first and turned
+out not to reliably call back across separate connect_over_cdp() sessions.
 """
+import os
+import subprocess
 import sys
 import time
 import webbrowser
@@ -25,8 +27,11 @@ from playwright.sync_api import sync_playwright  # noqa: E402
 POLL_JS = """() => {
   const d = window.__qa_pending_device; window.__qa_pending_device = undefined;
   const r = !!window.__qa_report_requested; window.__qa_report_requested = false;
-  return {device: d || null, report: r};
+  const rr = !!window.__qa_rerun_requested; window.__qa_rerun_requested = false;
+  return {device: d || null, report: r, rerun: rr};
 }"""
+
+RUN_SCRIPT = core.HERE / "run.py"
 
 
 def handle_device(browser, page, cdp, panel, spec):
@@ -43,8 +48,23 @@ def handle_device(browser, page, cdp, panel, spec):
             pass
 
 
+def handle_rerun(panel):
+    argv = core.load_last_play()
+    if not argv:
+        panel.log("Issue found", "re-run", "Nothing has been run yet in this browser session.")
+        return
+    argv = [a for a in argv if a != "--write"]   # a panel click is not the user's explicit --write approval
+    try:
+        flags = 0x00000008 | 0x00000200 if os.name == "nt" else 0
+        subprocess.Popen([sys.executable, str(RUN_SCRIPT), *argv],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
+        panel.log("Verified", "re-run", "Started: play " + " ".join(argv[1:]))
+    except Exception as e:
+        panel.log("Issue found", "re-run", str(e))
+
+
 def handle_report(panel):
-    run = core.active_run()
+    run = core.last_touched_run() or core.active_run()
     if not run:
         panel.log("Issue found", "view report", "No active run - nothing recorded to report yet.")
         return
@@ -75,6 +95,8 @@ def main():
                 handle_device(browser, page, cdp, panel, flags["device"])
             if flags.get("report"):
                 handle_report(panel)
+            if flags.get("rerun"):
+                handle_rerun(panel)
 
 
 if __name__ == "__main__":
