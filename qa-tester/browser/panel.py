@@ -7,7 +7,10 @@ Tabs: Tests, Network (the calls each step made, flashed open after a step that l
 
 It lives inside the page itself, as a same-origin `<iframe srcdoc>` pinned to the right edge, not a second
 browser window: one app, one thing to look at. A header button (or `mobile` mode) can collapse it to a
-small floating circle so it never gets in the way of a narrow layout; tapping the circle brings it back.
+small floating pill, docked top-right (not bottom-right, which is where a site's own chat widget, cookie
+banner or back-to-top button usually sits) so it never gets in the way of a narrow layout. The pill still
+carries working Desktop/iPhone/Android/Tablet buttons, so switching device never requires reopening the
+full panel first; tapping the rest of the pill (the "QA" label) brings the full panel back.
 Because a real page reload wipes it, Panel keeps its own copy of everything shown (the plan, every result,
 every log line, the network rows) and replays that copy into a freshly (re)injected panel after navigation.
 
@@ -24,7 +27,7 @@ STATUS = {"Verified": "verified", "Issue found": "issue", "Could not verify": "c
 
 EXPANDED_CSS = ("position:fixed;right:0;top:0;width:360px;height:100%;border:none;z-index:2147483647;"
                 "box-shadow:-2px 0 14px rgba(0,0,0,.35)")
-MINI_CSS = ("position:fixed;right:14px;bottom:14px;width:60px;height:60px;border:none;border-radius:50%;"
+MINI_CSS = ("position:fixed;right:14px;top:14px;width:236px;height:36px;border:none;border-radius:20px;"
             "z-index:2147483647;box-shadow:0 2px 12px rgba(0,0,0,.45);background:transparent")
 
 CREATE_JS = """([html, css]) => {
@@ -51,10 +54,14 @@ HTML = """<!doctype html><html><head><meta charset="utf-8"><title>QA Runner</tit
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{font:13px/1.45 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text)}
 #shell{height:100%;display:flex;flex-direction:column}
 body.mini #shell{display:none}#mini{display:none}body.mini #mini{display:flex}
-#mini{position:absolute;inset:0;border-radius:50%;background:var(--top);color:var(--text);align-items:center;justify-content:center;
-  flex-direction:column;cursor:pointer;font-weight:700;font-size:11px;border:2px solid var(--line);user-select:none}
-#mini .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);margin-bottom:3px}
+#mini{position:absolute;inset:0;border-radius:20px;background:var(--top);color:var(--text);align-items:center;
+  gap:6px;padding:0 8px;cursor:pointer;font-weight:700;font-size:11px;border:1px solid var(--line);user-select:none}
+#mini .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
 #mini.has-issue .dot{background:var(--red)}#mini.has-pending .dot{background:var(--blue)}#mini.all-ok .dot{background:var(--green)}
+#mini .minidevs{display:flex;gap:3px}
+#mini .minidevs button{background:none;border:1px solid var(--line);color:var(--dim);border-radius:4px;padding:2px 5px;font:inherit;font-size:10px;cursor:pointer}
+#mini .minidevs button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
+#mini .label{margin-left:auto;flex:none}
 header{position:sticky;top:0;z-index:2;background:var(--top);border-bottom:1px solid var(--line);flex:none}
 .head{padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .headtext{min-width:0}h1{font-size:14px;margin:0;font-weight:600}.sub{color:var(--dim);font-size:12px;margin-top:2px}
@@ -87,7 +94,7 @@ td.m{width:46px;color:var(--dim)}td.s{width:38px}td.t{width:62px;color:var(--dim
 .empty{color:var(--dim);padding:14px 12px}
 </style></head><body>
 <div id="shell"><header><div class="head"><div class="headtext"><h1 id="title">QA Runner</h1><div class="sub" id="sub">Waiting for a scenario. Single commands appear under Log.</div></div>
-<button id="collapseBtn" title="Collapse to a small circle">&#10095;&#10095;</button></div>
+<button id="collapseBtn" title="Collapse to a small pill">&#10095;&#10095;</button></div>
 <div class="counts" id="counts"></div>
 <div class="devices" id="devices" title="Resize the real window to a phone/tablet, or back">
 <button data-d="desktop" class="on">Desktop</button><button data-d="iphone">iPhone</button><button data-d="android">Android</button><button data-d="tablet">Tablet</button></div>
@@ -95,7 +102,9 @@ td.m{width:46px;color:var(--dim)}td.s{width:38px}td.t{width:62px;color:var(--dim
 <main><section id="tests"><div class="empty">No test cases yet.</div></section>
 <section id="network" hidden><table><tbody id="net"></tbody></table><div class="empty" id="netempty">No calls yet.</div></section>
 <section id="log" hidden><div class="empty" id="logempty">No commands yet.</div></section></main></div>
-<div id="mini" title="Show the QA runner"><span class="dot"></span>QA</div>
+<div id="mini" title="Switch device, or tap QA to reopen the runner"><span class="dot"></span>
+<div class="minidevs"><button data-d="desktop" class="on" title="Desktop">Dsk</button><button data-d="iphone" title="iPhone">iOS</button><button data-d="android" title="Android">And</button><button data-d="tablet" title="Tablet">Tab</button></div>
+<span class="label">QA</span></div>
 <script>
 const MINI_CSS=""" + json.dumps(MINI_CSS) + """;
 const EXP_CSS=""" + json.dumps(EXPANDED_CSS) + """;
@@ -112,10 +121,11 @@ function toggle(mini){
 }
 document.getElementById('collapseBtn').onclick=()=>toggle(true);
 document.getElementById('mini').onclick=()=>toggle(false);
-document.querySelectorAll('#devices button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('#devices button').forEach(x=>x.classList.toggle('on',x===b));
-  window.top.__qa_pending_device=b.dataset.d;
-});
+function setDevice(name){
+  document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));
+  window.top.__qa_pending_device=name;
+}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=e=>{e.stopPropagation();setDevice(b.dataset.d);});
 function counts(){const c={verified:0,issue:0,cnv:0,pending:0};for(const k of S.cases){if(k.status in c)c[k.status]++;else if(k.status!=='nt')c.pending++;}
   document.getElementById('counts').innerHTML=S.cases.length?`<span class="c-v"><b>${c.verified}</b> Verified</span><span class="c-i"><b>${c.issue}</b> Issue found</span><span class="c-n"><b>${c.cnv}</b> Could not verify</span><span class="c-p"><b>${c.pending}</b> to go</span>`:'';
   const m=document.getElementById('mini');m.classList.toggle('has-issue',c.issue>0);m.classList.toggle('has-pending',c.issue===0&&c.pending>0);m.classList.toggle('all-ok',c.issue===0&&c.pending===0&&S.cases.length>0);}
