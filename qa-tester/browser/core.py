@@ -58,6 +58,18 @@ def active_run():
     return next((n for n in names if n and (QA / "runs" / n / "plan.md").exists()), None)
 
 
+def run_id(run):
+    """The short Run ID stamped into plan.md by `test-run.py new` (a distinct identifier for the run itself,
+    not to be confused with report.py's build id, which changes every time report.html is rebuilt). None for
+    a run created before this existed, or one without a plan.md (e.g. an auto-named `play` run)."""
+    try:
+        text = (QA / "runs" / run / "plan.md").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"^Run ID:\s*(\S+)", text, re.M)
+    return m.group(1) if m else None
+
+
 def run_login(run=None):
     """The Login section of the run's plan.md: site, signin, user, password. Placeholders and "none" count as empty.
     The password is registered so redact() hides it in every output."""
@@ -402,11 +414,20 @@ def _makers(target):
             lambda f: f.get_by_label(target), lambda f: f.get_by_placeholder(target), lambda f: f.get_by_text(target)]
 
 
+def _content_frames(page):
+    """page.frames, minus the runner panel's own srcdoc iframe - it logs each command's own description
+    (quoting the target verbatim), so an invalid or unlucky target string can silently text-match that log
+    instead of failing, making a bad check look like it passed against the real page."""
+    return [f for f in page.frames if f.url != "about:srcdoc"]
+
+
 def locate(page, target):
-    """All matches of `target`, searching the page and every frame inside it. May match nothing (count 0)."""
+    """All matches of `target`, searching the page and every frame inside it (not the runner panel's own
+    frame - see _content_frames). May match nothing (count 0)."""
     makers = _makers(target)
+    frames = _content_frames(page)
     for make in makers:
-        for frame in page.frames:
+        for frame in frames:
             try:
                 loc = make(frame)
                 if loc.count():
@@ -417,8 +438,8 @@ def locate(page, target):
 
 
 def find(page, make):
-    """First match of make(frame) in the page or any frame inside it."""
-    for frame in page.frames:
+    """First match of make(frame) in the page or any frame inside it (not the runner panel's own frame)."""
+    for frame in _content_frames(page):
         loc = make(frame)
         if loc.count() > 0:
             return loc.first

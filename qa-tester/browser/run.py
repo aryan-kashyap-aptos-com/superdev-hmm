@@ -53,6 +53,10 @@ import time
 from pathlib import Path
 from urllib.parse import urlsplit
 
+sys.dont_write_bytecode = True  # this folder lives in a cloud-synced Downloads dir where mtimes can lag a
+# save, which fools Python's pyc cache into serving stale compiled modules (bit us twice on report.py) -
+# recompiling from source every run is cheap at this project's size, so just never cache.
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import core  # noqa: E402
@@ -75,6 +79,7 @@ class Step:
         self.net, self.console = core.Net(page), []
         page.on("console", lambda m: self.console.append(m.text[:200]) if m.type == "error" else None)
         self.panel = panel_mod.Panel.existing(page)
+        self.panel.activity("Investigating: " + label.replace("-", ": ", 1))
 
     def finish(self, result, text, msg="", wait=True):
         if wait:
@@ -88,6 +93,7 @@ class Step:
         core.net_summary(self.net, self.page, self.a, self.label)
         shots = core.step_shot(self.page, self.a, self.label, self.net)
         self.panel.log(result, text, msg)
+        self.panel.done(f"Idle - last: {text} ({result})")
         rows = self.net.current()
         panel_rows = core.net_rows_for_panel(rows, urlsplit(self.page.url).hostname)
         self.panel.net(panel_rows)
@@ -536,8 +542,10 @@ def cmd_report(a):
     if not run:
         raise c.ConnectorError("No run given and no active run.", "Pass --run NAME, or set one active with "
                                "qa-tester/test-run.py use.")
-    path, events, counts = report_mod.build(run)
+    path, events, counts, build_id, built_at = report_mod.build(run)
     print(f"Report: {path}")
+    print(f"Build {build_id} · generated {built_at} - if a tab already open on this file shows a different "
+          "build id, it's stale: reload it.")
     print(f"{len(events)} recorded event(s).")
     for w in report_mod.RESULTS:
         if counts.get(w):
@@ -668,7 +676,6 @@ def main():
     pl.add_argument("--slow", type=int, default=600, help="ms pause after each step so it can be followed (default 600)")
     pl.add_argument("--timeout", type=int, default=5000, help="ms a check keeps retrying (default 5000)")
     pl.add_argument("--max-wait", type=int, default=20000, help="ms to wait for a slow page (default 20000)")
-    pl.add_argument("--viewport", action="store_true", help="end-of-case screenshots show only the visible part")
     pl.add_argument("--no-network-flash", action="store_true", help="do not flash the panel's Network tab after steps")
     pl.add_argument("--write", action="store_true", help="allow steps marked \"write\": true (needs the user's OK)")
     w = add("watch", cmd_watch, "record network calls while the user clicks", [step])

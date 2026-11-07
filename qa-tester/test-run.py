@@ -71,8 +71,9 @@ def cmd_new(a):
     if folder.exists():
         sys.exit(f"ERROR: {folder} already exists. Open its plan.md, or choose another topic.")
     (folder / "tasks").mkdir(parents=True)
+    run_id = datetime.datetime.now().strftime("%H%M%S")
     text = (TEMPLATES / "test-plan.md").read_text(encoding="utf-8")
-    text = text.replace("# Test plan: <topic>", f"# Test plan: {a.topic}", 1)
+    text = text.replace("# Test plan: <topic>", f"# Test plan: {a.topic}\n\nRun ID: {run_id}", 1)
     text = text.replace("Date: YYYY-MM-DD", f"Date: {datetime.date.today().isoformat()}", 1)
     if a.ticket:
         text = text.replace("Source: <ticket ID or request>", f"Source: {a.ticket}", 1)

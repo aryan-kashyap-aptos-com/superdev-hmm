@@ -97,6 +97,8 @@ header{position:sticky;top:0;z-index:2;background:var(--panel);backdrop-filter:b
 .hdot.has-issue{background:var(--red);box-shadow:0 0 0 3px var(--red-bg)}
 .hdot.has-pending{background:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
 .hdot.all-ok{background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
+.hdot.live{background:var(--accent);animation:hpulse 1.1s ease-in-out infinite}
+@keyframes hpulse{0%,100%{box-shadow:0 0 0 3px var(--accent-bg)}50%{box-shadow:0 0 0 6px transparent}}
 h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sub{color:var(--dim);font-size:12px;margin-top:3px;margin-left:15px}
 .head-actions{display:flex;gap:4px;flex:none;align-items:center}
@@ -233,7 +235,8 @@ window.qa={
   step(i,j,st,msg,ms){const s=S.cases[i].steps[j];s.status=st;s.msg=msg||'';s.ms=ms??null;render();},
   net(rows){S.net=S.net.concat(rows).slice(-400);renderNet();},
   log(st,text,msg){S.log.push({st,text,msg,t:new Date().toLocaleTimeString()});if(S.log.length>300)S.log.shift();renderLog();},
-  done(text){document.getElementById('sub').textContent=text;},
+  activity(text){document.getElementById('sub').textContent=text;document.getElementById('headerDot').classList.add('live');},
+  done(text){document.getElementById('sub').textContent=text;document.getElementById('headerDot').classList.remove('live');},
   collapse(mini){toggle(!!mini);},
   markDevice(name){document.querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===name));},
   restore(state){
@@ -384,6 +387,13 @@ class Panel:
 
     def tab(self, name):
         self._call("tab", name)
+
+    def activity(self, text):
+        """A live one-line status (e.g. "Investigating: ..." or "Running case 2 of 6") shown in the header
+        while something is in progress, with a pulsing dot - so a person watching the panel can tell apart
+        ad hoc exploration, a running scenario, and done, instead of only seeing results after the fact."""
+        self._sub = text
+        self._call("activity", text)
 
     def done(self, text):
         self._sub = text

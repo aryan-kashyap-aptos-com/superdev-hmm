@@ -416,6 +416,7 @@ def run(path, args):
             ctx = {"site": home, "net": net, "console": console, "net_mark": len(net.rows), "console_mark": len(console),
                    "case_id": case["id"], "shots": shots, "next_shot": next_shot}
             panel.case(ci, "running")
+            panel.activity(f"Running case {ci + 1} of {len(scenario['cases'])}: {case['title']}")
             print(f"\n{case['id']}  {case['title']}")
             steps_out, stopped, evidence = [], False, []
             for si, step in enumerate(case["steps"]):
@@ -460,16 +461,38 @@ def run(path, args):
                               screenshot=rel or None, case_id=case["id"], tags=case.get("tags"))
                 print(f"   {'+' if word == 'Verified' else '!'} {word:16} {text}" + (f"  -> {msg}" if msg and word != "Verified" else ""))
                 page.wait_for_timeout(args.slow)
+            last_target = next((s.get("target") for s in reversed(case["steps"]) if s.get("target")), None)
+            if last_target:
+                # A check like "visible" only asserts the element isn't hidden by CSS - it never requires
+                # the element to actually be scrolled into view, so without this the final-state screenshot
+                # below just shows wherever the viewport happened to be left (often the top of the page),
+                # not the section the case actually verified. Scroll to it first so the screenshot matches
+                # what was being checked.
+                try:
+                    core.locate(page, last_target).first.scroll_into_view_if_needed(timeout=3000)
+                    page.wait_for_timeout(150)
+                except Exception:
+                    pass
+            end_rel = []
             try:
-                end = core.capture(page, shots / f"{next_shot():02d}-{case['id']}-end.png", full=not args.viewport, net=net)
-                evidence += [str(Path(f).relative_to(core.QA / "runs" / run_name)).replace("\\", "/") for f in end]
+                # Viewport only, never full-page: this is "what does the screen look like right now", the
+                # same framing as the per-step failure screenshots above, not a scrolled-through stitch of
+                # the whole page - full_page=True on a long or infinite-scroll page produces an unreadably
+                # tall, narrow strip and makes capture() scroll through everything just for one thumbnail.
+                end = core.capture(page, shots / f"{next_shot():02d}-{case['id']}-end.png", full=False, net=net)
+                end_rel = [str(Path(f).relative_to(core.QA / "runs" / run_name)).replace("\\", "/") for f in end]
+                evidence += end_rel
             except Exception:
                 pass
             result = next((s["result"] for s in steps_out if s["result"] != "Verified"), "Verified")
             panel.case(ci, result)
+            # The case's own screenshot is just its final-state capture (above) - never the per-step failure
+            # screenshots, which are already attached to their own step events. Without this, a case that
+            # passes end to end has no screenshot anywhere in the report: step screenshots are only taken
+            # on failure, so "all steps passed" used to mean "zero visual evidence this ever ran."
             record.record(run_name, args.task, "case", case["title"], result,
                           f"{sum(1 for s in steps_out if s['result'] == 'Verified')}/{len(steps_out)} step(s) verified",
-                          case_id=case["id"], tags=case.get("tags"))
+                          case_id=case["id"], tags=case.get("tags"), screenshot=end_rel or None)
             cases_out.append({"id": case["id"], "title": case["title"], "result": result, "steps": steps_out, "evidence": evidence})
         totals = {w: sum(1 for k in cases_out if k["result"] == w) for w in RESULTS}
         panel.done("Finished: " + ", ".join(f"{n} {w}" for w, n in totals.items() if n))

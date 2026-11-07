@@ -13,6 +13,8 @@ import time
 import webbrowser
 from pathlib import Path
 
+sys.dont_write_bytecode = True  # see the same line in run.py: avoids stale-pyc risk in a cloud-synced folder
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import core  # noqa: E402
@@ -47,9 +49,9 @@ def handle_report(panel):
         panel.log("Issue found", "view report", "No active run - nothing recorded to report yet.")
         return
     try:
-        path, events, _ = report_mod.build(run)
+        path, events, _, build_id, _ = report_mod.build(run)
         webbrowser.open(path.resolve().as_uri())
-        panel.log("Verified", "view report", f"{len(events)} recorded event(s): {path}")
+        panel.log("Verified", "view report", f"build {build_id}, {len(events)} recorded event(s): {path}")
     except Exception as e:
         panel.log("Issue found", "view report", str(e))
 
