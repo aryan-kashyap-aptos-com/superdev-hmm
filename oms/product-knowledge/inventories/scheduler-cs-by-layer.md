@@ -1,0 +1,159 @@
+# Scheduler repo — all `.cs` files (98)
+
+## `src/oms-aws-job-scheduler.Api/Controllers` (8)
+
+- `src/oms-aws-job-scheduler.Api/Controllers/ComputeEnvironmentsController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/HealthController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/JobDefinitionsController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/JobQueuesController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/JobRunsController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/OrchestratorController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/ScheduledJobTypesController.cs`
+- `src/oms-aws-job-scheduler.Api/Controllers/ScheduledJobsController.cs`
+
+## `src/oms-aws-job-scheduler.Api/Filters` (1)
+
+- `src/oms-aws-job-scheduler.Api/Filters/FluentValidationFilter.cs`
+
+## `src/oms-aws-job-scheduler.Api/Middleware` (1)
+
+- `src/oms-aws-job-scheduler.Api/Middleware/ExceptionHandlingMiddleware.cs`
+
+## `src/oms-aws-job-scheduler.Api/Program.cs` (1)
+
+- `src/oms-aws-job-scheduler.Api/Program.cs`
+
+## `src/oms-aws-job-scheduler.Application/Abstractions` (11)
+
+- `src/oms-aws-job-scheduler.Application/Abstractions/IComputeEnvironmentService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IEventBridgeScheduleService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IJobDefinitionService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IJobQueueService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IJobRunService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IOmsAwsJobSchedulerRepository.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IOrchestratorService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IScheduledJobScheduleService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IScheduledJobService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IScheduledJobTypeService.cs`
+- `src/oms-aws-job-scheduler.Application/Abstractions/IUnitOfWork.cs`
+
+## `src/oms-aws-job-scheduler.Application/Common` (5)
+
+- `src/oms-aws-job-scheduler.Application/Common/EmptyJson.cs`
+- `src/oms-aws-job-scheduler.Application/Common/Mapper.cs`
+- `src/oms-aws-job-scheduler.Application/Common/PagedResult.cs`
+- `src/oms-aws-job-scheduler.Application/Common/Paging.cs`
+- `src/oms-aws-job-scheduler.Application/Common/ScheduleWallClockHelper.cs`
+
+## `src/oms-aws-job-scheduler.Application/DTOs` (9)
+
+- `src/oms-aws-job-scheduler.Application/DTOs/ComputeEnvironmentDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/JobDefinitionDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/JobQueueDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/JobRunDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/OrchestratorDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/ScheduleScheduledJobDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/ScheduledJobDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/ScheduledJobStepDtos.cs`
+- `src/oms-aws-job-scheduler.Application/DTOs/ScheduledJobTypeDtos.cs`
+
+## `src/oms-aws-job-scheduler.Application/DependencyInjection.cs` (1)
+
+- `src/oms-aws-job-scheduler.Application/DependencyInjection.cs`
+
+## `src/oms-aws-job-scheduler.Application/Exceptions` (3)
+
+- `src/oms-aws-job-scheduler.Application/Exceptions/ConflictException.cs`
+- `src/oms-aws-job-scheduler.Application/Exceptions/NotFoundException.cs`
+- `src/oms-aws-job-scheduler.Application/Exceptions/ValidationAppException.cs`
+
+## `src/oms-aws-job-scheduler.Application/Services` (8)
+
+- `src/oms-aws-job-scheduler.Application/Services/ComputeEnvironmentService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/JobDefinitionService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/JobQueueService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/JobRunService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/OrchestratorService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/ScheduledJobScheduleService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/ScheduledJobService.cs`
+- `src/oms-aws-job-scheduler.Application/Services/ScheduledJobTypeService.cs`
+
+## `src/oms-aws-job-scheduler.Application/Validation` (6)
+
+- `src/oms-aws-job-scheduler.Application/Validation/ComputeEnvironmentValidators.cs`
+- `src/oms-aws-job-scheduler.Application/Validation/JobDefinitionValidators.cs`
+- `src/oms-aws-job-scheduler.Application/Validation/JobQueueValidators.cs`
+- `src/oms-aws-job-scheduler.Application/Validation/JobRunValidators.cs`
+- `src/oms-aws-job-scheduler.Application/Validation/ScheduleScheduledJobValidator.cs`
+- `src/oms-aws-job-scheduler.Application/Validation/ScheduledJobValidators.cs`
+
+## `src/oms-aws-job-scheduler.Domain/Entities` (9)
+
+- `src/oms-aws-job-scheduler.Domain/Entities/ComputeEnvironment.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobDefinition.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobDependency.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobQueue.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobRun.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobRunAttempt.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/JobRunEvent.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/ScheduledJob.cs`
+- `src/oms-aws-job-scheduler.Domain/Entities/ScheduledJobStep.cs`
+
+## `src/oms-aws-job-scheduler.Domain/Enums` (5)
+
+- `src/oms-aws-job-scheduler.Domain/Enums/ComputeEnvironmentType.cs`
+- `src/oms-aws-job-scheduler.Domain/Enums/DependencyCondition.cs`
+- `src/oms-aws-job-scheduler.Domain/Enums/JobRunStatus.cs`
+- `src/oms-aws-job-scheduler.Domain/Enums/JobRunStatusTransitions.cs`
+- `src/oms-aws-job-scheduler.Domain/Enums/ScheduledJobType.cs`
+
+## `src/oms-aws-job-scheduler.Domain/IConcurrencyAware.cs` (1)
+
+- `src/oms-aws-job-scheduler.Domain/IConcurrencyAware.cs`
+
+## `src/oms-aws-job-scheduler.Domain/InvalidJobRunTransitionException.cs` (1)
+
+- `src/oms-aws-job-scheduler.Domain/InvalidJobRunTransitionException.cs`
+
+## `src/oms-aws-job-scheduler.Infrastructure/Aws` (4)
+
+- `src/oms-aws-job-scheduler.Infrastructure/Aws/AwsSchedulerServiceCollectionExtensions.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Aws/CronExpressionFormatter.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Aws/EventBridgeScheduleService.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Aws/NoOpEventBridgeScheduleService.cs`
+
+## `src/oms-aws-job-scheduler.Infrastructure/DependencyInjection.cs` (1)
+
+- `src/oms-aws-job-scheduler.Infrastructure/DependencyInjection.cs`
+
+## `src/oms-aws-job-scheduler.Infrastructure/Migrations` (5)
+
+- `src/oms-aws-job-scheduler.Infrastructure/Migrations/20260706000000_InitialCreate.Designer.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Migrations/20260706000000_InitialCreate.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Migrations/20261026064854_AddScheduledJobStepLastSyncedAt.Designer.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Migrations/20261026064854_AddScheduledJobStepLastSyncedAt.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Migrations/OmsAwsJobSchedulerDbContextModelSnapshot.cs`
+
+## `src/oms-aws-job-scheduler.Infrastructure/Persistence` (14)
+
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/ComputeEnvironmentConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobDefinitionConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobDependencyConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobQueueConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobRunAttemptConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobRunConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/JobRunEventConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/ScheduledJobConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Configurations/ScheduledJobStepConfiguration.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/DesignTimeDbContextFactory.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/NpgsqlDataSourceFactory.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/OmsAwsJobSchedulerDbContext.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/Repositories/OmsAwsJobSchedulerRepository.cs`
+- `src/oms-aws-job-scheduler.Infrastructure/Persistence/UnitOfWork.cs`
+
+## `tests` (4)
+
+- `tests/oms-aws-job-scheduler.UnitTests/ComputeEnvironmentServiceTests.cs`
+- `tests/oms-aws-job-scheduler.UnitTests/CronExpressionFormatterTests.cs`
+- `tests/oms-aws-job-scheduler.UnitTests/JobRunStatusTransitionsTests.cs`
+- `tests/oms-aws-job-scheduler.UnitTests/ScheduledJobScheduleServiceTests.cs`

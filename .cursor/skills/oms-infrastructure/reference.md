@@ -1,6 +1,7 @@
 # Terraform reference (detailed)
 
-Canonical copy: `oms/product-knowledge/02-terraform.md`.
+**100% `.tf` inventory:** `oms/product-knowledge/24-infrastructure-complete-reference.md` and `inventories/infrastructure-tf-by-root.md` (**974** files, **62** roots).  
+Canonical narrative: `oms/product-knowledge/02-terraform.md`.
 
 ## Stage resource ownership
 

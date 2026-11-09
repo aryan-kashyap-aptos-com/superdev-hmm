@@ -10,8 +10,11 @@ description: >-
 
 ## Read order
 
-0. **Onboarding (anyone new to OMS)** — `oms/product-knowledge/00-onboarding.md`  
-   Glossary, mental model, business view of the five jobs, beginner mistakes.
+0. **Home (Confluence-style)** — `oms/product-knowledge/HOME.md`  
+   Full TOC, five repos, role paths, where docs are written.
+
+0b. **Onboarding** — `oms/product-knowledge/00-onboarding.md`  
+   Glossary, mental model, five batch jobs, beginner mistakes.
 
 1. **Batch (application)** — `oms/product-knowledge/01-batch.md`  
    Skill: `oms-aws-service-manager-batch` (+ `reference.md`)
@@ -22,12 +25,20 @@ description: >-
 3. **QA / Site Manager** — `oms/product-knowledge/03-qa-environments.md`  
    Site Manager = **backadmin**; pod dev login example; `qa-tester` allowed sites via `environments.local.md`.
 
-## Two repositories
+4. **Deep repo scan** — `oms/product-knowledge/04-deep-repo-scan.md`  
+   Second-pass map of both RepoSuite repos: runners, orchestration, `oms_batch` catalog, README traps, `evaluateOnExit` gap.
+
+5. **Guides `06`–`31` + `COVERAGE.md` + `FUNCTIONAL-COVERAGE.md`** — file inventories (`22`–`24`, `26`) and **functional** guides (`27`–`31`).
+
+## Repositories (five)
 
 | Repo | Path | Owns |
 |------|------|------|
+| **oms** | `RepoSuite/oms` | ShopLogic/Site Manager, JobManager, DCEOM, SQL scripts |
+| **oms-aws-job-scheduler** | `RepoSuite/oms-aws-job-scheduler` | Scheduler API, `oms_batch` EF, EventBridge |
 | **oms-aws-service-manager-batch** | `RepoSuite/oms-aws-service-manager-batch` | .NET 8 containers, submit JSON, exit codes, S3/EOM behavior |
 | **oms-infrastructure** | `RepoSuite/oms-infrastructure` | VPC, RDS, ECS, Batch CE/JQ/JD, SSM, Harness state |
+| **Product knowledge** | `superdev-hmm/oms/product-knowledge/` | Docs — start at `HOME.md` |
 
 ## One picture
 

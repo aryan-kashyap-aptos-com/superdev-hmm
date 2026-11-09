@@ -3,6 +3,7 @@
 > **New to OMS?** Read [00-onboarding.md](./00-onboarding.md) first (glossary, diagram, what each job does in plain language).
 
 **Repo:** `RepoSuite/oms-aws-service-manager-batch`  
+**100% file inventory:** [22-batch-repo-complete-reference.md](./22-batch-repo-complete-reference.md) (565 files, 480 `.cs`).  
 **Stack:** .NET 8, AWS Batch (Fargate), Npgsql/Dapper, AWSSDK S3/SES/SSM  
 
 ### In plain English

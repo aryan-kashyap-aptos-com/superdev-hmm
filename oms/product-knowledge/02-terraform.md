@@ -3,6 +3,7 @@
 > **New to OMS?** Read [00-onboarding.md](./00-onboarding.md) first.
 
 **Repo:** `RepoSuite/oms-infrastructure`  
+**100% `.tf` inventory:** [24-infrastructure-complete-reference.md](./24-infrastructure-complete-reference.md) (**974** files, **62** roots).  
 **Role:** **Infrastructure as code** — networks, databases, APIs on ECS, and the AWS Batch “plumbing” (queues, job templates, IAM, logs). Does **not** contain the .NET business logic that runs inside containers.
 
 **Pair with:** [01-batch.md](./01-batch.md) for what those containers actually *do*.

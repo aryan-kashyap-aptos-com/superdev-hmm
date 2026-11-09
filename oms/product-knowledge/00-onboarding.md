@@ -1,14 +1,35 @@
 # OMS on AWS — onboarding (start here if you're new)
 
-This guide assumes **no prior OMS experience**. Technical depth lives in [01-batch.md](./01-batch.md) and [02-terraform.md](./02-terraform.md); read those after this page.
+**Full doc space:** [HOME.md](./HOME.md) — Confluence-style table of contents and role paths.
+
+This page is a **20-minute** introduction. Deep pages are split by domain (`06`–`10`).
 
 ---
 
 ## What is OMS?
 
-**OMS (Order Management System)** is the software retailers use to **take, change, route, and fulfill customer orders**. Think: order placed online → warehouse picks items → status updates → cancellations → feeds to other systems (e.g. commerce sites, marketplaces).
+**OMS (Order Management System)** is the software retailers use to **take, change, route, and fulfill customer orders**. Order logic lives in **PostgreSQL** and in shared .NET libraries (**EOM** / **DCEOM**).
 
-In Aptos Retail’s world, OMS is not one tiny app. It is a **family of services and databases** that work together. Most day-to-day order logic still lives in a large **PostgreSQL** database (“OMS DB”) and in libraries many teams call **EOM** (order/inventory components).
+On AWS, OMS is **many containers and databases**, not one app:
+
+- **Site Manager** — operator UI (`/backadmin`) → [06-site-manager-shoplogic.md](./06-site-manager-shoplogic.md)  
+- **APIs** — facades and core services → [09-facades-core-edge.md](./09-facades-core-edge.md)  
+- **Background work** — tasks, feeds, **AWS Batch** → [08-task-engine-feeds.md](./08-task-engine-feeds.md), [01-batch.md](./01-batch.md)  
+- **Platform** — VPC, RDS, Harness → [10-platform-data-delivery.md](./10-platform-data-delivery.md)
+
+---
+
+## Five places (not one repo)
+
+| # | Repo | Path | You change it when… |
+|---|------|------|---------------------|
+| 1 | **oms** | `RepoSuite/oms` | ShopLogic pages, JobManager, SQL scripts, APIs in monorepo |
+| 2 | **oms-aws-job-scheduler** | `RepoSuite/oms-aws-job-scheduler` | Scheduler REST API, `oms_batch` schema, EventBridge hooks |
+| 3 | **oms-aws-service-manager-batch** | `RepoSuite/oms-aws-service-manager-batch` | Batch worker .NET code & Docker |
+| 4 | **oms-infrastructure** | `RepoSuite/oms-infrastructure` | AWS resources, ECS, Batch definitions, SSM |
+| 5 | **Product knowledge** | `superdev-hmm/oms/product-knowledge/` | **Docs you are reading** (not production code) |
+
+Deep map: [27-functional-cross-repo-flows.md](./27-functional-cross-repo-flows.md), [FUNCTIONAL-COVERAGE.md](./FUNCTIONAL-COVERAGE.md), [COVERAGE.md](./COVERAGE.md).
 
 ---
 
@@ -17,7 +38,7 @@ In Aptos Retail’s world, OMS is not one tiny app. It is a **family of services
 ```mermaid
 flowchart LR
   subgraph people [People and schedulers]
-    SM[Service Manager / schedulers]
+    SM[Site Manager / schedulers]
     SF[AWS Step Functions optional]
   end
 
@@ -46,20 +67,7 @@ flowchart LR
   ECS --> SSM
 ```
 
-**Simple sentence:** Schedulers ask AWS Batch to **run a container once**; that container runs .NET code that **reads/writes OMS data** and sometimes **uploads files to S3**. Long-running APIs stay on **ECS**. **Terraform** in `oms-infrastructure` creates the AWS pieces; **.NET code** in `oms-aws-service-manager-batch` is what runs *inside* the container.
-
----
-
-## Two repos — who owns what?
-
-| Question | Answer | Repo |
-|----------|--------|------|
-| “What happens when inventory is exported?” | Business logic, SQL, XML, S3 upload | **oms-aws-service-manager-batch** |
-| “Which Docker image, CPU, retries, logs?” | Job definition, IAM, queues | **oms-infrastructure** |
-| “Where is the VPC / database?” | Foundation Terraform | **oms-infrastructure** (`01-infrastructure`) |
-| “Where is the order API?” | ECS service stacks | **oms-infrastructure** (`03-application/01-aws-ecs-service/…`) |
-
-If you only remember one thing: **batch repo = program**, **infra repo = where and how it runs on AWS**.
+**Simple sentence:** Schedulers ask AWS Batch to **run a container once**; that container runs .NET code that **reads/writes OMS data** and sometimes **uploads files to S3**. Long-running APIs stay on **ECS**. **Terraform** creates the AWS pieces; application code lives in **oms** and **batch** repos.
 
 ---
 
@@ -68,18 +76,24 @@ If you only remember one thing: **batch repo = program**, **infra repo = where a
 | Term | Meaning |
 |------|---------|
 | **OMS DB** | PostgreSQL database holding orders, items, suppliers, scheduler metadata, etc. |
-| **EOM** | Shared .NET libraries for order/inventory operations (private NuGet). Batch jobs that *change* orders often call EOM. |
-| **Service Manager** | Legacy Windows-side scheduler that used to run .NET “tasks” on a timer. We’re moving those tasks to **AWS Batch**. |
-| **ODX** | Older export/integration stack. New batch jobs **replace** many ODX flows (especially RabbitMQ hops). |
-| **Toronado** | Configuration/export subsystem; export jobs often get **XML/config** that describes *what* to export. |
-| **AWS Batch** | AWS product: “run this container with this command, on this queue, with these retries.” |
-| **Job definition** | AWS Batch template: image, CPU, memory, command, env vars, log group. Created by **Terraform stage B**. |
-| **SubmitJob** | API call: “run one instance of a job definition now,” with parameters (often a JSON payload). |
-| **Fargate** | Serverless containers for Batch/ECS — no EC2 instances to patch yourself. |
-| **SSM Parameter Store** | AWS place to store config and secrets (e.g. DB connection string *name*, not always the secret in git). |
-| **Harness** | CD tool that runs `terraform plan/apply` per stack folder. |
-| **Facade** | ECS API service that fronts OMS for a domain (orders, inventory, etc.). |
-| **Stage A/B/C/D** | Four Terraform steps to onboard one scheduled job onto Batch (see [02-terraform.md](./02-terraform.md)). |
+| **EOM** | Shared .NET libraries for order/inventory operations (private NuGet). |
+| **Service Manager** | Legacy Windows-side scheduler; migrating tasks to **AWS Batch**. |
+| **Site Manager** | Admin UI; URLs often under **`/backadmin/`**. |
+| **ShopLogic** | Main admin web application project in `RepoSuite/oms`. |
+| **minisoft** | ECS service name that hosts Site Manager image on AWS. |
+| **ODX** | Older export/integration stack; many flows replaced by Batch. |
+| **Toronado** | Export/job-step configuration in OMS DB. |
+| **AWS Batch** | Run a container with a command, queue, retries. |
+| **Job definition** | Batch template (image, CPU, env) — Terraform stage **B**. |
+| **SubmitJob** | API to run one job instance with JSON parameters. |
+| **Fargate** | Serverless containers for Batch/ECS. |
+| **SSM Parameter Store** | AWS config/secrets (often **names** of connection params). |
+| **Harness** | CD tool running `terraform apply` per stack. |
+| **Facade** | ECS API for a domain (orders, inventory). |
+| **Stage A/B/C/D** | Four Terraform steps for Batch onboarding ([02-terraform.md](./02-terraform.md)). |
+| **oms-aws-job-scheduler** | Separate repo — Batch scheduler API on ECS ([13-deployables-catalog.md](./13-deployables-catalog.md)). |
+
+More terms: [14-glossary-extended.md](./14-glossary-extended.md).
 
 ---
 
@@ -87,39 +101,23 @@ If you only remember one thing: **batch repo = program**, **infra repo = where a
 
 | Job | What problem it solves |
 |-----|-------------------------|
-| **Inventory Feed** | Build and publish **product inventory files** (e.g. for commerce) from OMS supplier data → **S3**. |
-| **Export Order Items** | Generate **order export notifications/files** for downstream feeds (replaces old queue-based export). |
-| **Reset Items for Reroute** | When routing changes, **reset line items** so they can be re-routed (bulk operational fix). |
-| **Update Item Status** | **Bulk status changes** on order lines (e.g. move many items to a new status). |
-| **Cancel Items** | **Bulk cancel** line items matching filters; can send email via SES. |
+| **Inventory Feed** | Product inventory files → **S3** |
+| **Export Order Items** | Order export files / notes (replaces queue export) |
+| **Reset Items for Reroute** | Bulk reset lines for rerouting |
+| **Update Item Status** | Bulk status changes |
+| **Cancel Items** | Bulk cancel; optional SES email |
 
-Each job is a **short-lived container**: start → do work → exit with a **number** (exit code). Zero usually means success. Infra uses that number to decide **retry or fail**.
-
----
-
-## How a run works (no jargon path)
-
-1. **Something triggers a run** — scheduler, Step Function, or manual `submit-job`.
-2. **AWS Batch** starts a container from an **image** built from the batch repo.
-3. The container receives a **JSON instruction** (what to run, filters, settings). Often passed as the **last command-line argument** or an env var.
-4. The program loads **database connection** info (often via SSM + env vars — no password in git).
-5. It runs SQL / EOM calls / file generation.
-6. It **exits** with a code. **CloudWatch** has JSON logs for support.
+Details: [01-batch.md](./01-batch.md).
 
 ---
 
-## Service Manager → Batch migration (why A→C→B→D exists)
+## How a batch run works
 
-Old world: a Windows service ran `ExportOrderItems.exe` on a schedule.
-
-New world needs:
-
-1. **Shared Batch capacity** (queue + compute) for all jobs — **stage A**
-2. **Scheduler database rows** so the OMS scheduler UI knows those queues exist — **stage C**
-3. **This job’s** image, command, retries, logs — **stage B** (per job)
-4. **Scheduler database row** for *this* job definition — **stage D** (per job)
-
-Apply order: **A → C → B → D**. Details: [02-terraform.md](./02-terraform.md).
+1. Trigger — scheduler, Step Function, or manual SubmitJob.  
+2. AWS Batch starts container from **batch repo** image.  
+3. Container receives **JSON** (argv or env).  
+4. DB connection via **SSM** env vars.  
+5. Work + **exit code**; logs in CloudWatch.
 
 ---
 
@@ -127,35 +125,24 @@ Apply order: **A → C → B → D**. Details: [02-terraform.md](./02-terraform.
 
 | You are… | Read first | Then |
 |----------|------------|------|
-| **New developer** on batch code | This page → [01-batch.md](./01-batch.md) | Job README under `Jobs/<Name>/` in RepoSuite |
-| **New platform / DevOps** | This page → [02-terraform.md](./02-terraform.md) | `config.tfvars.example` for your job’s stage B |
-| **Support / on-call** | This page, exit code tables in [01-batch.md](./01-batch.md) | CloudWatch log group from stage B |
-| **Architect** | All three product-knowledge files | `docs/ARCHITECTURE.md` in batch repo |
-
----
-
-## Local paths (this machine)
-
-| Repo | Path |
-|------|------|
-| Batch (.NET) | `/Users/akashyap/RepoSuite/oms-aws-service-manager-batch` |
-| Terraform | `/Users/akashyap/RepoSuite/oms-infrastructure` |
+| **Brand new** | [HOME.md](./HOME.md) → this page | [06](./06-site-manager-shoplogic.md) or [03 QA](./03-qa-environments.md) |
+| **Batch developer** | [01-batch.md](./01-batch.md) | [07](./07-batch-scheduler-api-ui.md), [02-terraform.md](./02-terraform.md) |
+| **Platform / DevOps** | [02-terraform.md](./02-terraform.md) | [10-platform-data-delivery.md](./10-platform-data-delivery.md) |
+| **QA / explorer** | [03-qa-environments.md](./03-qa-environments.md) | [06-site-manager-shoplogic.md](./06-site-manager-shoplogic.md) |
+| **Architect** | [05-oms-estate-map.md](./05-oms-estate-map.md) | [04-deep-repo-scan.md](./04-deep-repo-scan.md) |
 
 ---
 
 ## Common beginner mistakes
 
-1. **Editing only the .NET repo** but forgetting **Terraform job definition** (image tag, env, `Ref::` parameter name).
-2. **Expecting RabbitMQ** — new inventory/export paths are **in-process**, not queues in the batch repo.
-3. **Using the wrong folder number** for Terraform stage B/D (README typos vs real `02-` / `03-` folders).
-4. **Confusing “task id”** on Export Order Items with AWS Batch job id — export needs a **scheduler task GUID** from OMS DB.
-5. **Retrying forever** on exit codes that mean “config wrong” — only some exit codes are retryable.
+1. Confusing **five repos** — editing docs does not deploy code; scheduler API is **not** in the batch repo.  
+2. **Terraform-only** or **code-only** changes for Batch (need both).  
+3. **Wrong Batch Terraform folder numbers** (`02-` vs `03-` for B/D).  
+4. **Export `taskId`** ≠ AWS Batch job id.  
+5. **Retrying** on non-retryable exit codes ([01-batch.md](./01-batch.md)).
 
 ---
 
 ## Next steps
 
-1. [01-batch.md](./01-batch.md) — jobs, JSON payload, exit codes, Docker, tests.  
-2. [02-terraform.md](./02-terraform.md) — folders, SSM, state, ECR wiring.
-
-For Cursor agents: skill **`oms-product-knowledge`** points here first.
+Open [HOME.md](./HOME.md) and follow your role path. For Cursor: skill **`oms-product-knowledge`**.

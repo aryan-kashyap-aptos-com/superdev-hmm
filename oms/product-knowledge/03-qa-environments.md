@@ -57,6 +57,22 @@ Example private row (already in `qa-tester/environments.local.md` on this machin
 
 ---
 
+## Why the QA panel “Tests” tab is empty
+
+The runner has **three tabs**:
+
+| Tab | What appears there |
+|-----|---------------------|
+| **Tests** | Only **scenario test cases** from `play <scenario.json>` (C1, C2, steps with ✓/✗). |
+| **Log** | **Single commands** you run from the terminal: `login`, `goto`, `snapshot`, `click`, … |
+| **Network** | HTTP calls (also flashes open after some steps). |
+
+So if you only ran `login` or `goto`, the **Tests** list stays at “No test cases yet” — that is normal. Open the **Log** tab, or run a **scenario** (below) to fill **Tests**.
+
+The panel title may still mention an old active run until you `test-run.py use` a run for this product.
+
+---
+
 ## Using superdev-hmm QA browser on Site Manager
 
 ```bash
@@ -104,6 +120,12 @@ Non-exhaustive checklist for new QA:
 4. **Session** — refresh page: still signed in if cookie cached.
 
 Document findings in the run’s `tasks/…/results.md`, not in public git if screenshots show customer data.
+
+---
+
+## Environment matrix (expanded)
+
+Full naming, SSM paths, Harness ECS list: [11-environments-matrix.md](./11-environments-matrix.md).
 
 ---
 

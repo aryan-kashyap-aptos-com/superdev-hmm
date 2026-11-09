@@ -1,6 +1,7 @@
 # Batch reference (detailed)
 
-Canonical copy: `oms/product-knowledge/01-batch.md`. Below is the same knowledge structured for agents.
+**100% file inventory:** `oms/product-knowledge/22-batch-repo-complete-reference.md` and `oms/product-knowledge/inventories/batch-*`.  
+Canonical narrative: `oms/product-knowledge/01-batch.md`. Below is agent-oriented distillation.
 
 ## Shared infrastructure assembly
 
