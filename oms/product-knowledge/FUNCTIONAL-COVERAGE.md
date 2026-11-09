@@ -22,8 +22,10 @@
 | F11 | QA / environments | [03](./03-qa-environments.md), [11](./11-environments-matrix.md) | ✅ |
 | F12 | Ops runbooks | [16](./16-operations-runbooks.md) | ✅ |
 | F13 | 15 architecture domains map | [05](./05-oms-estate-map.md) | ✅ |
+| F14 | **Commerce UI + `DCEOM.WebApi` scenarios** | [33](./33-functional-commerce-and-apis.md) | ✅ |
+| F15 | **Order services deep scan (ASMx, facade, domain, Confluence)** | [34](./34-functional-order-services-deep-scan.md) | ✅ |
 
-**Functional scope:** **13/13** rows above have a primary guide.
+**Functional scope:** **15/15** rows above have a primary guide.
 
 ---
 

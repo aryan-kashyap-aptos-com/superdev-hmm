@@ -2,7 +2,7 @@
 
 **Audience:** New developers, QA, anyone who hears “Site Manager”, “backadmin”, or “ShopLogic” and needs orientation.  
 **Prerequisites:** [00-onboarding.md](./00-onboarding.md) (5 min).  
-**Related:** [03-qa-environments.md](./03-qa-environments.md), [07-batch-scheduler-api-ui.md](./07-batch-scheduler-api-ui.md), [26-oms-monorepo-complete-reference.md](./26-oms-monorepo-complete-reference.md) (full repo inventory).
+**Related:** [33-functional-commerce-and-apis.md](./33-functional-commerce-and-apis.md) (Commerce + APIs scenarios), [03-qa-environments.md](./03-qa-environments.md), [07-batch-scheduler-api-ui.md](./07-batch-scheduler-api-ui.md).
 
 ---
 

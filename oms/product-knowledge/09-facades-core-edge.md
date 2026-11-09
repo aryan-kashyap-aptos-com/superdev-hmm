@@ -179,6 +179,7 @@ Facades often expose **CNAME** variables in Harness (`order_facade_cname`, `inve
 
 ## Next reading
 
+- [34-functional-order-services-deep-scan.md](./34-functional-order-services-deep-scan.md) — ASMX vs facade vs `IOrderService`  
 - [06-site-manager-shoplogic.md](./06-site-manager-shoplogic.md)  
 - [10-platform-data-delivery.md](./10-platform-data-delivery.md)  
 - [08-task-engine-feeds.md](./08-task-engine-feeds.md)  

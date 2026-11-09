@@ -56,6 +56,8 @@ This is the **single written home** for Aptos OMS on AWS on your machine. It is 
 | 29 | [29-functional-batch-jobs.md](./29-functional-batch-jobs.md) | Batch devs | All 5 jobs — business + execution |
 | 30 | [30-functional-scheduler-platform.md](./30-functional-scheduler-platform.md) | Scheduler | Catalog, lifecycle, EventBridge |
 | 31 | [31-functional-infrastructure-platform.md](./31-functional-infrastructure-platform.md) | Platform | Apply order, ECS/Batch roles |
+| 33 | [33-functional-commerce-and-apis.md](./33-functional-commerce-and-apis.md) | Commerce/QA | All Commerce pages + `/api` scenarios |
+| 34 | [34-functional-order-services-deep-scan.md](./34-functional-order-services-deep-scan.md) | Integrations | OrderService.asmx, facade, domain services, Confluence |
 | **—** | **[COVERAGE.md](./COVERAGE.md)** | Leads | File inventory + links to functional |
 
 **RepoSuite runbooks (full text):** `oms-aws-service-manager-batch/docs/batch-job-manager-deployment-runbook.md`, `oms/docs/odx-feed-pipeline-monitor-runbook.md`.
