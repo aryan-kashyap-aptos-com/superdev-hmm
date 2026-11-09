@@ -1,18 +1,32 @@
 # Product knowledge — OMS infrastructure (`oms-infrastructure`)
 
-**Repo:** `RepoSuite/oms-infrastructure`  
-**Role:** Terraform roots per stack (S3 remote state), Harness-deployed. Owns AWS resources; **not** .NET job logic.
+> **New to OMS?** Read [00-onboarding.md](./00-onboarding.md) first.
 
-**Pair with:** `oms/product-knowledge/01-batch.md` for containers, exit codes, and submit JSON.
+**Repo:** `RepoSuite/oms-infrastructure`  
+**Role:** **Infrastructure as code** — networks, databases, APIs on ECS, and the AWS Batch “plumbing” (queues, job templates, IAM, logs). Does **not** contain the .NET business logic that runs inside containers.
+
+**Pair with:** [01-batch.md](./01-batch.md) for what those containers actually *do*.
+
+### In plain English
+
+Think of this repo as **blueprints for AWS**. Each subfolder is one blueprint stack (its own Terraform state). Harness (or you locally) runs `terraform apply` to create or update real resources. When someone says “deploy inventory feed to dev,” that usually means **apply stage B** with the right image tag **and** the batch repo has already published that image to ECR.
 
 ---
 
 ## Layer model
 
+Three layers — **foundation → shared platform → specific apps**:
+
+| Layer | Analogy | Examples |
+|-------|---------|----------|
+| **01-infrastructure** | Land, power, water | VPC, RDS PostgreSQL, message broker, bastion host for DB scripts |
+| **02-platform** | Shared building | ECS cluster, **shared Batch queue**, scheduler DB sync for queues |
+| **03-application** | Tenants & equipment | Each microservice (order API), **each Batch job definition**, Lambdas |
+
 ```text
-01-infrastructure/     VPC, RDS, MQ, peering, bastion, KMS, Beanstalk, TGW, endpoints
-02-platform/           ECS cluster, static web, AWS Batch platform (A + C), Lambda layers
-03-application/        ECS microservices, per-job Batch (B + D), Lambda, Cognito, SQS, API GW, …
+01-infrastructure/     VPC, RDS, MQ, peering, bastion, KMS, …
+02-platform/           ECS cluster, AWS Batch platform (stages A + C), …
+03-application/        ECS facades, per-job Batch (stages B + D), API GW, …
 ```
 
 **Convention:** `{layer}/{product}/{numbered-stack}/` — each folder is its own Terraform root (`terraform init -backend-config=…`).
@@ -21,7 +35,16 @@
 
 ## Service Manager Batch — pipeline A → C → B → D
 
-**Apply order:** **A → C → B → D** (repeat B+D per `jobname`; A+C once per `batch_shared_name`).
+**Plain English:** Adding a new scheduled job to AWS Batch is a **four-step Terraform rollout**, not one button.
+
+| Stage | One-line explanation |
+|-------|----------------------|
+| **A** | Create the **shared parking lot** — Batch compute + queue for many jobs |
+| **C** | Tell the **OMS scheduler database** “this queue exists” (Postgres rows) |
+| **B** | Register **this job’s recipe** — Docker image, CPU, command, env, logs, retries |
+| **D** | Tell the **scheduler database** “this job definition exists” |
+
+**Apply order:** **A → C → B → D**. Do A+C once per environment “platform”; do B+D **once per job** (e.g. `inventory-feed`, `cancel-items`).
 
 > **Folder naming trap:** READMEs sometimes say `03-servicemanager-scheduled-job` / `05-catalog-job-db`. On disk use **`02-servicemanager-scheduled-job`** and **`03-servicemanager-batch-catalog-job-db`**. Stage **C** is under **`02-platform`**, not `03-application/04-…`.
 
@@ -42,6 +65,8 @@
 ---
 
 ## SSM contracts
+
+**Plain English:** **SSM Parameter Store** is where AWS keeps **configuration the containers need at runtime** (often including *where to find* the database connection string). Terraform **writes** metadata parameters when you apply A and B; the .NET job **reads** them using env vars like `ssm_connectionstring`.
 
 Prefix: `/{owners}/{space}/{environment}` — `owners` comes from variable **`business_divsion`** (spelling is intentional in code).
 

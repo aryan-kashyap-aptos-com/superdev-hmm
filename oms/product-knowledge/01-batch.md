@@ -1,20 +1,29 @@
 # Product knowledge — OMS AWS Batch application (`oms-aws-service-manager-batch`)
 
+> **New to OMS?** Read [00-onboarding.md](./00-onboarding.md) first (glossary, diagram, what each job does in plain language).
+
 **Repo:** `RepoSuite/oms-aws-service-manager-batch`  
 **Stack:** .NET 8, AWS Batch (Fargate), Npgsql/Dapper, AWSSDK S3/SES/SSM  
-**Boundary:** Application code and container images only. Job queues, CE, job definitions, IAM, and `evaluateOnExit` live in **oms-infrastructure**.
+
+### In plain English
+
+This repository is the **source code for short-lived “worker” programs** that run inside Docker on AWS Batch. Each program connects to the **OMS database**, does one kind of bulk work (export inventory, cancel lines, etc.), writes **logs**, and **exits with a number** that tells AWS whether to retry.
+
+It does **not** create VPCs, job queues, or IAM roles — that is **`oms-infrastructure`** ([02-terraform.md](./02-terraform.md)).
 
 ---
 
 ## What this repo is for
 
-Replaces legacy **Windows Service Manager scheduled tasks** and parts of **ODX + RabbitMQ** with **containerized AWS Batch jobs** that talk to OMS PostgreSQL (and EOM where required). There is **no runtime dependency** on `oms_npgsql`, `odx`, or `export-service` as separate deployables.
+We are moving **scheduled Windows tasks** (Service Manager) and old **message-queue exports** (ODX + RabbitMQ) to **one container per run** on AWS Batch.
 
-| Legacy pattern | New pattern |
-|----------------|-------------|
-| OMS publishes to RabbitMQ `inventory_requested`; ODX consumes | **Inventory Feed:** scheduler + export **in-process**, S3 upload |
-| ODX `ExportOrderItemsTaskHandler` → queue `export_requested` | **Export Order Items:** in-process sink + S3 (DCOMS-29257) |
-| ODX task handlers for cancel / reset / update status | **TASK** jobs with `Eom.Component.*` adapters |
+| Old way (simplified) | New way in this repo |
+|----------------------|----------------------|
+| Message on RabbitMQ → another service exports inventory | **Inventory Feed:** one container does scheduling + export → **S3** |
+| ODX publishes “export orders” to a queue | **Export Order Items:** same work **inside one process** → **S3** |
+| ODX “task handlers” for cancel / reset / status | **TASK** jobs calling shared **EOM** libraries |
+
+No runtime dependency on legacy deployables `oms_npgsql`, `odx`, or `export-service`.
 
 ---
 
@@ -37,7 +46,11 @@ docs/batch/*.example.json              Job definition + SubmitJob templates
 
 ## Jobs catalog
 
+Each job = a folder under `Jobs/`, a **.NET executable**, and a **Docker image** pushed to ECR by your pipeline.
+
 ### Inventory Feed
+
+**Plain English:** “Pull supplier inventory from OMS using export settings, build commerce-style XML, upload to S3, optionally update ‘last synced’ in scheduler tables.”
 
 | | |
 |---|---|
@@ -51,6 +64,8 @@ Legacy `configXml`-only envelopes are **rejected**; use generic EXPORT envelope 
 
 ### Export Order Items
 
+**Plain English:** “Find order lines that haven’t been exported yet for this scheduled task, write export records and notes, upload a JSON export file to S3.” Needs a stable **task id** from the OMS scheduler (not the AWS Batch run id).
+
 | | |
 |---|---|
 | **DLL** | `OmsAwsBatch.ExportOrderItems.Job.dll` |
@@ -61,6 +76,8 @@ Legacy `configXml`-only envelopes are **rejected**; use generic EXPORT envelope 
 
 ### Reset Items for Reroute
 
+**Plain English:** “Given filters (which orders/lines), call EOM to reset items so routing can run again.”
+
 | | |
 |---|---|
 | **DLL** | `OmsAwsBatch.ResetItemsForReroute.Job.dll` |
@@ -69,6 +86,8 @@ Legacy `configXml`-only envelopes are **rejected**; use generic EXPORT envelope 
 
 ### Update Item Status
 
+**Plain English:** “Bulk-change line item status (from status A to status B) for everything matching filters.”
+
 | | |
 |---|---|
 | **DLL** | `OmsAwsBatch.UpdateItemStatus.Job.dll` |
@@ -76,6 +95,8 @@ Legacy `configXml`-only envelopes are **rejected**; use generic EXPORT envelope 
 | **Filters** | Non-empty `itemStatuses`, exactly one `newItemStatuses` |
 
 ### Cancel Items
+
+**Plain English:** “Bulk-cancel order lines matching filters; optionally email stakeholders via SES.”
 
 | | |
 |---|---|
@@ -88,6 +109,8 @@ Legacy `configXml`-only envelopes are **rejected**; use generic EXPORT envelope 
 ---
 
 ## Submit-job contract
+
+**Plain English:** Every run needs a **JSON instruction**. AWS Batch passes it into the container (usually as the **last argument** after `dotnet MyJob.dll`). The program parses that JSON to learn operation, filters, and settings.
 
 ### Resolution order (`BatchSubmitJobJson.Resolve`)
 
@@ -119,6 +142,8 @@ Do **not** put literal `Ref::` in `containerOverrides` without Batch substitutio
 ---
 
 ## Exit codes (infra must mirror)
+
+**Plain English:** When the container finishes, it returns an integer to the OS. **0 = success.** Other numbers mean specific failures. Terraform job definitions can say “retry only on code 4” etc. If you change a number in code, **update Terraform** or retries will be wrong.
 
 Defined under `Shared/OmsAwsBatch.Infrastructure/Diagnostics/`.  
 **Retry classifier:** `BatchExitRetryClassifier` — only **`UnhandledException` (4)** on TASK-style jobs is retryable; Inventory **scheduler failure (4)** is retryable; **Export 5/8** and **Inventory 7** are not.

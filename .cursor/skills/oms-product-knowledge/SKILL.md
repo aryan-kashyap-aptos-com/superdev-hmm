@@ -10,6 +10,9 @@ description: >-
 
 ## Read order
 
+0. **Onboarding (anyone new to OMS)** — `oms/product-knowledge/00-onboarding.md`  
+   Glossary, mental model, business view of the five jobs, beginner mistakes.
+
 1. **Batch (application)** — `oms/product-knowledge/01-batch.md`  
    Skill: `oms-aws-service-manager-batch` (+ `reference.md`)
 

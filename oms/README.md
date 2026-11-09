@@ -13,8 +13,9 @@ This branch holds **project skills** and pointers for Order Management System (O
 
 | # | Document | Contents |
 |---|----------|----------|
-| 1 | [01-batch.md](./product-knowledge/01-batch.md) | All five jobs, submit JSON, exit codes, SSM, Docker, tests, ODX legacy |
-| 2 | [02-terraform.md](./product-knowledge/02-terraform.md) | Layers, A→C→B→D, SSM/state, Harness, ECR wiring, ECS list, gotchas |
+| **0** | [00-onboarding.md](./product-knowledge/00-onboarding.md) | **Start here** — what OMS is, glossary, diagram, who reads what |
+| 1 | [01-batch.md](./product-knowledge/01-batch.md) | Batch jobs, JSON payloads, exit codes, Docker (with plain-English intros) |
+| 2 | [02-terraform.md](./product-knowledge/02-terraform.md) | Terraform layers, A→C→B→D, SSM/state, ECR wiring (with analogies) |
 
 ## Project skills (Cursor agents)
 
