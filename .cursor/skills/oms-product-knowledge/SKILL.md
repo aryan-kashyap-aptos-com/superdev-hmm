@@ -1,78 +1,65 @@
 ---
 name: oms-product-knowledge
 description: >-
-  OMS on AWS — how batch jobs (oms-aws-service-manager-batch) and Terraform
-  (oms-infrastructure) fit together. Use for DCOMS/Batch migrations, Harness
-  apply order, exit codes, SSM DB bootstrap, or Service Manager scheduled jobs.
+  OMS on AWS — start here. Batch app repo then Terraform infra repo, A→C→B→D
+  pipeline, SSM contracts, legacy ODX migration. Points to deep product knowledge
+  in oms/product-knowledge/01-batch.md and 02-terraform.md.
 ---
 
-# OMS product knowledge (umbrella)
+# OMS product knowledge (start here)
 
-## Repositories
+## Read order
 
-| Repo | Role |
-|------|------|
-| **oms-aws-service-manager-batch** | .NET 8 **application** code for AWS Batch: inventory feed, export order items, reset reroute, update item status, cancel items. Job definitions / CE / queues live in infra. |
-| **oms-infrastructure** | **Terraform** for VPC, RDS, ECS microservices, Batch platform, Step Functions, SQS, API Gateway, Parameter Store, etc. |
+1. **Batch (application)** — `oms/product-knowledge/01-batch.md`  
+   Skill: `oms-aws-service-manager-batch` (+ `reference.md`)
 
-Local paths (this machine): `RepoSuite/oms-aws-service-manager-batch`, `RepoSuite/oms-infrastructure`.
+2. **Terraform (infrastructure)** — `oms/product-knowledge/02-terraform.md`  
+   Skill: `oms-infrastructure` (+ `reference.md`)
 
-## End-to-end: Service Manager → AWS Batch
+## Two repositories
 
-Legacy Windows Service scheduled .NET jobs are moving to containers on AWS Batch.
+| Repo | Path | Owns |
+|------|------|------|
+| **oms-aws-service-manager-batch** | `RepoSuite/oms-aws-service-manager-batch` | .NET 8 containers, submit JSON, exit codes, S3/EOM behavior |
+| **oms-infrastructure** | `RepoSuite/oms-infrastructure` | VPC, RDS, ECS, Batch CE/JQ/JD, SSM, Harness state |
 
-```text
-Application code (oms-aws-service-manager-batch)
-    → Docker image → ECR (deploy pipeline)
-Infrastructure (oms-infrastructure)
-    → job definition, CE, JQ, retry/evaluateOnExit, CloudWatch logs
-    → Toronado / catalog Postgres rows (stages C, D)
-Trigger
-    → SubmitJob JSON (Ref:: parameter) and/or Step Functions (scheduled job stack)
-```
-
-**Apply order (Batch migration, per job):** **A → C → B → D**
-
-| Stage | Stack |
-|-------|--------|
-| A | `02-platform/03-aws-batch/02-aws-batch-servicemanager-platform` |
-| C | `02-platform/03-aws-batch/03-aws-batch-servicemanager-catalog-platform-db` |
-| B | `03-application/03-aws-batch-job/03-servicemanager-scheduled-job` |
-| D | `03-application/03-aws-batch-job/05-servicemanager-batch-catalog-job-db` |
-
-## Contract between repos
-
-- **Exit codes** are defined in batch repo (`OmsAwsBatch.Infrastructure.Diagnostics.*ExitCode`). Infra **`evaluateOnExit`** must stay aligned — see batch `docs/ARCHITECTURE.md`.
-- **DB connection:** jobs use **`SsmDatabaseConnectionBootstrap`** → `ConnectionStrings:Database` from `ssm_connectionstring` + `connectionstringParams`. Batch **job role** needs `ssm:GetParameter` (+ KMS if applicable).
-- **Submit payload:** Batch job definition uses `Ref::<paramName>`; inner JSON carries `configXml`, `jobStepId`, filters/settings per job. Examples under batch `docs/batch/*.example.json`.
-- **No RabbitMQ** in the new inventory feed path; export order items likewise in-process (DCOMS-29257 pattern).
-
-## Infra layout (high level)
+## One picture
 
 ```text
-oms-infrastructure/
-  01-infrastructure/   # VPC, RDS, MQ, Beanstalk, peering, …
-  02-platform/         # Shared Batch CE/JQ, Service Manager platform
-  03-application/      # ECS services, per-job Batch, Lambda, Cognito, SQS, …
+Scheduler / Step Functions
+        │
+        ▼ SubmitJob (parameters → Ref:: on command)
+┌───────────────────────────────────────┐
+│  Batch job container (.NET)           │  ← oms-aws-service-manager-batch
+│  SSM DB bootstrap, exit code → process│
+└───────────────────────────────────────┘
+        ▲
+        │ image, JD, retry, logs, IAM
+        │
+┌───────────────────────────────────────┐
+│  Terraform stages A → C → B → D       │  ← oms-infrastructure
+└───────────────────────────────────────┘
 ```
 
-## Deeper skills
+## Migration pipeline (memorize)
 
-- Batch jobs, build, tests, observability → **oms-aws-service-manager-batch** skill.
-- Terraform paths, SSM metadata keys, state keys → **oms-infrastructure** skill.
+**A → C → B → D** — platform, catalog platform DB, job definition, catalog job DB.
 
-## Commands cheat sheet
+## Cross-repo rules
 
-```bash
-# Batch app repo
-cd RepoSuite/oms-aws-service-manager-batch
-dotnet build OmsAwsBatchJobs.sln
-dotnet test OmsAwsBatchJobs.sln --filter "TestCategory!=RequiresDocker&TestCategory!=RequiresOmsDatabase"
+| Change in batch repo | Must update in infra |
+|----------------------|----------------------|
+| New exit code | Job definition `evaluateOnExit` (stage B) |
+| New env var / SSM name | Stage B environment block |
+| New container / DLL | ECR repo, tag, command |
+| New job | Full B+D for new `jobname`; A+C if new platform |
 
-# Infra (typical; use env-specific backend + secrets)
-cd RepoSuite/oms-infrastructure/<stack-folder>
-terraform init -backend-config="dev.conf" -var-file="secrets.tfvars"
-terraform plan -var-file="secrets.tfvars"
-```
+## Legacy context
 
-When changing retry behavior or alarms, always cross-check **exit code tables** in batch docs against the job definition Terraform.
+- **RabbitMQ paths removed** for inventory feed and export order items in batch repo.
+- **Windows Service Manager** scheduled tasks → Batch + Toronado/scheduler catalog Postgres.
+- **ODX** task handler **behavior** preserved; transport is in-process + Batch.
+
+## Index on OMS branch
+
+`superdev-hmm/oms/README.md` — skills inventory and local paths.

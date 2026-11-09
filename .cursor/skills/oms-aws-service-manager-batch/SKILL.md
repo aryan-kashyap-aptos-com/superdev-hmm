@@ -1,83 +1,55 @@
 ---
 name: oms-aws-service-manager-batch
 description: >-
-  RepoSuite oms-aws-service-manager-batch — .NET 8 AWS Batch jobs (inventory
-  feed, export order items, reset reroute, update item status, cancel items).
-  Use for SubmitJob JSON, exit codes, SSM DB bootstrap, Docker publish, tests.
+  OMS .NET 8 AWS Batch jobs (RepoSuite/oms-aws-service-manager-batch): Inventory
+  Feed, Export Order Items, Reset/Update/Cancel TASK jobs, GenericJob submit
+  JSON, SSM DB bootstrap, exit codes, Docker publish, EOM NuGet. Read reference.md
+  for full product knowledge.
 ---
 
-# oms-aws-service-manager-batch
+# OMS Batch application repo
 
-**Path:** `/Users/akashyap/RepoSuite/oms-aws-service-manager-batch`
+**Local path:** `/Users/akashyap/RepoSuite/oms-aws-service-manager-batch`
 
-Standalone .NET 8 batch jobs — **no** dependency on `oms_npgsql`, `odx`, or `export-service` as runtime coupling.
+## When to use this skill
 
-## Layout
+- Implementing or debugging a **Batch container** (not Terraform CE/JQ/JD)
+- **SubmitJob** inner JSON, `Ref::` parameters, argv vs env precedence
+- **Exit codes** and `BatchExitRetryClassifier` (before changing `evaluateOnExit` in infra)
+- **SSM** `ssm_connectionstring` + `connectionstringParams`
+- **Docker** publish-then-COPY images; private **Eom.Component.*** feed
+- Legacy **ODX / RabbitMQ** parity questions
 
-```text
-Shared/OmsAwsBatch.Infrastructure/   # DB factory, SSM bootstrap, logging, exit codes, SES
-Jobs/
-  InventoryFeed/                     # PRODUCTINVENTORY export, S3, Toronado lastsynced
-  ExportOrderItems/                  # In-process export (was Rabbit export_requested)
-  ResetItemsForReroute/              # EOM adapter + private NuGet
-  UpdateItemStatus/
-  CancelItems/
-docs/
-  ARCHITECTURE.md                    # Exit codes, legacy vs new, observability
-  batch/*.example.json               # Job definition + submit-job templates
-```
+## Five jobs (quick)
 
-## Jobs summary
+| Job | DLL | Batch param key | EOM? |
+|-----|-----|-----------------|------|
+| Inventory Feed | `OmsAwsBatch.InventoryFeed.Job.dll` | `inventoryFeedJobJson` | No |
+| Export Order Items | `OmsAwsBatch.ExportOrderItems.Job.dll` | `exportOrderItemsJobJson` | Yes |
+| Reset Items for Reroute | `OmsAwsBatch.ResetItemsForReroute.Job.dll` | `resetItemsForRerouteJobJson` | Yes |
+| Update Item Status | `OmsAwsBatch.UpdateItemStatus.Job.dll` | `updateItemStatusJobJson` | Yes |
+| Cancel Items | `OmsAwsBatch.CancelItems.Job.dll` | **`jobParamter`** | Yes + optional SES |
 
-| Job | Export type / notes |
-|-----|---------------------|
-| **InventoryFeed** | `ExportType` must be `PRODUCTINVENTORY`. Phase 1 scheduler + phase 2 in-process sink; S3 via AWSSDK. |
-| **ExportOrderItems** | Requires stable `taskId` in settings (not Batch job id). Exit **8** if S3 bucket missing (checked before work). |
-| **ResetItemsForReroute** | Generic TASK envelope; exit **7** if EOM reports per-order errors. |
-| **UpdateItemStatus** | `itemStatuses` + exactly one `newItemStatuses` in filters. |
-| **CancelItems** | See job README under `Jobs/CancelItems/`. |
+## Non-negotiables
 
-## Exit codes (infra must match)
+1. **Infra owns** JD, retry, CloudWatch — **this repo owns** exit code integers and runner behavior (`docs/ARCHITECTURE.md`).
+2. **Export Order Items:** `settings.taskId` = scheduler task GUID; exit **8** if S3 bucket missing (checked first).
+3. **Cancel Items:** orchestrator typo `jobParamter` is intentional.
+4. **No RabbitMQ** for inventory / export paths in this repo.
 
-Canonical tables: `docs/ARCHITECTURE.md`. Infrastructure **`evaluateOnRetry`** / **`evaluateOnExit`** must use the same numeric meanings.
+## Commands
 
-Examples:
-
-- InventoryFeed: **7** = success flag but `ErrorCount > 0`
-- ExportOrderItems: **8** = missing `ExportOrderItems:S3:BucketName` (non-retryable)
-
-## SubmitJob / argv
-
-1. Build inner JSON (`configXml`, `jobStepId`, job-specific `settings` / `filters`).
-2. Pass as Batch parameter (e.g. `inventoryFeedJobJson`) with job definition `command: ["Ref::inventoryFeedJobJson"]` after `ENTRYPOINT` `dotnet …dll`.
-3. Runner reads **last argv segment** if it looks like `{...}`, else env `*__SubmitJobParameterJson`.
-
-Never put literal `Ref::` in containerOverrides without Batch substitution.
-
-## Database
-
-- Env: `ssm_connectionstring` (parameter **name**), `connectionstringParams` (suffix).
-- Merged in-memory to `ConnectionStrings:Database`.
-- InventoryFeed also updates `jobstep.lastsynced` when configured.
-
-## Build & test
-
-```powershell
+```bash
+cd RepoSuite/oms-aws-service-manager-batch
 dotnet build OmsAwsBatchJobs.sln
 dotnet test OmsAwsBatchJobs.sln --filter "TestCategory!=RequiresDocker&TestCategory!=RequiresOmsDatabase"
 ```
 
-Docker: **publish on agent, COPY into runtime Dockerfile** — see `README.md` and `docs/docker-images.md`.
+## Full product knowledge
 
-Private **Eom.Component.*** packages: `docs/nuget-private-feed.md`.
+Read **`reference.md`** in this skill folder, or repo copy:  
+`superdev-hmm/oms/product-knowledge/01-batch.md` (on branch **OMS**).
 
-## Observability
+## Terraform handoff
 
-- `AddOmsAwsBatchProcessLogging` → JSON console for CloudWatch Insights.
-- Scopes: `CorrelationId` (`OMS_BATCH_CORRELATION_ID`), `AwsBatchJobId`, `AwsBatchJobAttempt`.
-- No raw submit JSON in logs — use `LogRedaction` summaries.
-- Regression / queries: `docs/batch/REGRESSION-TESTS-OBSERVABILITY.md`.
-
-## Idempotency
-
-Treat reruns as **at-least-once** unless EOM/export layer guarantees otherwise. Inventory `lastsynced` only on full success (zero errors).
+After code changes, update stage **B** (+ **D** if metadata changes): skill **oms-infrastructure**.

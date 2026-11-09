@@ -9,13 +9,20 @@ This branch holds **project skills** and pointers for Order Management System (O
 | Batch job code (.NET 8) | `/Users/akashyap/RepoSuite/oms-aws-service-manager-batch` |
 | Terraform / Harness infra | `/Users/akashyap/RepoSuite/oms-infrastructure` |
 
-## Project skills (read these first)
+## Product knowledge (read in order)
+
+| # | Document | Contents |
+|---|----------|----------|
+| 1 | [01-batch.md](./product-knowledge/01-batch.md) | All five jobs, submit JSON, exit codes, SSM, Docker, tests, ODX legacy |
+| 2 | [02-terraform.md](./product-knowledge/02-terraform.md) | Layers, A→C→B→D, SSM/state, Harness, ECR wiring, ECS list, gotchas |
+
+## Project skills (Cursor agents)
 
 | Skill | When to use |
 |-------|-------------|
-| [oms-product-knowledge](../.cursor/skills/oms-product-knowledge/SKILL.md) | Any OMS infra + batch question; start here |
-| [oms-aws-service-manager-batch](../.cursor/skills/oms-aws-service-manager-batch/SKILL.md) | .NET Batch jobs, exit codes, submit JSON, Docker |
-| [oms-infrastructure](../.cursor/skills/oms-infrastructure/SKILL.md) | Terraform layout, Batch migration pipeline, SSM |
+| [oms-product-knowledge](../.cursor/skills/oms-product-knowledge/SKILL.md) | Start here — links to full docs |
+| [oms-aws-service-manager-batch](../.cursor/skills/oms-aws-service-manager-batch/SKILL.md) | Batch app; see `reference.md` in same folder |
+| [oms-infrastructure](../.cursor/skills/oms-infrastructure/SKILL.md) | Terraform; see `reference.md` in same folder |
 
 ## Cursor skills inventory
 
