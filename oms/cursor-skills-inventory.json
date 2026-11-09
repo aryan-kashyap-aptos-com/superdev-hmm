@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "source": "/Users/akashyap/.cursor/skills-cursor/.sync-manifest.json",
+  "capturedAt": "2026-11-09",
+  "personalSkillsRoot": "/Users/akashyap/.cursor/skills-cursor",
+  "projectSkillsRoot": ".cursor/skills",
+  "omsSkills": [
+    "oms-product-knowledge",
+    "oms-aws-service-manager-batch",
+    "oms-infrastructure"
+  ],
+  "personalSkills": [
+    "agent-sdk-create-agent",
+    "automate",
+    "autopilot",
+    "canvas",
+    "create-hook",
+    "create-rule",
+    "create-skill",
+    "create-subagent",
+    "cursor-blame",
+    "goal",
+    "loop",
+    "migrate-to-skills",
+    "new-repo",
+    "onboard",
+    "origin",
+    "rename-chat",
+    "review",
+    "review-bugbot",
+    "review-security",
+    "sdk",
+    "share",
+    "shell",
+    "split-to-prs",
+    "statusline",
+    "update-cli-config",
+    "update-cursor-settings",
+    "visualize"
+  ]
+}
