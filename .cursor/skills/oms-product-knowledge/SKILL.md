@@ -19,6 +19,9 @@ description: >-
 2. **Terraform (infrastructure)** — `oms/product-knowledge/02-terraform.md`  
    Skill: `oms-infrastructure` (+ `reference.md`)
 
+3. **QA / Site Manager** — `oms/product-knowledge/03-qa-environments.md`  
+   Site Manager = **backadmin**; pod dev login example; `qa-tester` allowed sites via `environments.local.md`.
+
 ## Two repositories
 
 | Repo | Path | Owns |
