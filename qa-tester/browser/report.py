@@ -59,17 +59,50 @@ def _host_label():
 
 def _display_title(run):
     name = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", run)
+    name = re.sub(r"^[A-Za-z][A-Za-z0-9]{1,9}-\d+-", "", name)
     words = name.replace("-", " ").replace("_", " ").split()
     return " ".join(w.upper() if w.lower() == "qa" else w.capitalize() for w in words) or run
 
 
-def build(run, out_path=None):
-    events = record.read_events(run)
-    if not events:
+last_session_label = ""
+
+
+def _file_base(run, ticket, folder):
+    """The report's file name, in the format the team asked for:
+    <TICKET>-<Title> -<DDMMYYYY>-<HHMMSS>   e.g.  ABC-123-Login Page -10112026-123144
+    (the space before the dash is part of the format). Unique to the second; a repeat in the same second gets -2."""
+    title = re.sub(r'[<>:"/|?*\\]', "", _display_title(run)).strip()
+    now = datetime.now()
+    base = f"{ticket + '-' if ticket else ''}{title} -{now:%d%m%Y}-{now:%H%M%S}"
+    unique, n = base, 1
+    while (folder / (unique + ".html")).exists() or (folder / (unique + ".pdf")).exists():
+        n += 1
+        unique = f"{base}-{n}"
+    return unique
+
+
+def build(run, out_path=None, session="latest"):
+    """Build the report for ONE session by default (the latest), so earlier attempts never mix in. Pass
+    session="all" for everything, or a session id for an earlier one. every report is a NEW file named report-<TICKET>-<date-time>-<session>.html (never overwritten)."""
+    global last_session_label
+    all_events = record.read_events(run)
+    if not all_events:
         raise core.c.ConnectorError(
             f"No recorded events for run '{run}' yet.",
             "Events are written by ad hoc commands, `play`, and `crawl` while this run is active (--run "
             f"{run}, or make it the active run with qa-tester/test-run.py use).")
+    sess = record.sessions(all_events)
+    if session in (None, "latest"):
+        sid = sess[-1][0]
+    elif session == "all":
+        sid = None
+    else:
+        sid = session
+        if sid not in [x[0] for x in sess]:
+            raise core.c.ConnectorError(f"No session '{session}' in run '{run}'.",
+                                        "Sessions: " + ", ".join(x[0] for x in sess) + " (see `report --list`).")
+    events = [e for e in all_events if sid is None or e.get("session") == sid]
+    last_session_label = f"{sid or 'all'}" + (f" ({len(sess)} session(s) in this run)" if len(sess) > 1 else "")
     for e in events:
         e.setdefault("task", "")
     counts = {}
@@ -89,23 +122,47 @@ def build(run, out_path=None):
             site = core.site().get("url")
         except Exception:
             pass
-    out_path = Path(out_path) if out_path else core.QA / "runs" / run / "report.html"
+    # Unique name every time: report-<TICKET>-<date-time>-<session>.html. The old fixed "report.html" let an
+    # already-open tab or the browser cache keep showing a stale build while a newer PDF sat next to it.
+    run_folder = core.QA / "runs" / run
+    out_path = Path(out_path) if out_path else run_folder / (_file_base(run, core.run_ticket(run), run_folder) + ".html")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     build_id = uuid.uuid4().hex[:6]
     built_at = datetime.now().strftime(_TS_FMT)
     rid = core.run_id(run)
     host_label, os_family = _host_label()
+    ticket = core.run_ticket(run)
     meta = {
-        "run": run, "site": site or "", "started": events[0]["ts"], "finished": events[-1]["ts"],
+        "run": run, "ticket": ticket, "site": site or "", "started": events[0]["ts"], "finished": events[-1]["ts"],
         "host": host_label, "os": os_family, "runner": "local", "build": build_id, "generated": built_at,
+        "session": sid or "all", "n_sessions": len(sess),
+        "session_pos": ([x[0] for x in sess].index(sid) + 1) if sid else "",
     }
     if rid:
         meta["rid"] = rid
-    out_path.write_text(_html(run, meta, events, build_id, built_at, rid), encoding="utf-8")
+    page_html = _html(run, meta, events, build_id, built_at, rid)
+    out_path.write_text(page_html, encoding="utf-8")
     try:
-        build_pdf(run, meta, events, counts, out_path.with_name("report.pdf"))
+        (out_path.parent / "LATEST-REPORT.txt").write_text(f"{out_path.name}" + chr(10) + f"built {built_at}" + chr(10), encoding="utf-8")
+    except OSError:
+        pass
+    try:
+        import time as _t
+        for kind, target in (("summary", out_path.with_suffix(".pdf")),
+                             ("detail", out_path.with_name(out_path.stem + " Detail.pdf"))):
+            # Two renders back to back in one process can make the second one fail ("Printing failed"),
+            # so each PDF gets its own retries, and a failure names the file that failed.
+            for attempt in (1, 2, 3):
+                try:
+                    build_pdf(run, meta, events, counts, target, kind)
+                    break
+                except Exception as e:
+                    if attempt == 3:
+                        print(f"(Could not build {target.name}: {e})")
+                    else:
+                        _t.sleep(2)
     except Exception as e:
-        print(f"(Could not build report.pdf: {e})")
+        print(f"(Could not build the PDFs: {e})")
     return out_path, events, counts, build_id, built_at
 
 
@@ -114,10 +171,17 @@ def _html(run, meta, events, build_id, built_at, rid):
     built_short = f"{built_dt.day} {built_dt.strftime('%b %Y, %H:%M')}"
     run_id_sidebar = f'Run <span title="A fixed id for this run itself, from plan.md. Stays the same across every rebuild of this report.">{rid}</span><br>' if rid else ""
     run_id_foot = f"Run {rid} &middot; " if rid else ""
+    sess = meta.get("session", "")
+    if meta.get("ticket"):
+        run_id_sidebar += f'Ticket <span>{_esc(meta["ticket"])}</span><br>'
+        run_id_foot += f'{_esc(meta["ticket"])} &middot; '
+    run_id_sidebar += f'Session <span title="One play or crawl. This report shows only this session.">{sess}</span><br>'
+    run_id_foot += f"Session {sess} &middot; "
 
     page = _TEMPLATE_PATH.read_text(encoding="utf-8")
+    page = page.replace("<title>", '<meta http-equiv="Cache-Control" content="no-store"><title>', 1)
     subs = {
-        "__QA_TITLE__": _esc(_display_title(run)),
+        "__QA_TITLE__": _esc((meta.get("ticket") + " · " if meta.get("ticket") else "") + _display_title(run)),
         "__QA_HOST_NAME__": _esc(meta["host"]),
         "__QA_HOST_SUB__": f"{meta['runner'].capitalize()} runner",
         "__QA_RUN_NAME__": _esc(run),
@@ -273,18 +337,24 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:6px 0 8px}}
 </div></body></html>"""
 
 
-def _pdf_via_page(page, src_uri, out_path):
+def _pdf_via_page(page, src_uri, out_path, kind="detail", footer_html=None):
     page.goto(src_uri)
-    page.pdf(path=str(out_path), format="A4", print_background=True,
-             margin={"top": "16mm", "bottom": "14mm", "left": "14mm", "right": "14mm"},
-             display_header_footer=True, header_template="<div></div>",
-             footer_template='<div style="font-size:8px;width:100%;text-align:center;color:#9a9a9a;'
-                             'font-family:-apple-system,Arial,sans-serif;padding:0 14mm">'
-                             '<span class="title"></span> &middot; Page <span class="pageNumber">'
-                             '</span> of <span class="totalPages"></span></div>')
+    page.wait_for_load_state("load")
+    page.evaluate("document.fonts && document.fonts.ready")
+    if kind == "summary":
+        margin = {"top": "16mm", "bottom": "16mm", "left": "15mm", "right": "15mm"}
+        footer = footer_html
+    else:
+        margin = {"top": "16mm", "bottom": "14mm", "left": "14mm", "right": "14mm"}
+        footer = ('<div style="font-size:8px;width:100%;text-align:center;color:#9a9a9a;'
+                  'font-family:-apple-system,Arial,sans-serif;padding:0 14mm">'
+                  '<span class="title"></span> &middot; Page <span class="pageNumber">'
+                  '</span> of <span class="totalPages"></span></div>')
+    page.pdf(path=str(out_path), format="A4", print_background=True, margin=margin,
+             display_header_footer=True, header_template="<div></div>", footer_template=footer)
 
 
-def build_pdf(run, meta, events, counts, out_path):
+def build_pdf(run, meta, events, counts, out_path, kind="detail"):
     """A standalone, purpose-built PDF - not a browser print of the interactive dashboard. Rendered from its
     own plain static template (no sidebar, no JS, light theme only - a document meant to be handed to
     someone, not a screenshot of the tool's own UI).
@@ -302,8 +372,19 @@ def build_pdf(run, meta, events, counts, out_path):
     out_path = Path(out_path)
     cases = _group_cases(events)
     total = len(events)
-    src_path = out_path.with_name("_pdf_source.html")
-    src_path.write_text(_pdf_html(run, meta, cases, counts, total), encoding="utf-8")
+    src_path = out_path.with_name(f"_pdf_source_{kind}.html")
+    footer_html = None
+    if kind == "summary":
+        import stakeholder_pdf
+        html, facts_ = stakeholder_pdf.build_html(run, meta, events, cases, counts, _display_title(run), out_path.name)
+        footer_html = stakeholder_pdf.footer(meta.get("ticket") or "", stakeholder_pdf.load_text(run).get("short") or _display_title(run))
+        build_pdf.last_facts = facts_
+        build_pdf.last_notes = stakeholder_pdf.reconcile(run, events, cases, facts_, stakeholder_pdf._plan_table(run))
+    else:
+        import pdf_report
+        html = pdf_report.build_html(run, meta, events, cases, counts, total, _display_title(run),
+                                     out_path.name, meta.get("n_sessions", 1))
+    src_path.write_text(html, encoding="utf-8")
     src_uri = src_path.resolve().as_uri()
     try:
         with sync_playwright() as p:
@@ -311,7 +392,7 @@ def build_pdf(run, meta, events, counts, out_path):
                 browser = p.chromium.connect_over_cdp(core.CDP)
                 page = browser.new_page()
                 try:
-                    _pdf_via_page(page, src_uri, out_path)
+                    _pdf_via_page(page, src_uri, out_path, kind, footer_html)
                 finally:
                     page.close()
             else:
@@ -332,7 +413,7 @@ def build_pdf(run, meta, events, counts, out_path):
                         raise core.c.ConnectorError("The temporary PDF-rendering browser did not start.", "")
                     browser = p.chromium.connect_over_cdp(cdp)
                     page = browser.new_page()
-                    _pdf_via_page(page, src_uri, out_path)
+                    _pdf_via_page(page, src_uri, out_path, kind, footer_html)
                 finally:
                     proc.terminate()
     finally:

@@ -476,6 +476,7 @@ def cmd_crawl(a):
     folder = core.QA / "runs" / run_name / "tasks" / a.task if a.task else core.QA / "runs" / run_name
     (folder / "pages").mkdir(parents=True, exist_ok=True)
     results = []
+    record.start_session(run_name)
 
     def crawl(page):
         net, console = core.Net(page), []
@@ -543,11 +544,23 @@ def cmd_report(a):
     if not run:
         raise c.ConnectorError("No run given and no active run.", "Pass --run NAME, or set one active with "
                                "qa-tester/test-run.py use.")
-    path, events, counts, build_id, built_at = report_mod.build(run)
+    if a.list:
+        import record as _rec
+        for sid, first, last, n in _rec.sessions(_rec.read_events(run)):
+            print(f"{sid}  {first} -> {last}  {n} event(s)")
+        return
+    path, events, counts, build_id, built_at = report_mod.build(run, session=a.session)
     print(f"Report: {path}")
+    print(f"Report PDF: {path.with_suffix('.pdf')}")
+    print(f"Session: {report_mod.last_session_label}")
     print(f"Build {build_id} · generated {built_at} - if a tab already open on this file shows a different "
           "build id, it's stale: reload it.")
     print(f"{len(events)} recorded event(s).")
+    notes = getattr(report_mod.build_pdf, "last_notes", None)
+    if notes:
+        print("Check before presenting (numbers that do not line up in the source report):")
+        for n in notes:
+            print(f"  - {n}")
     for w in report_mod.RESULTS:
         if counts.get(w):
             print(f"  {counts[w]} {w}")
@@ -673,6 +686,8 @@ def main():
     pl.add_argument("scenario")
     pl.add_argument("--run", help="run folder name under qa-tester/runs/")
     pl.add_argument("--task", help="task folder inside the run")
+    pl.add_argument("--same-session", action="store_true",
+                    help="join the run's current session instead of starting a new one (several scenarios, one report)")
     pl.add_argument("--site", help="site name, if the scenario does not give one")
     pl.add_argument("--slow", type=int, default=600, help="ms pause after each step so it can be followed (default 600)")
     pl.add_argument("--timeout", type=int, default=5000, help="ms a check keeps retrying (default 5000)")
@@ -696,6 +711,9 @@ def main():
     rp = add("report", cmd_report, "build a standalone report.html of everything recorded for a run")
     rp.add_argument("--run", help="defaults to the active run")
     rp.add_argument("--open", action="store_true", help="open it in the default browser once built")
+    rp.add_argument("--session", default="latest",
+                    help="which session to report: 'latest' (default), 'all', or a session id (see `report --list`)")
+    rp.add_argument("--list", action="store_true", help="list this run's sessions and exit")
     args = p.parse_args()
     args.fn(args)
 

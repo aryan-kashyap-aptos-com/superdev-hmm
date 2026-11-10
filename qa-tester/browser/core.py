@@ -70,6 +70,37 @@ def run_id(run):
     return m.group(1) if m else None
 
 
+_TICKET_RE = re.compile(r"\b([A-Z][A-Z0-9]{1,9}-\d+)\b")
+
+
+def run_ticket(run):
+    """The ticket this run is about (for example ABC-123), or "" if none. Read from the plan's
+    `Source:` line, else from the run's folder name. Any Jira project key counts, not only DCOMS."""
+    try:
+        text = (QA / "runs" / run / "plan.md").read_text(encoding="utf-8")
+        m = re.search(r"^Source:\s*(.+)$", text, re.M)
+        if m:
+            t = _TICKET_RE.search(m.group(1))
+            if t:
+                return t.group(1)
+    except OSError:
+        pass
+    t = _TICKET_RE.search(run or "")
+    return t.group(1) if t else ""
+
+
+def file_stamp():
+    """Date and time to the second, for file names: 20261110-123005. Every report and results file carries
+    one, so no two files share a name and a tab or cache can never show an older one."""
+    return time.strftime("%Y%m%d-%H%M%S")
+
+
+def named(kind, run, session="", ext=""):
+    """A unique, sortable file name: <kind>-<TICKET>-<date-time>-<session><ext>, ticket left out if none."""
+    t = run_ticket(run)
+    return "-".join(x for x in (kind, t, file_stamp(), session) if x) + ext
+
+
 def run_login(run=None):
     """The Login section of the run's plan.md: site, signin, user, password. Placeholders and "none" count as empty.
     The password is registered so redact() hides it in every output."""
