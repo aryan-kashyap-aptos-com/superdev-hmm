@@ -405,6 +405,8 @@ def run(path, args):
 
     cases_out = []
     started = datetime.datetime.now()
+    session_id = record.current_session(run_name) if getattr(args, "same_session", False) else record.start_session(run_name)
+    print(f"Session {session_id}")
     with core.session() as (_, page):
         net, console = core.Net(page), []
         page.on("console", lambda m: console.append(m.text[:200]) if m.type == "error" else None)
@@ -496,16 +498,20 @@ def run(path, args):
             cases_out.append({"id": case["id"], "title": case["title"], "result": result, "steps": steps_out, "evidence": evidence})
         totals = {w: sum(1 for k in cases_out if k["result"] == w) for w in RESULTS}
         panel.done("Finished: " + ", ".join(f"{n} {w}" for w, n in totals.items() if n))
-    write_results(folder, run_name, scenario, home, started, cases_out)
+    write_results(folder, run_name, scenario, home, started, cases_out, session_id)
     return cases_out
 
 
-def write_results(folder, run_name, scenario, home, started, cases_out):
-    data = {"scenario": scenario.get("name"), "site": home["name"], "started": started.isoformat(timespec="seconds"),
+def write_results(folder, run_name, scenario, home, started, cases_out, session_id=""):
+    data = {"scenario": scenario.get("name"), "session": session_id, "site": home["name"], "started": started.isoformat(timespec="seconds"),
             "finished": datetime.datetime.now().isoformat(timespec="seconds"), "cases": cases_out}
+    ticket = core.run_ticket(run_name)
+    data["ticket"] = ticket
+    stamp_name = core.named("results", run_name, session_id)
     (folder / "results.json").write_text(json.dumps(data, indent=1), encoding="utf-8")
-    lines = [f"# Scenario results: {scenario.get('name', '')}", "",
-             f"Site: {home['name']}. Started {data['started']}, finished {data['finished']}.",
+    (folder / (stamp_name + ".json")).write_text(json.dumps(data, indent=1), encoding="utf-8")
+    lines = [f"# Scenario results: {(ticket + ' - ') if ticket else ''}{scenario.get('name', '')}", "",
+             f"{('Ticket: ' + ticket + '. ') if ticket else ''}Session: {session_id}. Site: {home['name']}. Started {data['started']}, finished {data['finished']}.",
              "Result words: Verified, Issue found, Could not verify, Not tested.", "",
              "| ID | Test case | Result | Evidence |", "|----|-----------|--------|----------|"]
     for k in cases_out:
@@ -515,8 +521,10 @@ def write_results(folder, run_name, scenario, home, started, cases_out):
         for i, s in enumerate(k["steps"], 1):
             detail = f": {s['detail']}" if s["detail"] else ""
             lines.append(f"{i}. {s['result']} - {s['step']}{detail}")
-    (folder / "results.md").write_text(core.redact("\n".join(lines)) + "\n", encoding="utf-8")
-    print(f"\nResults: {folder / 'results.md'}")
+    body = core.redact("\n".join(lines)) + "\n"
+    (folder / "results.md").write_text(body, encoding="utf-8")
+    (folder / (stamp_name + ".md")).write_text(body, encoding="utf-8")
+    print(f"\nResults: {folder / (stamp_name + '.md')}")
     for w in RESULTS:
         n = sum(1 for k in cases_out if k["result"] == w)
         if n:

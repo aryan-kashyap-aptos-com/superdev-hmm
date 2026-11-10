@@ -40,6 +40,12 @@ Keep it general: no customer names, accounts, or passwords here.
 - Many menus keep their links in the page but hidden (for example a Sign Out link until the user menu opens). `hidden` is the right check.
 - Screenshots must not contain the tester's own overlays. Use the connector's outline (it fades and is removed before capture).
 
+## Reports and stale pages
+- A report with a fixed file name (`report.html`) is cached by open tabs and the browser: the user sees an old page while a newer PDF exists. Every report now has a unique name with the ticket and a date-time to the second. Open the printed file, and quote its name and time to the user.
+- A report built from the whole event log mixes old attempts into the new one. Reports show one session; each `play` is a session unless `--same-session` is used.
+- The runner panel's Report button runs inside a long-lived background process, so it uses the code from when the browser started. Restart the browser after changing the tool.
+- The `page-text` check scans every frame, including the runner panel's own frame, which shows your step notes. Never put the text you are searching for in a step note or title; check inside the page's own container instead.
+
 ## Folders and sharing
 - One run folder per piece of testing, one task folder per task. Plan first, summary last, then run `test-run.py check`.
 - The repository is public. Never push run folders, site maps, real addresses, screenshots of internal systems, or session notes. Real sites go in `environments.local.md`.

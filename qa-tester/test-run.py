@@ -67,7 +67,10 @@ def set_active(folder, base):
 
 
 def cmd_new(a):
-    folder = a.base / f"{datetime.date.today().isoformat()}-{slug(a.topic)}"
+    # The ticket id goes in the folder name (2026-11-10-ABC-123-topic), so every report, results file and
+    # summary made inside it is traceable to the ticket from its path alone.
+    ticket_part = f"{a.ticket.strip().upper()}-" if a.ticket and a.ticket.strip().upper() not in a.topic.upper() else ""
+    folder = a.base / f"{datetime.date.today().isoformat()}-{ticket_part}{slug(a.topic)}"
     if folder.exists():
         sys.exit(f"ERROR: {folder} already exists. Open its plan.md, or choose another topic.")
     (folder / "tasks").mkdir(parents=True)

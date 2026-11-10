@@ -15,6 +15,29 @@ runs/2026-11-07-<topic>/
 └── summary.md           written LAST, for someone who has never seen the product
 ```
 
+## Hard rules for reports and file names (never skip)
+
+1. **Every report is a new file, never an overwrite.** `report` writes `report-<TICKET>-<YYYYMMDD-HHMMSS>-<session>.html`
+   and the matching `.pdf` in the run folder. The same naming (`results-<TICKET>-<date-time>-<session>.md/.json`) is used for
+   each task's results. A fixed name like `report.html` lets an open tab or the browser cache show an older build.
+2. **Always open the file the `report` command prints** (`report --open` does this). Do not reopen a tab you already had.
+   After building, say the file name, its date-time, and the session id to the user, so they can see it is the new one.
+3. **A report shows one session** (the latest by default). Several scenarios that belong together are played with
+   `play --same-session`. `report --list` shows every session; `report --session all` shows everything.
+4. **The ticket id is in every name.** Any ticket counts (ABC-123, XYZ-45), not only one project. `test-run.py new --ticket <ID>`
+   puts it in the run folder name, and reports, results files and the report's title and footer carry it. When you write a
+   summary, note or scenario file for a ticket, put the ticket id in its file name too (for example
+   `ABC-123-login-page-summary.md`).
+5. **The PDF is a 3-page stakeholder summary** (verdict, KPI tiles, what we checked / test cases and page performance / evidence and run
+   details). A longer step-by-step PDF is written next to it, named `... Detail.pdf`. The numbers in the summary are computed from the
+   recorded events. The wording comes from `runs/<run>/stakeholder.json`, which the tester writes after the run (format: top of
+   `browser/stakeholder_pdf.py`; use `[[calls]]`, `[[ready_min]]` and the other placeholders instead of typing numbers). Without it a plain
+   factual summary is generated. After `report`, read the "Check before presenting" lines it prints (headline versus step counts,
+   duplicate case IDs, cases not in the plan, anything not Verified) and pass them on to the user. Render the PDF pages and look at them
+   before handing it over.
+4a. If the runner panel's **Report** button was opened before the tool was changed, it still runs the old code (it lives in a
+   background process). After changing the browser tool, run `run.py stop` and `run.py start` so it picks up the change.
+
 ## 1. Understand
 
 - Read `qa-tester/learnings.md` first. It lists what earlier runs taught.

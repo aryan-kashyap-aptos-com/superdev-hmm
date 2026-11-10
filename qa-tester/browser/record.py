@@ -7,8 +7,10 @@ inside the one Chrome window, and loses everything (including the network calls 
 that window closes. This file does not. `report.py` reads it to build a standalone report you can open any
 time after the browser - or the whole demo - is done.
 """
+import hashlib
 import json
 import time
+import uuid
 from pathlib import Path
 
 import core
@@ -35,6 +37,36 @@ def next_seq(run):
     return n
 
 
+def _session_file(run):
+    return _run_dir(run) / ".session"
+
+
+def current_session(run):
+    """The id of the session this run is in now (a short hex id). Created on first use."""
+    f = _session_file(run)
+    try:
+        sid = f.read_text(encoding="utf-8").strip()
+        if sid:
+            return sid
+    except OSError:
+        pass
+    return start_session(run)
+
+
+def start_session(run):
+    """Begin a new session for this run and return its id. A session is one `play` or `crawl` (plus any
+    ad hoc commands run until the next one starts). Every event, results file and report carries the id,
+    so a report can show one session and old attempts never mix into it."""
+    sid = uuid.uuid4().hex[:6]
+    f = _session_file(run)
+    try:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(sid, encoding="utf-8")
+    except OSError:
+        pass
+    return sid
+
+
 def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screenshot=None, case_id=None, tags=None):
     """Append one event. Safe to call often and never raises: a demo must not break because logging a
     line failed. `run` may be None (nothing to attach the record to, e.g. no active run) - then it is
@@ -43,7 +75,7 @@ def record(run, task, kind, text, result=None, msg="", ms=None, net=None, screen
         return
     core.touch_run(run)
     try:
-        row = {"seq": next_seq(run), "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "task": task or "", "kind": kind,
+        row = {"seq": next_seq(run), "session": current_session(run), "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "task": task or "", "kind": kind,
                "case_id": case_id, "text": text, "result": result, "msg": core.redact(msg or ""),
                "ms": ms, "net": net or [], "screenshot": screenshot, "tags": tags or []}
         d = _run_dir(run)
@@ -68,7 +100,42 @@ def read_events(run):
         except json.JSONDecodeError:
             continue
     out.sort(key=lambda e: e.get("seq", 0))
+    _infer_legacy_sessions(out)
     return out
+
+
+def _infer_legacy_sessions(events):
+    """Events recorded before session ids existed have none. Give them one so old runs still group: a new
+    legacy session starts when a test case repeats within a task (a scenario was replayed) or after a
+    gap of more than 15 minutes. The id is derived from the first event's time, so it never changes."""
+    cur, seen, last_ts = None, set(), None
+    for e in events:
+        if e.get("session"):
+            cur, seen, last_ts = None, set(), None
+            continue
+        ts = time.mktime(time.strptime(e["ts"], "%Y-%m-%d %H:%M:%S")) if e.get("ts") else None
+        key = (e.get("task") or "", e.get("case_id")) if e.get("kind") == "case" else None
+        gap = ts is not None and last_ts is not None and ts - last_ts > 900
+        if cur is None or gap or (key and key in seen):
+            cur = "l" + hashlib.md5((e.get("ts") or str(e.get("seq"))).encode()).hexdigest()[:5]
+            seen = set()
+        if key:
+            seen.add(key)
+        e["session"] = cur
+        last_ts = ts if ts is not None else last_ts
+
+
+def sessions(events):
+    """[(id, first_ts, last_ts, n_events)] in the order they began."""
+    order, info = [], {}
+    for e in events:
+        sid = e.get("session")
+        if sid not in info:
+            info[sid] = [e.get("ts"), e.get("ts"), 0]
+            order.append(sid)
+        info[sid][1] = e.get("ts")
+        info[sid][2] += 1
+    return [(sid, *info[sid]) for sid in order]
 
 
 STATUS = {"Verified": "verified", "Issue found": "issue", "Could not verify": "cnv", "Not tested": "nt"}
