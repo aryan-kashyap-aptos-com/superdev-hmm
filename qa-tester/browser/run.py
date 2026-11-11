@@ -556,11 +556,6 @@ def cmd_report(a):
     print(f"Build {build_id} · generated {built_at} - if a tab already open on this file shows a different "
           "build id, it's stale: reload it.")
     print(f"{len(events)} recorded event(s).")
-    notes = getattr(report_mod.build_pdf, "last_notes", None)
-    if notes:
-        print("Check before presenting (numbers that do not line up in the source report):")
-        for n in notes:
-            print(f"  - {n}")
     for w in report_mod.RESULTS:
         if counts.get(w):
             print(f"  {counts[w]} {w}")

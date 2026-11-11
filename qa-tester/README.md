@@ -77,8 +77,8 @@ runs/2026-11-07-<topic>/
 
 - **Names:** `<TICKET>-<Title> -<DDMMYYYY>-<HHMMSS>.html` and `.pdf`, plus `... Detail.pdf`. A new file every time, never an overwrite, so an old tab can never show a stale report. The ticket id is in every name when the run has one (`new --ticket ABC-123`).
 - **Sessions:** every `play` or `crawl` starts a session with its own id; a report shows one session. `play --same-session` groups several scenarios into one report. `report --list` lists sessions, `--session all` shows everything.
-- **The PDF** is a 3-page stakeholder summary (verdict, KPI tiles, what we checked, test cases, page performance, evidence, run details). Numbers are computed from the recorded events; the wording comes from `runs/<run>/stakeholder.json` (format at the top of `browser/stakeholder_pdf.py`).
-- **Before presenting**, read the "Check before presenting" lines `report` prints (headline vs step counts, duplicate case IDs, cases not in the plan, anything not Verified).
+- **The PDF** is the full step-by-step report: every case with what it checks, its steps and timing, network calls, screenshots and console checks.
+- **Before presenting**, compare the headline counts with the step counts and mention any mismatch to the user.
 - After changing the browser tool, run `run.py stop` then `run.py start`: the runner panel's Report button runs old code until the browser restarts.
 
 Full rules: `method.md`, "Hard rules for reports and file names".

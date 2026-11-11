@@ -148,8 +148,7 @@ def build(run, out_path=None, session="latest"):
         pass
     try:
         import time as _t
-        for kind, target in (("summary", out_path.with_suffix(".pdf")),
-                             ("detail", out_path.with_name(out_path.stem + " Detail.pdf"))):
+        for kind, target in (("detail", out_path.with_suffix(".pdf")),):
             # Two renders back to back in one process can make the second one fail ("Printing failed"),
             # so each PDF gets its own retries, and a failure names the file that failed.
             for attempt in (1, 2, 3):
@@ -337,19 +336,15 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:6px 0 8px}}
 </div></body></html>"""
 
 
-def _pdf_via_page(page, src_uri, out_path, kind="detail", footer_html=None):
+def _pdf_via_page(page, src_uri, out_path):
     page.goto(src_uri)
     page.wait_for_load_state("load")
     page.evaluate("document.fonts && document.fonts.ready")
-    if kind == "summary":
-        margin = {"top": "16mm", "bottom": "16mm", "left": "15mm", "right": "15mm"}
-        footer = footer_html
-    else:
-        margin = {"top": "16mm", "bottom": "14mm", "left": "14mm", "right": "14mm"}
-        footer = ('<div style="font-size:8px;width:100%;text-align:center;color:#9a9a9a;'
-                  'font-family:-apple-system,Arial,sans-serif;padding:0 14mm">'
-                  '<span class="title"></span> &middot; Page <span class="pageNumber">'
-                  '</span> of <span class="totalPages"></span></div>')
+    margin = {"top": "16mm", "bottom": "14mm", "left": "14mm", "right": "14mm"}
+    footer = ('<div style="font-size:8px;width:100%;text-align:center;color:#9a9a9a;'
+              'font-family:-apple-system,Arial,sans-serif;padding:0 14mm">'
+              '<span class="title"></span> &middot; Page <span class="pageNumber">'
+              '</span> of <span class="totalPages"></span></div>')
     page.pdf(path=str(out_path), format="A4", print_background=True, margin=margin,
              display_header_footer=True, header_template="<div></div>", footer_template=footer)
 
@@ -373,17 +368,9 @@ def build_pdf(run, meta, events, counts, out_path, kind="detail"):
     cases = _group_cases(events)
     total = len(events)
     src_path = out_path.with_name(f"_pdf_source_{kind}.html")
-    footer_html = None
-    if kind == "summary":
-        import stakeholder_pdf
-        html, facts_ = stakeholder_pdf.build_html(run, meta, events, cases, counts, _display_title(run), out_path.name)
-        footer_html = stakeholder_pdf.footer(meta.get("ticket") or "", stakeholder_pdf.load_text(run).get("short") or _display_title(run))
-        build_pdf.last_facts = facts_
-        build_pdf.last_notes = stakeholder_pdf.reconcile(run, events, cases, facts_, stakeholder_pdf._plan_table(run))
-    else:
-        import pdf_report
-        html = pdf_report.build_html(run, meta, events, cases, counts, total, _display_title(run),
-                                     out_path.name, meta.get("n_sessions", 1))
+    import pdf_report
+    html = pdf_report.build_html(run, meta, events, cases, counts, total, _display_title(run),
+                                 out_path.name, meta.get("n_sessions", 1))
     src_path.write_text(html, encoding="utf-8")
     src_uri = src_path.resolve().as_uri()
     try:
@@ -392,7 +379,7 @@ def build_pdf(run, meta, events, counts, out_path, kind="detail"):
                 browser = p.chromium.connect_over_cdp(core.CDP)
                 page = browser.new_page()
                 try:
-                    _pdf_via_page(page, src_uri, out_path, kind, footer_html)
+                    _pdf_via_page(page, src_uri, out_path)
                 finally:
                     page.close()
             else:
@@ -413,7 +400,7 @@ def build_pdf(run, meta, events, counts, out_path, kind="detail"):
                         raise core.c.ConnectorError("The temporary PDF-rendering browser did not start.", "")
                     browser = p.chromium.connect_over_cdp(cdp)
                     page = browser.new_page()
-                    _pdf_via_page(page, src_uri, out_path, kind, footer_html)
+                    _pdf_via_page(page, src_uri, out_path)
                 finally:
                     proc.terminate()
     finally:

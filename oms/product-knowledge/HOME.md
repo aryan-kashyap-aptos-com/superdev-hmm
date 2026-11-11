@@ -41,6 +41,7 @@ This is the **single written home** for Aptos OMS on AWS on your machine. It is 
 | 14 | [14-glossary-extended.md](./14-glossary-extended.md) | New hires | Extended acronyms |
 | 15 | [15-infrastructure-stack-index.md](./15-infrastructure-stack-index.md) | Platform | All **62** Terraform roots |
 | 16 | [16-operations-runbooks.md](./16-operations-runbooks.md) | Ops, QA | BJM sanity checks, ODX monitor, SQL |
+| — | [**session-learnings/**](../session-learnings/README.md) | Ops, you | **Cursor chat distillate** — pod2dev, IIS recycle, EBS, MQ cutover, Harness traps |
 | 17 | [17-workflows-and-step-functions.md](./17-workflows-and-step-functions.md) | Batch/workflows | SFN, Lambda catalog, multi-step |
 | 18 | [18-scheduler-api.md](./18-scheduler-api.md) | Scheduler devs | `oms-aws-job-scheduler` API + EF |
 | 19 | [19-ssm-parameter-catalog.md](./19-ssm-parameter-catalog.md) | Platform | All 83 foundation SSM params |
@@ -58,6 +59,7 @@ This is the **single written home** for Aptos OMS on AWS on your machine. It is 
 | 31 | [31-functional-infrastructure-platform.md](./31-functional-infrastructure-platform.md) | Platform | Apply order, ECS/Batch roles |
 | 33 | [33-functional-commerce-and-apis.md](./33-functional-commerce-and-apis.md) | Commerce/QA | All Commerce pages + `/api` scenarios |
 | 34 | [34-functional-order-services-deep-scan.md](./34-functional-order-services-deep-scan.md) | Integrations | OrderService.asmx, facade, domain services, Confluence |
+| 35 | [35-qa-findings-payment-service-handlebars.md](./35-qa-findings-payment-service-handlebars.md) | QA | Handlebars fix test, regression env facts, tooling lessons |
 | **—** | **[COVERAGE.md](./COVERAGE.md)** | Leads | File inventory + links to functional |
 
 **RepoSuite runbooks (full text):** `oms-aws-service-manager-batch/docs/batch-job-manager-deployment-runbook.md`, `oms/docs/odx-feed-pipeline-monitor-runbook.md`.

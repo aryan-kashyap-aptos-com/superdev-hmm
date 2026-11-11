@@ -28,13 +28,7 @@ runs/2026-11-07-<topic>/
    puts it in the run folder name, and reports, results files and the report's title and footer carry it. When you write a
    summary, note or scenario file for a ticket, put the ticket id in its file name too (for example
    `ABC-123-login-page-summary.md`).
-5. **The PDF is a 3-page stakeholder summary** (verdict, KPI tiles, what we checked / test cases and page performance / evidence and run
-   details). A longer step-by-step PDF is written next to it, named `... Detail.pdf`. The numbers in the summary are computed from the
-   recorded events. The wording comes from `runs/<run>/stakeholder.json`, which the tester writes after the run (format: top of
-   `browser/stakeholder_pdf.py`; use `[[calls]]`, `[[ready_min]]` and the other placeholders instead of typing numbers). Without it a plain
-   factual summary is generated. After `report`, read the "Check before presenting" lines it prints (headline versus step counts,
-   duplicate case IDs, cases not in the plan, anything not Verified) and pass them on to the user. Render the PDF pages and look at them
-   before handing it over.
+5. **The PDF** is the full step-by-step report (every case with what it checks, steps, network calls, screenshots). Render its pages and look at them before handing it over. Compare the headline counts with the step counts and tell the user about any mismatch.
 4a. If the runner panel's **Report** button was opened before the tool was changed, it still runs the old code (it lives in a
    background process). After changing the browser tool, run `run.py stop` and `run.py start` so it picks up the change.
 
