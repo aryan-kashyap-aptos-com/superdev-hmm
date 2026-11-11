@@ -1,0 +1,415 @@
+[
+  {
+    "transcriptId": "005bc46e-5be3-4949-b57d-22589dca1c5e",
+    "firstUserQuery": "https://aptos.atlassian.net/browse/DCOMS-29931 Check this ticket and tell me how oms crm connectivity is established as i see theres something in parameter store, webconfig and even some tables. so check and tell me and how can i verify the username is coming from crm or not or in simple if crm interation is succcesful and even tell me how to chcrk if crm endpoint is of soap or rest",
+    "topics": [
+      "crm"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\005bc46e-5be3-4949-b57d-22589dca1c5e\\005bc46e-5be3-4949-b57d-22589dca1c5e.jsonl"
+  },
+  {
+    "transcriptId": "08ae06d9-6d99-40d4-8478-8d8f7d557895",
+    "firstUserQuery": "OMS has a couple of PHP files in the oms codebase: Can you -- or someone from your team -- confirm these PHP pages are not being deployed in OMS environments? ShopVisible.Core.ShopLogic/includes/tiny_mce/plugins/filemanager/plugins/externalauthenticator/auth\u2026 ShopVisible.Core.ShopLogic/includes/tiny_mce/plugins/imagemanager/plugins/externalauthenticator/aut\u2026 Hi Siddharth - I will be opening a tick",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\08ae06d9-6d99-40d4-8478-8d8f7d557895\\08ae06d9-6d99-40d4-8478-8d8f7d557895.jsonl"
+  },
+  {
+    "transcriptId": "152861da-5c7f-4013-b35a-adb8abebe40d",
+    "firstUserQuery": "I want you to go to the SV3 account and tell me all places wherever Name tag is not added , my main aread like ecs task definition and others?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\152861da-5c7f-4013-b35a-adb8abebe40d\\152861da-5c7f-4013-b35a-adb8abebe40d.jsonl"
+  },
+  {
+    "transcriptId": "19ff6eb2-5ee9-41ce-97b5-c490261433c7",
+    "firstUserQuery": "In my aws accouns us-east-1 region there are many lambdas , I want you to find me aLL LAMBDAS WITH *Name* tags which are not there case sensative. Then as oer the lambda name I wanna put the same tag there as the name of lambdas. Get me all such lambdas",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\19ff6eb2-5ee9-41ce-97b5-c490261433c7\\19ff6eb2-5ee9-41ce-97b5-c490261433c7.jsonl"
+  },
+  {
+    "transcriptId": "1d2bf5a6-6c46-4e76-a0c9-af3496380b30",
+    "firstUserQuery": "Can you make a connector i will add my aws account details like client id, decret,sessionid, you connet to rdp, I will even pass the secret arn , db name SO make me a new connector and a templet for env",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\1d2bf5a6-6c46-4e76-a0c9-af3496380b30\\1d2bf5a6-6c46-4e76-a0c9-af3496380b30.jsonl"
+  },
+  {
+    "transcriptId": "438f9613-cd37-4511-a14e-149e926d7a40",
+    "firstUserQuery": "Explore the ConnectorSuite codebase at C:\\PROD\\ConnectorSuite to understand how connectors are built. I need to create a new AWS RDP connector that accepts: - AWS credentials (client id, secret, session id) - Secret ARN - DB name Find: 1. Overall project structure 2. Existing connector examples (especially any AWS-related ones) 3. How env templates are structured 4. Connector interface/base classe",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\1d2bf5a6-6c46-4e76-a0c9-af3496380b30\\subagents\\438f9613-cd37-4511-a14e-149e926d7a40.jsonl"
+  },
+  {
+    "transcriptId": "29e5f510-4da7-4fcb-a945-c841fc2726c3",
+    "firstUserQuery": "Can you search a chat for me in cursor?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\29e5f510-4da7-4fcb-a945-c841fc2726c3\\29e5f510-4da7-4fcb-a945-c841fc2726c3.jsonl"
+  },
+  {
+    "transcriptId": "96693b9a-5399-4f10-90b8-88040a08254c",
+    "firstUserQuery": "The user is asking: \"Can you search a chat for me in cursor?\" They want to know how to search for chats/conversations in Cursor IDE. Please look up Cursor product documentation and provide accurate, up-to-date information about: 1. Whether Cursor supports searching within chats or searching across past chats 2. How to do it (keyboard shortcuts, UI locations, commands) 3. Any limitations Return a c",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\29e5f510-4da7-4fcb-a945-c841fc2726c3\\subagents\\96693b9a-5399-4f10-90b8-88040a08254c.jsonl"
+  },
+  {
+    "transcriptId": "356260d7-4ac1-48ec-b28e-3ef322e13f74",
+    "firstUserQuery": "Sometimes i face this issues on my harness pipeline can you investigate whats the issue? Copy Content 44s Initializing WinRM connection to 20.108.20.55 ... Connected to 20.108.20.55 Executing command ... Transferring encoded script to a remote file. File size: 4792 Bytes, Chunk size: 6144 Bytes Transferred 100.00% data to remote file... Content Location -> \\\\omspod.aptos.com\\shareddev\\dev\\poddev\\s",
+    "topics": [
+      "harness"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\356260d7-4ac1-48ec-b28e-3ef322e13f74\\356260d7-4ac1-48ec-b28e-3ef322e13f74.jsonl"
+  },
+  {
+    "transcriptId": "37782e31-265b-4ace-b370-31226a2545d6",
+    "firstUserQuery": "How can we? in OMS?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\37782e31-265b-4ace-b370-31226a2545d6\\37782e31-265b-4ace-b370-31226a2545d6.jsonl"
+  },
+  {
+    "transcriptId": "38e6de8b-a25f-4635-9105-b93b8d3352bc",
+    "firstUserQuery": "Do detailed reserach on this ticket , I want you to read it all & previous comments but dont make a baised opinion, only on hard facts validate that things and get me all your research. Currently we dont have the perf db connected to postgres mcp, its the podqa mcp, but its the same ddl , so you can do your resarch and later whne you need any results from perf db, I will run and get you that https",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\38e6de8b-a25f-4635-9105-b93b8d3352bc\\38e6de8b-a25f-4635-9105-b93b8d3352bc.jsonl"
+  },
+  {
+    "transcriptId": "3d75129a-26ce-4ba5-a2f3-b1a1e5e6a500",
+    "firstUserQuery": "I am getting this issues while place order uisng sitemanager 2026-09-04 14:12:41,244 [82] INFO DCEOM.Infrastructure.Logger [(null)] - getTax started. session ID: [z1h40lsx50ins0o41ez0jqfh] getTax. Estimating avalara tax only, tax document will not be posted to Avalara. session ID: [z1h40lsx50ins0o41ez0jqfh]. Took: 00:00:00.0000039 getTax. Tax request sent to avalara. session ID: [z1h40lsx50ins0o41",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\3d75129a-26ce-4ba5-a2f3-b1a1e5e6a500\\3d75129a-26ce-4ba5-a2f3-b1a1e5e6a500.jsonl"
+  },
+  {
+    "transcriptId": "4073756f-0a8e-432a-a2ff-a5ff61fc99e2",
+    "firstUserQuery": "# Cursor Investigation Prompt \u2014 DCOMS-29626 / AO-to-OMS Sumo Logs You have access to an existing Sumo Logic connector. Use that connector to investigate the logs for Jira issue **DCOMS-29626**. Do not modify code, production configuration, database data, or logs. This is a read-only investigation. ## Objective Determine exactly what AO/Omni sent to OMS during the pickup-completion flow and whether",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\4073756f-0a8e-432a-a2ff-a5ff61fc99e2\\4073756f-0a8e-432a-a2ff-a5ff61fc99e2.jsonl"
+  },
+  {
+    "transcriptId": "4ac7b483-f521-4c0d-a44f-26283ba9c480",
+    "firstUserQuery": "I want you to go to the SV3 account and tell me all places wherever Name tag is not added , my main aread like ecs task definition and others?run multi threading aou at once at the once so will be faster",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\4ac7b483-f521-4c0d-a44f-26283ba9c480\\4ac7b483-f521-4c0d-a44f-26283ba9c480.jsonl"
+  },
+  {
+    "transcriptId": "4b072f17-f57e-412d-8fa9-0c71750f26d9",
+    "firstUserQuery": "Description Use when the user asks how to connect Sumo Logic's MCP server to an AI client like Cursor or Claude Code, or asks about Sumo Logic MCP setup, OAuth, deployment URLs, or available MCP tools for log search/alerts/Cloud SIEM/dashboards. Instructions Sumo Logic MCP Server Connection (User's deployment: US West / Oregon - us2) The user's Sumo Logic org is on the US West (Oregon) deployment ",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\4b072f17-f57e-412d-8fa9-0c71750f26d9\\4b072f17-f57e-412d-8fa9-0c71750f26d9.jsonl"
+  },
+  {
+    "transcriptId": "4b295235-29f1-461c-9906-e057c723883b",
+    "firstUserQuery": "Do me a help, As you see my @c:\\PROD\\ConnectorSuite\\ there are plenty of really good connectors i have made. I want you to take it to next level, and make it such that anyone can use it by cloning it in their system. So Make all those connectors in @c:\\Users\\akashyap\\Downloads\\mcp-connector-suite-main\\mcp-connector-suite-main\\ folder. Structure it proeprly and tell me what you plan to do",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\4b295235-29f1-461c-9906-e057c723883b\\4b295235-29f1-461c-9906-e057c723883b.jsonl"
+  },
+  {
+    "transcriptId": "4cd8e53f-cae9-4768-b43b-926f332af0fd",
+    "firstUserQuery": "can you use aws cli and using cloud trail check and tell me who deletd omnipod-qa RMQ instance",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\4cd8e53f-cae9-4768-b43b-926f332af0fd\\4cd8e53f-cae9-4768-b43b-926f332af0fd.jsonl"
+  },
+  {
+    "transcriptId": "55ec5c11-29de-430a-85cb-d6cf5948815d",
+    "firstUserQuery": "Is it posssible for you to crea me an iam role and give to me export AWS_ACCESS_KEY_ID=\"ASIAT44DGFI2WOJ2VO3J\" export AWS_SECRET_ACCESS_KEY=\"H4DVxJ6m01pZiX/QKnZn/QGm/w96iCB8E0bRp5nB\" export AWS_SESSION_TOKEN=\"IQoJb3JpZ2luX2VjEIz//////////wEaCXVzLWVhc3QtMSJHMEUCIQDDS4Gcf95xy1pktWUZ60/KoqJcGOJiXChtgUthZCnijwIgFMY6hrfEyWFfirImvib5T0NlVHUJDvIXdQpokpsK/h4q7gMIVBAEGgwyNjgxNzM3MTYwMjEiDM9ad8V9yAo1R5gR9SrL",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\55ec5c11-29de-430a-85cb-d6cf5948815d\\55ec5c11-29de-430a-85cb-d6cf5948815d.jsonl"
+  },
+  {
+    "transcriptId": "5b69127f-66d9-4166-b839-1e8c42ce0275",
+    "firstUserQuery": "MOve the oms repo to master and upgrade the package Introduced through BouncyCastle.Cryptography@2.4.0 Fixed in BouncyCastle.Cryptography@2.7.0 In recent master commits we have made introducwd cryptography module but now that has critical issue, we need to resolve by upgrading package, So I will say you can pull latets master, chcekout from there, See previous commits and thennunderstand and then ",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\5b69127f-66d9-4166-b839-1e8c42ce0275\\5b69127f-66d9-4166-b839-1e8c42ce0275.jsonl"
+  },
+  {
+    "transcriptId": "5dfae401-bc78-4740-b5df-6144f378eb80",
+    "firstUserQuery": "nvestigation Results 1. Lambda \u2014 Weekend Spikes (Sep 26\u201328) Confirmed: Lambda spikes sharply on Saturdays only, driven entirely by GB-seconds (compute time, not invocation count). Date Lambda GB-Second Cost vs Weekday Baseline Sep 19 (Sat) $11.04 +2,054% Sep 20 (Sun) $8.64 +1,590% Sep 21\u201325 (weekdays) $0.41\u2013$0.75 avg baseline ~$0.51/day Sep 26 (Sat) $6.90 +1,245% Sep 27 (Sun) $0.60 normal Sep 28\u20133",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\5dfae401-bc78-4740-b5df-6144f378eb80\\5dfae401-bc78-4740-b5df-6144f378eb80.jsonl"
+  },
+  {
+    "transcriptId": "5f8a3df3-9d92-4a4e-9751-37f4192c6acc",
+    "firstUserQuery": "Read the entire ticket: https://aptos.atlassian.net/browse/DCOMS-29916 validate it all by moving to the hotfix barnches and validating all things in detail. Donot approve the comments as the sorce of truth the code is the right source of truth check all and then tell me ,Once done then verify if shawns comment is all good or anything is missing verify it all and tell next steps and create a full m",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\5f8a3df3-9d92-4a4e-9751-37f4192c6acc\\5f8a3df3-9d92-4a4e-9751-37f4192c6acc.jsonl"
+  },
+  {
+    "transcriptId": "65894cef-3004-4c92-8ce6-096f4cb19a95",
+    "firstUserQuery": "Check this issue: https://aptos.atlassian.net/browse/DCOMS-29903 And see if any reasons, why its stopped now EVen if you wnat to check in db use this @oms_aws_rds_connector i have added tr uat Configuration . jUST EVEN tell me what that job does how it works, wherethe queries are written and why the job is failing in PROD and in prod just use read only queries no write",
+    "topics": [
+      "rds-sso"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\65894cef-3004-4c92-8ce6-096f4cb19a95\\65894cef-3004-4c92-8ce6-096f4cb19a95.jsonl"
+  },
+  {
+    "transcriptId": "688d50da-32a0-4a76-bad3-46326d744902",
+    "firstUserQuery": "I have a question everytime i have to login to aws for @ConnectorSuite/oms_aws_rds_connector/oms_aws_rds.py , then update the temp creds. Can we somehow automate so that I dont have to di it again and again?",
+    "topics": [
+      "rds-sso"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\688d50da-32a0-4a76-bad3-46326d744902\\688d50da-32a0-4a76-bad3-46326d744902.jsonl"
+  },
+  {
+    "transcriptId": "6d8d975b-7562-4dfc-a9e1-d5da5bab6230",
+    "firstUserQuery": "https://aptos.atlassian.net/browse/DCOMS-29981 Do analysis over here and tell me what is supposed to be done and where are we today in a much simpler way and short, dont be a token spending machine",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\6d8d975b-7562-4dfc-a9e1-d5da5bab6230\\6d8d975b-7562-4dfc-a9e1-d5da5bab6230.jsonl"
+  },
+  {
+    "transcriptId": "6e2f706e-be4b-4d16-9dfc-58aeb1606e84",
+    "firstUserQuery": "Use aws sso and login to ll bean and in prod db using datat api from @ConnectorSuite/oms_aws_rds_connector/oms_aws_rds.py Check how many times this job runs : Validate In Store Pickup Inventory\" job",
+    "topics": [
+      "rds-sso"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\6e2f706e-be4b-4d16-9dfc-58aeb1606e84\\6e2f706e-be4b-4d16-9dfc-58aeb1606e84.jsonl"
+  },
+  {
+    "transcriptId": "6ea96e2f-c5c5-414d-84e0-a8653961d621",
+    "firstUserQuery": "Hey, hi, buddy. So what I was about to say you is that I mean, I want you to use AWS CLI. And fetch all the parameters tokens for two different environments. Like for the I have two different environments that are set up on the V1 architecture and V2 architecture. Something like this. So what is happening is that in the V2 architecture we have some parameters for values in which the name is slight",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\6ea96e2f-c5c5-414d-84e0-a8653961d621\\6ea96e2f-c5c5-414d-84e0-a8653961d621.jsonl"
+  },
+  {
+    "transcriptId": "736f93be-e7b7-4872-b549-2ab70acccff6",
+    "firstUserQuery": "https://aptos.atlassian.net/browse/DCOMS-29975",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\736f93be-e7b7-4872-b549-2ab70acccff6\\736f93be-e7b7-4872-b549-2ab70acccff6.jsonl"
+  },
+  {
+    "transcriptId": "751c4e59-216a-4f27-9f4f-b2b2f67c9dcf",
+    "firstUserQuery": "Go to the terraform cide on ominfrastuture repo and tell me the deafult configuration fro order facade",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\751c4e59-216a-4f27-9f4f-b2b2f67c9dcf\\751c4e59-216a-4f27-9f4f-b2b2f67c9dcf.jsonl"
+  },
+  {
+    "transcriptId": "77027e34-8960-4553-92fd-0c645729d034",
+    "firstUserQuery": "I have These brokers on aws oms-omnipod-qa-mq-broker oms-shared-dev-mq-broker oms-appsec-dast-mq-broker oms-perf-qa-mq-broker Can you run cli commands and fetch all the parameter store keys if any has configurations for above? As per me usually its in this format /oms/{space}/{env}/aws-mq-broker/endpoint /oms/{space}/{env}/aws-mq-broker/port /oms/{space}/{env}/aws-mq-broker/scheme /oms/{space}/{en",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\77027e34-8960-4553-92fd-0c645729d034\\77027e34-8960-4553-92fd-0c645729d034.jsonl"
+  },
+  {
+    "transcriptId": "a03c3737-956d-4606-89b4-f2a7b76f30bc",
+    "firstUserQuery": "Now read the db connector Similar way i wanna create a sumologic conector using which i can just let my cursor query and check for SUmologic queries and save then in excel sheet Sumologic Access ID suQxlXKBiZjTP4 Access Key ZgpFGvQooIxatjSpxi3cxBcHeJufi1O6OYOJVbeIeETGPTaulrG2r1mPTSeRrelK",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a03c3737-956d-4606-89b4-f2a7b76f30bc\\a03c3737-956d-4606-89b4-f2a7b76f30bc.jsonl"
+  },
+  {
+    "transcriptId": "a2022380-5d07-4818-88cf-8c6713779fd9",
+    "firstUserQuery": "Okay this is me violating my \"don't bug Aryan at ridiculous hours\" rule, but I'm being lazy and didn't feel like scheduling it, and figure you'll get back to me when you do (read that as not a priority). I'm working in the Value engineering enviroment now to get the CRM Rest config setup. Site manager is working, but the torojob is failing. Claude offered up this when I asked where the error was c",
+    "topics": [
+      "crm"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a2022380-5d07-4818-88cf-8c6713779fd9\\a2022380-5d07-4818-88cf-8c6713779fd9.jsonl"
+  },
+  {
+    "transcriptId": "a2951ae8-57ab-4348-94e5-091fb41fdefa",
+    "firstUserQuery": "I've got a question for you guys about OMNI integration with the facades. Is there any technical reason that the facades on the OMS side could not have different versions deployed pointing to one OMS instance? For example with omnipoddev as the OMS side AO-Reg1 (26.5) - > OMNI 26.5 -> omnipoddev AO-REG2 (26.6) -> OMNI 26.6 -> omnipoddev All other AO envs -> OMNI Master -> omnipoddev Are there tech",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a2951ae8-57ab-4348-94e5-091fb41fdefa\\a2951ae8-57ab-4348-94e5-091fb41fdefa.jsonl"
+  },
+  {
+    "transcriptId": "a32adae0-d68d-4614-b74d-29df6eaf33b1",
+    "firstUserQuery": "Check the oms, oms ifra repo odx and se ethere is a rababit mq isntace that is being cretaed , i wanna know if we can point many instances to same RMQ? RIght now every env has one RMQ So I have 19 instances of RMQ right now, can i directly just one RMQ and point all my enviroenmnts to use that?, What i have to do for that tell me in detail",
+    "topics": [
+      "odx-feeds"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a32adae0-d68d-4614-b74d-29df6eaf33b1\\a32adae0-d68d-4614-b74d-29df6eaf33b1.jsonl"
+  },
+  {
+    "transcriptId": "8b693330-c7f2-4392-8c10-242787230b42",
+    "firstUserQuery": "Search the entire workspace for ALL RabbitMQ usage across repos. The workspace contains multiple roots: oms, odx, oms-infrastructure-v2, oms-harness-template, eom-kernel, eom-payment, eom-component-order, ConnectorSuite, BuildPublish, etc. Search patterns: rabbitmq, RabbitMQ, RabbitMq, IRabbitMq, aws_mq, amazon mq, mq_broker, mqbroker, virtualhost, main_exchange, OdxCredential, RabbitMqHostname, b",
+    "topics": [
+      "mq-ssm",
+      "harness",
+      "odx-feeds"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a32adae0-d68d-4614-b74d-29df6eaf33b1\\subagents\\8b693330-c7f2-4392-8c10-242787230b42.jsonl"
+  },
+  {
+    "transcriptId": "a41293e9-b02b-4983-a5ed-b8642533d20f",
+    "firstUserQuery": "This is a New OMS ODX monitor epic I want you to do thru each and everything on epic and linking tickets ,https://aptos.atlassian.net/browse/DCOMS-29203 This is because I think there are many hypotheses that we have made across this monitor. I want you to even then go to the ODX feeds and oms repo, and then tell me what exactly what the ODX feed does each and everything about it, and what kind of ",
+    "topics": [
+      "odx-feeds"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a41293e9-b02b-4983-a5ed-b8642533d20f\\a41293e9-b02b-4983-a5ed-b8642533d20f.jsonl"
+  },
+  {
+    "transcriptId": "3060e5b4-6e1b-43da-a87e-3e6dbae51259",
+    "firstUserQuery": "Thoroughly explore the OMS repository at c:\\oms to understand the ODX feed pipeline. I need comprehensive documentation on: 1. What ODX feeds are and how they work end-to-end 2. All ODX-related tables, models, services (especially odxtasklogging, OdxQueue, OMSFeeds) 3. All ODX fields/columns and what they mean 4. Feed types, statuses, pipeline stages 5. Any existing monitoring or logging infrastru",
+    "topics": [
+      "odx-feeds"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a41293e9-b02b-4983-a5ed-b8642533d20f\\subagents\\3060e5b4-6e1b-43da-a87e-3e6dbae51259.jsonl"
+  },
+  {
+    "transcriptId": "a5d25782-d3ed-4adf-a494-600d9c4c4fee",
+    "firstUserQuery": "Read This https://aptos.atlassian.net/browse/DCOMS-29625",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a5d25782-d3ed-4adf-a494-600d9c4c4fee\\a5d25782-d3ed-4adf-a494-600d9c4c4fee.jsonl"
+  },
+  {
+    "transcriptId": "a93ab818-4656-4fcd-b5f0-be602dc05edc",
+    "firstUserQuery": "In OMS repo, https://bitbucket.org/aptosretail/oms/branch/feature/mijain/DCOMS-30077-adyen-invoke-total-amount just reset the package .json and push it",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a93ab818-4656-4fcd-b5f0-be602dc05edc\\a93ab818-4656-4fcd-b5f0-be602dc05edc.jsonl"
+  },
+  {
+    "transcriptId": "a9f68228-baf7-4343-b775-f7b4337eef66",
+    "firstUserQuery": "You are helping me with a read-only audit and backup of our OMS Amazon MQ (RabbitMQ) configuration BEFORE I destroy the shared test broker via the Harness pipeline (OMSConsolidatedMQ). Do NOT modify, create, or delete anything in AWS (no put-parameter, no terraform apply/destroy, no broker changes). Only run read/describe/get commands. Ask me before running anything that is not read-only. CONTEXT ",
+    "topics": [
+      "mq-ssm",
+      "harness"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\a9f68228-baf7-4343-b775-f7b4337eef66\\a9f68228-baf7-4343-b775-f7b4337eef66.jsonl"
+  },
+  {
+    "transcriptId": "ac96ced6-d3ab-40ea-a644-cb5cd19b9d68",
+    "firstUserQuery": "Can you check this and lemme know will it affect us? https://aptos.atlassian.net/browse/DCOMS-29952 EMAIL THREAD: [Action may be required] Amazon MQ is changing broker TLS certificates [AWS Account: 452840050147] [US-EAST-1] Siddharth Aryan Kashyap; Bharat Kansara Raghul Muthu AC; James Tune; Shawn Keaney; Marc Russell; Anil Kumar Singh; Mohammed Kazi Getting this into the radar of Batman. Bharat/",
+    "topics": [
+      "mq-ssm"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\ac96ced6-d3ab-40ea-a644-cb5cd19b9d68\\ac96ced6-d3ab-40ea-a644-cb5cd19b9d68.jsonl"
+  },
+  {
+    "transcriptId": "c2380a3c-5c73-4600-9c50-f5bfdb69384b",
+    "firstUserQuery": "Can we use pgbouncer on our oms app?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\c2380a3c-5c73-4600-9c50-f5bfdb69384b\\c2380a3c-5c73-4600-9c50-f5bfdb69384b.jsonl"
+  },
+  {
+    "transcriptId": "504d87b7-b4ef-43f4-8206-e16ce76f51eb",
+    "firstUserQuery": "Explore the OMS codebase across c:\\oms, c:\\OMS Other, and c:\\PROD\\ConnectorSuite to understand how the OMS app connects to PostgreSQL. Find: 1. What apps/services make DB connections (Classic ASP, .NET, Java, Lambda, etc.) 2. Connection string configuration patterns 3. Whether RDS Proxy or any connection pooler is already used 4. Database infrastructure (Aurora PostgreSQL, terraform modules) 5. An",
+    "topics": [
+      "rds-sso"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\c2380a3c-5c73-4600-9c50-f5bfdb69384b\\subagents\\504d87b7-b4ef-43f4-8206-e16ce76f51eb.jsonl"
+  },
+  {
+    "transcriptId": "cf66cbd4-fb81-4e80-8f67-24cd208778be",
+    "firstUserQuery": "Just curious you saw my connectors right? I have some environments setu on differnt ec2 isntances, so how i test ove rther eis that i login using an rdp to domain controller and then rdp into some other machine like below, is there some way you can make some kind of connector so I dont have to rdp agian and again I just want to run powershell quries there maybe in admin mode to check nad update so",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\cf66cbd4-fb81-4e80-8f67-24cd208778be\\cf66cbd4-fb81-4e80-8f67-24cd208778be.jsonl"
+  },
+  {
+    "transcriptId": "d2e1f72a-77a3-4d1c-baef-d5d3eb597178",
+    "firstUserQuery": "In oms-infrastructurerepo fetch all latest and even check this error i am facing on my harnes spipeliness Analyze the error for the pipeline execution 2:05 pm Thought for a few seconds Pipeline Execution Analysis Pipeline: snipes-uat-lambda-sql (Run #29) Status: Failed Duration: 29 seconds Triggered by: marc.russell@aptos.com Root Cause The terraform_plan step in stage alf_clearerrlogtable_deploy ",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\d2e1f72a-77a3-4d1c-baef-d5d3eb597178\\d2e1f72a-77a3-4d1c-baef-d5d3eb597178.jsonl"
+  },
+  {
+    "transcriptId": "d573220d-ec45-42fc-aa88-e05dd44c7640",
+    "firstUserQuery": "in my postgres mcp change the db to regression202510qa from poddev and my toro job stopped working can you please h",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\d573220d-ec45-42fc-aa88-e05dd44c7640\\d573220d-ec45-42fc-aa88-e05dd44c7640.jsonl"
+  },
+  {
+    "transcriptId": "d8c9af46-6aca-4d71-82d6-d78e831a91e7",
+    "firstUserQuery": "connector suite folder create a new folder as tickets and move all tickets over tehre Even make a mandatory rule that every chat i create will create a folder inside this tickets , If its about a ticket then Ticket Number - Small SUmamry and date of chat, if random topic, then create a folder amed as RANDOM, inside that a subfolder with the name of the task in better way , later in further sesssio",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\d8c9af46-6aca-4d71-82d6-d78e831a91e7\\d8c9af46-6aca-4d71-82d6-d78e831a91e7.jsonl"
+  },
+  {
+    "transcriptId": "d951acac-61b2-48eb-aa03-622f38a92543",
+    "firstUserQuery": "I am getting error while switching the Update Item tab on OMS System.NullReferenceException: Object reference not set to an instance of an object. at backadmin_itemLevelStatus.rptltemMain_ItemDataBound(Object sender, RepeaterltemEventArgs e) in c:\\harness\\ShopVisible.Core.ShopLogic\\backadmin\\itemLevelStatus.aspx.cs:line 1794 at System.Web.UI.WebControls.Repeater.OnltemDataBound(RepeaterltemEventAr",
+    "topics": [
+      "harness"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\d951acac-61b2-48eb-aa03-622f38a92543\\d951acac-61b2-48eb-aa03-622f38a92543.jsonl"
+  },
+  {
+    "transcriptId": "de2b9617-0f23-44f6-8772-7efb858b3ea2",
+    "firstUserQuery": "Scan this ticket , https://aptos.atlassian.net/browse/DCOMS-29904 the use sumologic connector to get me check if there were any errors during this period and then even get ,e a query to get the log during that time priod and ne smart in sumo, even find the reason of that and incase you find something. If any attachments download and see",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\de2b9617-0f23-44f6-8772-7efb858b3ea2\\de2b9617-0f23-44f6-8772-7efb858b3ea2.jsonl"
+  },
+  {
+    "transcriptId": "de863baa-6de9-4724-abd3-de8728d7214c",
+    "firstUserQuery": "scan the entire codebase we have cognito and keycload both. I wann a somehow just keep one that is cognito, cant i do it . I see its still being used for serrvice manager , taxation service, etc. Draft me if i can do it or not? detailed scan",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\de863baa-6de9-4724-abd3-de8728d7214c\\de863baa-6de9-4724-abd3-de8728d7214c.jsonl"
+  },
+  {
+    "transcriptId": "2448caec-b52d-43f1-95ca-47da1fd94d84",
+    "firstUserQuery": "Search the codebase at c:\\oms for all Keycloak and Cognito references. The workspace is large so use ripgrep via shell with timeouts and file type filters. Find: 1. All files mentioning keycloak (case insensitive) 2. All files mentioning cognito (case insensitive) 3. Services/apps that use each (service manager, taxation, etc.) 4. Config files (yaml, yml, properties, env, json, xml, gradle, pom) 5",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\de863baa-6de9-4724-abd3-de8728d7214c\\subagents\\2448caec-b52d-43f1-95ca-47da1fd94d84.jsonl"
+  },
+  {
+    "transcriptId": "e5de510f-6701-407c-8c9e-46835ecb33b5",
+    "firstUserQuery": "Can you tell me how is the GUID generated isnidde codebase?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\e5de510f-6701-407c-8c9e-46835ecb33b5\\e5de510f-6701-407c-8c9e-46835ecb33b5.jsonl"
+  },
+  {
+    "transcriptId": "e6f80e0a-5135-441e-85ed-79ed26755d02",
+    "firstUserQuery": "while generating a shippig label i am getting this error tell why?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\e6f80e0a-5135-441e-85ed-79ed26755d02\\e6f80e0a-5135-441e-85ed-79ed26755d02.jsonl"
+  },
+  {
+    "transcriptId": "e96c600d-502b-4b63-8a23-44d66123eb03",
+    "firstUserQuery": "So suppose if I want to actually make a basic network pairing, so all basic networks, what I will do is that first I need to create a VPC. That VPC I will be creating a range. Maybe for now I will just name it as 10 dot 0 dot 0 slash 16. So that means the first two will be blocked. Other twos I mean 2225600 256. I'm not wrong, so what I understand now, if what I will do is that I will just create ",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\e96c600d-502b-4b63-8a23-44d66123eb03\\e96c600d-502b-4b63-8a23-44d66123eb03.jsonl"
+  },
+  {
+    "transcriptId": "ed79d44f-b5a0-467d-94e0-fd39fad0e34e",
+    "firstUserQuery": "Understand this ticket: https://aptos.atlassian.net/browse/DCOMS-29860 Can you get me a snowpa req, to recreate this issue@ConnectorSuite/tickets/DCOMS-29975-simfa-digital-delivery-carrier-log/podqa_SNWPA_simfa_outbound_digital.xml",
+    "topics": [
+      "simfa-lambda"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\ed79d44f-b5a0-467d-94e0-fd39fad0e34e\\ed79d44f-b5a0-467d-94e0-fd39fad0e34e.jsonl"
+  },
+  {
+    "transcriptId": "ef839844-59b7-42a0-b0e4-72fe2c427dc1",
+    "firstUserQuery": "Do you guys have any documentation on how the serverless components are deployed for OMS? I'm working on a slide deck for this all and got the info for AO, but wasn't sure where its at for OMS. thanks Create me a document",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\ef839844-59b7-42a0-b0e4-72fe2c427dc1\\ef839844-59b7-42a0-b0e4-72fe2c427dc1.jsonl"
+  },
+  {
+    "transcriptId": "f0a9783e-0faa-4715-bcac-56ff7cdce2e1",
+    "firstUserQuery": "PLease go thru this ticket: https://aptos.atlassian.net/browse/DCOMS-30069 Tell me the areas wheres its affecting in my entire code base and then maybe use aws cli and tell the impact seeing there if you need additional info",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f0a9783e-0faa-4715-bcac-56ff7cdce2e1\\f0a9783e-0faa-4715-bcac-56ff7cdce2e1.jsonl"
+  },
+  {
+    "transcriptId": "f32cd57f-a139-445d-807b-df149dbdd4cc",
+    "firstUserQuery": "Thank you Aryan Kashyap. But I still see the message \"Could not generate picklist at this time. There is not enough space on the disk.\\n\" Can you chek the issue",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f32cd57f-a139-445d-807b-df149dbdd4cc\\f32cd57f-a139-445d-807b-df149dbdd4cc.jsonl"
+  },
+  {
+    "transcriptId": "f457f850-95a3-4521-9351-95fdc1756686",
+    "firstUserQuery": "So I have made an ecom ordr using this SNOWPA payload, can you check in oms how this rates tag that i am getting as response is generated ----------- <?xml version=\"1.0\" encoding=\"UTF-8\"?> <Orders> <Order> <OrderExternalOrderID>DemoEcomm_002</OrderExternalOrderID> <OrderSessionID>DCOMS116130000061</OrderSessionID> <OrderStatusId>4</OrderStatusId> <OrderAffiliateType>2</OrderAffiliateType> <!--Ship",
+    "topics": [
+      "simfa-lambda"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f457f850-95a3-4521-9351-95fdc1756686\\f457f850-95a3-4521-9351-95fdc1756686.jsonl"
+  },
+  {
+    "transcriptId": "f6437da6-06e6-4ed0-9276-d2cf43483b0c",
+    "firstUserQuery": "Read this ticket https://aptos.atlassian.net/browse/DCOMS-29691",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f6437da6-06e6-4ed0-9276-d2cf43483b0c\\f6437da6-06e6-4ed0-9276-d2cf43483b0c.jsonl"
+  },
+  {
+    "transcriptId": "3ebce684-d035-47f6-8cb1-a66de944aaf3",
+    "firstUserQuery": "Explore c:\\OMS Other\\oms-infrastructure-v2 and related repos for Harness pipeline configuration, templates, and deployment setup for pod2-dev. Find: 1. Harness template files, pipeline YAML, .harness folders 2. References to OMS-App-Deploy, webserver_setup_require, webserver deploy 3. pod2-dev environment configuration 4. What \"fetch templates\" means in this context - git branches, harness templat",
+    "topics": [
+      "pod2dev-ec2",
+      "harness"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f6437da6-06e6-4ed0-9276-d2cf43483b0c\\subagents\\3ebce684-d035-47f6-8cb1-a66de944aaf3.jsonl"
+  },
+  {
+    "transcriptId": "f984843a-bdce-411f-bcb7-db9240cf54a6",
+    "firstUserQuery": "check this ticket DCOMS-30003 So claude suggested me a fix in feature/akashyap/DCOMS-30003-upgrade-fusioncharts-remove-highcharts, can you tell me thats the right fix? Or we are supposed to upgrade it using npm or nuget or simialr ?",
+    "topics": [],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f984843a-bdce-411f-bcb7-db9240cf54a6\\f984843a-bdce-411f-bcb7-db9240cf54a6.jsonl"
+  },
+  {
+    "transcriptId": "c9a70275-19c0-4af2-b2e0-2c66964607b0",
+    "firstUserQuery": "Full Repository Path: c:\\OMS Other Goal: Document how Site Manager (ShopVisible.Core.ShopLogic) is built, packaged, and deployed to content servers \u2014 especially whether deleted git files are removed on target. Search thoroughly in: - oms-infrastructure-v2/pipelines/ (oms-app-deploy-pipeline.yaml, oms-gamma-pipeline.yaml) - oms-harness-template/ (OMSDEVSITEMANAGERCDORGTEMPLATE, OMS-App-Deploy relat",
+    "topics": [
+      "ebs-disk",
+      "harness"
+    ],
+    "sourcePath": "C:\\Users\\akashyap\\.cursor\\projects\\c-PROD-ConnectorSuite\\agent-transcripts\\f984843a-bdce-411f-bcb7-db9240cf54a6\\subagents\\c9a70275-19c0-4af2-b2e0-2c66964607b0.jsonl"
+  }
+]
