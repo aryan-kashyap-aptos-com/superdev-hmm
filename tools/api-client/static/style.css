@@ -1,0 +1,40 @@
+.side-section{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.side-head{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.side-head .btn{padding:3px 8px;font-size:11.5px}
+.tree{overflow:auto;flex:1}
+.tree .folder{font-size:11.5px;color:var(--ink-3);font-weight:600;margin:12px 6px 4px;text-transform:uppercase;letter-spacing:.04em}
+.tree .collection{display:flex;align-items:center;justify-content:space-between;padding:6px;border-radius:8px;color:var(--ink);font-weight:600;font-size:13px;margin-top:6px}
+.tree .collection .rm{color:var(--ink-3);font-size:14px}
+.tree .collection .rm:hover{color:var(--bad)}
+.tree .req{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:13px;color:var(--ink-2);cursor:pointer}
+.tree .req:hover{background:var(--surface)}
+.tree .req.active{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.tree .req .m{font-size:10.5px;font-weight:700;width:36px;flex:none}
+.tree .req .m.get{color:#3dd27f}.tree .req .m.post{color:#f5a623}.tree .req .m.put{color:#5aa2ff}.tree .req .m.delete{color:#ff5f5a}.tree .req .m.patch{color:#c285ff}
+.tree .req .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+#envSelect{font-size:13px}
+
+.req-bar{display:flex;gap:10px;padding:18px 32px;border-bottom:1px solid var(--line)}
+.req-bar select{width:110px;flex:none;font-weight:600}
+.req-bar input{flex:1;font-family:var(--mono);font-size:13px}
+
+.tabs{display:flex;gap:4px;padding:12px 32px 0}
+.tab{padding:7px 14px;border-radius:9px 9px 0 0;font-size:13px;color:var(--ink-3);font-weight:500}
+.tab.on{color:var(--ink);background:var(--surface)}
+.tab-panes{padding:16px 32px;border-bottom:1px solid var(--line)}
+.pane{display:none}
+.pane.on{display:block}
+.rows{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.row-kv{display:flex;gap:8px}
+.row-kv input{flex:1}
+.row-kv .rm{flex:none;color:var(--ink-3);padding:0 6px}
+#bodyText{width:100%;font-family:var(--mono);font-size:13px;resize:vertical}
+
+.resp{padding:24px 32px 100px;flex:1;overflow:auto}
+.resp-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.resp-head .status{font-weight:700;font-size:14px}
+.resp-head .time{color:var(--ink-3);font-size:12.5px}
+.resp-actions{margin-left:auto;display:flex;gap:8px}
+.resp pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:12.8px;max-height:60vh}
+.resp h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin:18px 0 8px}
