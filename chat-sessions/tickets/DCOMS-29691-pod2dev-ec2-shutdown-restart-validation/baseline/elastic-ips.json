@@ -1,12 +1,12 @@
 ﻿{
     "Addresses": [
         {
-            "AllocationId": "eipalloc-00ee486adc3c12aae",
-            "AssociationId": "eipassoc-0437a941347bf50c4",
+            "AllocationId": "eipalloc-000000000000000f1",
+            "AssociationId": "eipassoc-000000000000000f2",
             "Domain": "vpc",
-            "NetworkInterfaceId": "eni-0ad9048d05af410a3",
-            "NetworkInterfaceOwnerId": "268173716021",
-            "PrivateIpAddress": "20.115.111.201",
+            "NetworkInterfaceId": "eni-000000000000000f3",
+            "NetworkInterfaceOwnerId": "123456789012",
+            "PrivateIpAddress": "203.0.113.9",
             "Tags": [
                 {
                     "Key": "cat_environment",
@@ -39,7 +39,7 @@
             ],
             "PublicIpv4Pool": "amazon",
             "NetworkBorderGroup": "us-east-1",
-            "PublicIp": "54.164.148.105"
+            "PublicIp": "203.0.113.10"
         }
     ]
 }

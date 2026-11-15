@@ -26,13 +26,13 @@ Environment verified healthy **before** the planned off-hours EC2 shutdown. Site
 
 | Instance | Instance ID |
 |---|---|
-| oms-pod2-dev-content | `i-05b829a2f1fd2d7b9` |
-| oms-pod2-dev-services | `i-077bb903286497148` |
-| oms-pod2-dev-sitemanager | `i-05692759bfaaa9cc3` |
-| oms-pod2-dev-api | `i-0548397f26e0277c5` |
-| oms-pod2-dev-toronado | `i-0ebec6c5bc911d854` |
-| oms-pod2-dev-BastionHost | `i-0b489a48f31463d74` |
-| oms-pod2-dev-rds-migration-host | `i-0f2a63e597d421e39` |
+| oms-pod2-dev-content | `i-00000000000000046` |
+| oms-pod2-dev-services | `i-00000000000000047` |
+| oms-pod2-dev-sitemanager | `i-00000000000000044` |
+| oms-pod2-dev-api | `i-00000000000000045` |
+| oms-pod2-dev-toronado | `i-00000000000000048` |
+| oms-pod2-dev-BastionHost | `i-00000000000000042` |
+| oms-pod2-dev-rds-migration-host | `i-00000000000000043` |
 
 ## Next steps
 

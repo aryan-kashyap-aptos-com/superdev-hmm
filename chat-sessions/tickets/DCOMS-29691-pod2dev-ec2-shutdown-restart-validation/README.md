@@ -40,7 +40,7 @@ DCOMS-29691-pod2dev-ec2-shutdown-restart-validation/
 
 ## Quick start
 
-Requires AWS CLI with access to account `268173716021` (us-east-1).
+Requires AWS CLI with access to account `123456789012` (us-east-1).
 
 ```powershell
 # Re-collect all baseline data

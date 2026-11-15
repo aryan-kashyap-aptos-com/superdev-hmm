@@ -2,7 +2,7 @@
 
 **Ticket:** DCOMS-29691  
 **Date:** 2026-09-04  
-**Account:** 268173716021 | **Region:** us-east-1
+**Account:** 123456789012 | **Region:** us-east-1
 
 This documents what happened after **ASG scale-to-0 terminated** all app EC2 instances, and the **correct recovery path** used to bring pod2-dev back.
 
@@ -30,13 +30,13 @@ This documents what happened after **ASG scale-to-0 terminated** all app EC2 ins
 
 | Tier | Old instance (terminated) | New instance |
 |------|---------------------------|--------------|
-| content | i-05b829a2f1fd2d7b9 | i-0d23caf16cd2c5adb |
-| services | i-077bb903286497148 | i-0f603ed7f8f947bd7 |
-| sitemanager | i-05692759bfaaa9cc3 | i-036505377f8ad5c6e |
-| api | i-0548397f26e0277c5 | i-02b70bcb094c2dcec |
-| toronado | i-0ebec6c5bc911d854 | i-0aee83fe4726581e4 |
-| bastion | i-0b489a48f31463d74 | same (was only stopped) |
-| rds-migration | i-0f2a63e597d421e39 | same (was only stopped) |
+| content | i-00000000000000046 | i-00000000000000037 |
+| services | i-00000000000000047 | i-00000000000000039 |
+| sitemanager | i-00000000000000044 | i-00000000000000032 |
+| api | i-00000000000000045 | i-00000000000000035 |
+| toronado | i-00000000000000048 | i-0000000000000003b |
+| bastion | i-00000000000000042 | same (was only stopped) |
+| rds-migration | i-00000000000000043 | same (was only stopped) |
 
 **Symptoms:** ALB **502** → then **500** on SM. Health checks **404** on `/hashcheck.asp`.
 
@@ -172,7 +172,7 @@ python oms_ec2.py --env .env.pod2dev exec toronado "Get-Service OMS-* | Format-T
 
 # ALB SM target
 aws elbv2 describe-target-health `
-  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7 `
+  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sm-tg/000000000000003e `
   --region us-east-1
 ```
 

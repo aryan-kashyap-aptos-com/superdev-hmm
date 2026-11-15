@@ -1,7 +1,7 @@
 ﻿[
     {
         "Name": "oms-pod2-dev-api-tg",
-        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-api-tg/baa2ac4086597929",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-api-tg/000000000000003f",
         "Port": 80,
         "Protocol": "HTTP",
         "TargetType": "instance",
@@ -9,7 +9,7 @@
     },
     {
         "Name": "oms-pod2-dev-cnt-tg",
-        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-cnt-tg/ce191efaf850200f",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-cnt-tg/0000000000000040",
         "Port": 80,
         "Protocol": "HTTP",
         "TargetType": "instance",
@@ -17,7 +17,7 @@
     },
     {
         "Name": "oms-pod2-dev-sftptg",
-        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sftptg/b7f93b0411dfa182",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sftptg/000000000000003d",
         "Port": 22,
         "Protocol": "TCP",
         "TargetType": "instance",
@@ -25,7 +25,7 @@
     },
     {
         "Name": "oms-pod2-dev-sm-tg",
-        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sm-tg/000000000000003e",
         "Port": 80,
         "Protocol": "HTTP",
         "TargetType": "instance",
@@ -33,7 +33,7 @@
     },
     {
         "Name": "oms-pod2-dev-svc-tg",
-        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-svc-tg/34bffc65beb3c2d1",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-svc-tg/0000000000000041",
         "Port": 80,
         "Protocol": "HTTP",
         "TargetType": "instance",

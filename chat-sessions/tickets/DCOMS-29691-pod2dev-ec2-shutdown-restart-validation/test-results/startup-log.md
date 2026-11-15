@@ -14,13 +14,13 @@
 
 | Tier | Instance ID | ASG health |
 |---|---|---|
-| oms-pod2-dev-content | i-0d23caf16cd2c5adb | Healthy |
-| oms-pod2-dev-services | i-0f603ed7f8f947bd7 | Healthy |
-| oms-pod2-dev-sitemanager | i-036505377f8ad5c6e | Healthy |
-| oms-pod2-dev-api | i-02b70bcb094c2dcec | Healthy |
-| oms-pod2-dev-toronado | i-0aee83fe4726581e4 | Healthy |
-| oms-pod2-dev-BastionHost | i-0b489a48f31463d74 | running (same instance, was stopped) |
-| oms-pod2-dev-rds-migration-host | i-0f2a63e597d421e39 | running (same instance, was stopped) |
+| oms-pod2-dev-content | i-00000000000000037 | Healthy |
+| oms-pod2-dev-services | i-00000000000000039 | Healthy |
+| oms-pod2-dev-sitemanager | i-00000000000000032 | Healthy |
+| oms-pod2-dev-api | i-00000000000000035 | Healthy |
+| oms-pod2-dev-toronado | i-0000000000000003b | Healthy |
+| oms-pod2-dev-BastionHost | i-00000000000000042 | running (same instance, was stopped) |
+| oms-pod2-dev-rds-migration-host | i-00000000000000043 | running (same instance, was stopped) |
 
 All 5 ASGs restored to saved capacity (min/max/desired from `asg-settings-before-shutdown.json`).
 

@@ -46,11 +46,11 @@
   "standalone_ec2": [
     {
       "name": "oms-pod2-dev-BastionHost",
-      "instance_id": "i-0b489a48f31463d74"
+      "instance_id": "i-00000000000000042"
     },
     {
       "name": "oms-pod2-dev-rds-migration-host",
-      "instance_id": "i-0f2a63e597d421e39"
+      "instance_id": "i-00000000000000043"
     }
   ]
 }

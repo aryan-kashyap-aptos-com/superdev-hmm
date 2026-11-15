@@ -1,15 +1,15 @@
 ﻿{
     "region":  "us-east-1",
-    "account":  "268173716021",
+    "account":  "123456789012",
     "note":  "Post-recovery baseline after terminate + App-Deploy + DFS (DCOMS-29691)",
     "captured_at_utc":  "2026-09-04T12:16:29Z",
     "instance_ids":  [
-                         "i-0b489a48f31463d74",
-                         "i-02b70bcb094c2dcec",
-                         "i-0f603ed7f8f947bd7",
-                         "i-036505377f8ad5c6e",
-                         "i-0f2a63e597d421e39",
-                         "i-0d23caf16cd2c5adb",
-                         "i-0aee83fe4726581e4"
+                         "i-00000000000000042",
+                         "i-00000000000000035",
+                         "i-00000000000000039",
+                         "i-00000000000000032",
+                         "i-00000000000000043",
+                         "i-00000000000000037",
+                         "i-0000000000000003b"
                      ]
 }

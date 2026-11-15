@@ -9,18 +9,18 @@
 
 | Name | Instance ID | State at stop |
 |---|---|---|
-| oms-pod2-dev-content | i-05b829a2f1fd2d7b9 | stopping → stopped |
-| oms-pod2-dev-services | i-077bb903286497148 | stopping → stopped |
-| oms-pod2-dev-sitemanager | i-05692759bfaaa9cc3 | stopping → stopped |
-| oms-pod2-dev-api | i-0548397f26e0277c5 | stopping → stopped |
-| oms-pod2-dev-toronado | i-0ebec6c5bc911d854 | stopping → stopped |
-| oms-pod2-dev-BastionHost | i-0b489a48f31463d74 | stopping → stopped |
-| oms-pod2-dev-rds-migration-host | i-0f2a63e597d421e39 | stopping → stopped |
+| oms-pod2-dev-content | i-00000000000000046 | stopping → stopped |
+| oms-pod2-dev-services | i-00000000000000047 | stopping → stopped |
+| oms-pod2-dev-sitemanager | i-00000000000000044 | stopping → stopped |
+| oms-pod2-dev-api | i-00000000000000045 | stopping → stopped |
+| oms-pod2-dev-toronado | i-00000000000000048 | stopping → stopped |
+| oms-pod2-dev-BastionHost | i-00000000000000042 | stopping → stopped |
+| oms-pod2-dev-rds-migration-host | i-00000000000000043 | stopping → stopped |
 
 ## Command used
 
 ```powershell
-aws ec2 stop-instances --instance-ids i-05b829a2f1fd2d7b9 i-077bb903286497148 i-05692759bfaaa9cc3 i-0548397f26e0277c5 i-0b489a48f31463d74 i-0ebec6c5bc911d854 i-0f2a63e597d421e39
+aws ec2 stop-instances --instance-ids i-00000000000000046 i-00000000000000047 i-00000000000000044 i-00000000000000045 i-00000000000000042 i-00000000000000048 i-00000000000000043
 ```
 
 ## Not stopped

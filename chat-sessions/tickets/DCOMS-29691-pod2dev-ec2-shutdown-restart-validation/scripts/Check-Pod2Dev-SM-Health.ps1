@@ -133,7 +133,7 @@ if ($iisOk -and $sm) {
     Write-Host "Using host header: $hostHeader"
 
     try {
-        $hashResp = Invoke-WebRequest -Uri "http://127.0.0.1/hashcheck.asp" -Headers @{ Host = $hostHeader } `
+        $hashResp = Invoke-WebRequest -Uri "http://203.0.113.22/hashcheck.asp" -Headers @{ Host = $hostHeader } `
             -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
         $hashOk = ($hashResp.StatusCode -eq 200)
         Write-Result '/hashcheck.asp (ALB health path)' $hashOk "HTTP $($hashResp.StatusCode)"
@@ -144,7 +144,7 @@ if ($iisOk -and $sm) {
     }
 
     try {
-        $loginResp = Invoke-WebRequest -Uri "http://127.0.0.1/backadmin/login.aspx" -Headers @{ Host = $hostHeader } `
+        $loginResp = Invoke-WebRequest -Uri "http://203.0.113.22/backadmin/login.aspx" -Headers @{ Host = $hostHeader } `
             -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
         $loginOk = ($loginResp.StatusCode -eq 200)
         Write-Result '/backadmin/login.aspx' $loginOk "HTTP $($loginResp.StatusCode)"
@@ -191,7 +191,7 @@ if (-not $SkipAws) {
             }
         }
 
-        $tgArn = 'arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7'
+        $tgArn = 'arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sm-tg/000000000000003e'
         try {
             $health = aws elbv2 describe-target-health --target-group-arn $tgArn --region $AwsRegion --output json 2>$null | ConvertFrom-Json
             if ($health.TargetHealthDescriptions) {

@@ -35,15 +35,15 @@
             ],
             "VpcSecurityGroups": [
                 {
-                    "VpcSecurityGroupId": "sg-094676a661fb903e2",
+                    "VpcSecurityGroupId": "sg-000000000000000fa",
                     "Status": "active"
                 }
             ],
             "HostedZoneId": "Z2R2ITUGPM61AM",
             "StorageEncrypted": true,
-            "KmsKeyId": "arn:aws:kms:us-east-1:268173716021:key/a42a6f8c-3327-4a90-b371-5f4cc016e901",
+            "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000038",
             "DbClusterResourceId": "cluster-3TVQXBHRAC7BKWO2ENBAPZTK6Q",
-            "DBClusterArn": "arn:aws:rds:us-east-1:268173716021:cluster:oms-pod2-dev-aurora",
+            "DBClusterArn": "arn:aws:rds:us-east-1:123456789012:cluster:oms-pod2-dev-aurora",
             "AssociatedRoles": [],
             "IAMDatabaseAuthenticationEnabled": false,
             "ClusterCreateTime": "2026-06-18T09:11:29.199000+00:00",
@@ -90,7 +90,7 @@
             "NetworkType": "IPV4",
             "DatabaseInsightsMode": "standard",
             "PerformanceInsightsEnabled": false,
-            "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-east-1:268173716021:key/8b9fd2ea-a679-4e57-978a-c67e1bfdff22",
+            "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000039",
             "LocalWriteForwardingStatus": "disabled",
             "EngineLifecycleSupport": "open-source-rds-extended-support"
         }
