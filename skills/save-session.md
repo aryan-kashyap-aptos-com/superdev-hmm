@@ -16,10 +16,11 @@ python chat-sessions/save-session.py note --section "Next steps" --replace --tex
 
 - `start` makes `chat-sessions/YYYY-MM-DD-topic.md`, points `LATEST.md` at it, and rebuilds `INDEX.md` (one line per session).
   If `LATEST.md` already names a file for this same work, do not run `start` again; use `note`.
-- `--ticket <ID>` (optional): when the work is for a Jira ticket, pass its ID. This creates
-  `chat-sessions/tickets/<ID>/` for the ticket's real deliverables (specs, queries, runbooks, test results) —
-  keep those out of the session note itself, just point to the folder under "Files and systems touched".
-  Omit `--ticket` for work that isn't tied to one; see `chat-sessions/EXAMPLE.md` for a full worked example.
+- `--ticket <ID>` (optional): when the work is for a Jira ticket, pass its ID. Omit it for work that isn't tied
+  to one and `save-session.py` auto-assigns an `SD-NNNN` id itself — never invent an ID by hand. Either way it
+  creates `chat-sessions/tickets/<ID>/` for the ticket's real deliverables (specs, queries, runbooks, test
+  results) — keep those out of the session note itself, just point to the folder under "Files and systems
+  touched". See `chat-sessions/EXAMPLE.md` for a full worked example.
 - `note` edits the newest session block. `--replace` swaps the section; without it the line is added.
   Sections: Goal, Where we are, Decisions, Tried and failed, Files and systems touched, Evidence, Open questions, Next steps, Watch out.
 - If you cannot run commands, copy `chat-sessions/TEMPLATE.md` by hand and set `File:` in `LATEST.md`.

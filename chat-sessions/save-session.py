@@ -22,6 +22,9 @@ ROOT = HERE.parent
 LATEST = HERE / "LATEST.md"
 INDEX = HERE / "INDEX.md"
 SKIP = {"LATEST.md", "TEMPLATE.md", "INDEX.md", "README.md", "EXAMPLE.md"}
+# Auto-assigned ticket prefix for work with no Jira ticket. scaffold-product.py sets this per branch/product
+# (so a new product's auto IDs don't look like they came from this one) - edit the value, not the line shape.
+AUTO_PREFIX = "SD"
 EMPTY = "(none yet)"
 SECTIONS = ["Goal", "Where we are", "Decisions", "Tried and failed", "Files and systems touched",
             "Evidence", "Open questions", "Next steps", "Watch out"]
@@ -60,6 +63,23 @@ def set_latest(path):
     LATEST.write_text(f"# Latest session\n\nFile: {rel}\n", encoding="utf-8")
 
 
+def next_auto_ticket():
+    """Next free AUTO_PREFIX-NNNN id, by scanning existing session headers and tickets/ folders."""
+    pattern = re.compile(rf"{re.escape(AUTO_PREFIX)}-(\d+)")
+    seen = set()
+    for p in HERE.glob("*.md"):
+        if p.name in SKIP:
+            continue
+        m = re.search(r"^Ticket:\s*(.+)$", p.read_text(encoding="utf-8"), re.M)
+        if m:
+            seen.add(m.group(1).strip())
+    tdir = HERE / "tickets"
+    if tdir.is_dir():
+        seen |= {d.name for d in tdir.iterdir() if d.is_dir()}
+    nums = [int(m.group(1)) for s in seen for m in [pattern.fullmatch(s)] if m]
+    return f"{AUTO_PREFIX}-{max(nums, default=0) + 1:04d}"
+
+
 def cmd_start(args):
     path = HERE / f"{datetime.date.today().isoformat()}-{slug(args.topic)}.md"
     if path.exists():
@@ -68,15 +88,15 @@ def cmd_start(args):
         path.write_text(text.rstrip() + "\n\n" + block(n, args.goal), encoding="utf-8")
         print(f"Added Session {n} to {path.relative_to(ROOT).as_posix()}")
     else:
-        ticket = args.ticket or "(none)"
+        ticket = args.ticket or next_auto_ticket()
         head = (f"# {args.topic}\n\nDate: {datetime.date.today().isoformat()}\n"
                 f"Project / product: {args.product or 'unknown'}\nTicket: {ticket}\n\n")
         path.write_text(head + block(1, args.goal), encoding="utf-8")
         print(f"Created {path.relative_to(ROOT).as_posix()}")
-        if args.ticket:
-            tdir = HERE / "tickets" / args.ticket
-            tdir.mkdir(parents=True, exist_ok=True)
-            print(f"Ticket workspace: {tdir.relative_to(ROOT).as_posix()}/ (put deliverables here, not in the session note)")
+        tdir = HERE / "tickets" / ticket
+        tdir.mkdir(parents=True, exist_ok=True)
+        label = "auto-assigned" if not args.ticket else "Jira ticket"
+        print(f"Ticket: {ticket} ({label}). Workspace: {tdir.relative_to(ROOT).as_posix()}/ (put deliverables here, not in the session note)")
     set_latest(path)
     build_index()
 
@@ -139,7 +159,8 @@ def build_index():
         nxt = first_line(text.split("## Session")[-1] if "## Session" in text else text, "Next steps")
         rows.append(f"| {p.stem[:10]} | {ticket_cell} | [{title}]({p.name}) | {goal} | {nxt} |".replace("\n", " "))
     out = ["# All sessions", "", "Newest first. Open a file only when you need its detail. "
-           "Ticket is `(none)` for work not tied to a Jira ticket; otherwise it links to `tickets/<id>/`.", "",
+           f"Jira work uses its real ID; everything else gets an auto-assigned `{AUTO_PREFIX}-NNNN`. "
+           "`(none)` only appears on sessions saved before this existed.", "",
            "| Date | Ticket | Session | Goal | Next step |", "|------|--------|---------|------|-----------|"] + rows
     INDEX.write_text("\n".join(out) + "\n", encoding="utf-8")
 
@@ -151,7 +172,8 @@ def main():
     s.add_argument("topic")
     s.add_argument("--goal", required=True)
     s.add_argument("--product")
-    s.add_argument("--ticket", help="Jira ticket ID, e.g. DCOMS-29203. Creates chat-sessions/tickets/<id>/ for deliverables. Omit for non-ticket work.")
+    s.add_argument("--ticket", help="Jira ticket ID, e.g. DCOMS-29203. Omit for non-ticket work and one is "
+                                     f"auto-assigned ({AUTO_PREFIX}-NNNN). Either way, creates chat-sessions/tickets/<id>/ for deliverables.")
     s.set_defaults(fn=cmd_start)
     n = sub.add_parser("note", help="add to or replace a section of the newest session")
     n.add_argument("--section", required=True)

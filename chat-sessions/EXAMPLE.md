@@ -3,8 +3,9 @@
 This file is a reference only. It is never read by `continue-session.md` and never listed in `INDEX.md`
 (`save-session.py` skips `EXAMPLE.md` by name). Copy its shape, don't edit it in place.
 
-It shows a session that IS tied to a ticket. A session with no ticket looks identical, just with
-`Ticket: (none)` and no `tickets/<id>/` folder.
+It shows a session tied to a real Jira ticket (`--ticket EXAMPLE-000`). Omit `--ticket` and the script
+auto-assigns an `SD-NNNN` id instead — everything else about the session file and its `tickets/<id>/` workspace
+looks identical either way.
 
 ---
 

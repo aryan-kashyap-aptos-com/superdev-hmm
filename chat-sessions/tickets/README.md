@@ -36,9 +36,9 @@ the ticket folder. Leave the old `CHAT-LOG.md` files as historical record; don't
 
 ## Work with no ticket
 
-Exploration, internal tooling, and other work not tied to a Jira ID has no folder here — it's just a session
-file with `Ticket: (none)`. Don't invent a ticket ID to force it into this folder. `RANDOM/` above is kept only
-because it predates this rule, for its historical content.
+Omit `--ticket` and `save-session.py` auto-assigns an `SD-NNNN` id and creates its workspace here the same way —
+nobody has to invent an ID by hand or leave work untracked. `RANDOM/` above predates this and is kept only for
+its historical content; new non-ticket work gets its own `SD-NNNN/` folder instead of going into `RANDOM/`.
 
 ## See also
 
