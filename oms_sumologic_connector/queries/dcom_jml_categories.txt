@@ -1,1 +1,0 @@
-_sourceCategory=DCOM* | where _sourceCategory matches /JML/i | count by _sourceCategory

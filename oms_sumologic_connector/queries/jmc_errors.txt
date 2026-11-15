@@ -1,1 +1,0 @@
-(_sourceCategory=DCOMS/API/PROD/jmc* OR _collector=OMS-jmc*) AND (_loglevel=ERROR OR _loglevel=WARN OR Exception) | count by _loglevel, _sourceCategory

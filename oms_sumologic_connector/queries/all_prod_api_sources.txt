@@ -1,1 +1,0 @@
-_sourceCategory=DCOMS/API/PROD/* | count by _sourceCategory | sort by _count desc | limit 200

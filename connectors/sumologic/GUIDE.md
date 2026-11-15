@@ -9,6 +9,7 @@ To search application and infrastructure logs in Sumo Logic: find errors, count 
 1. Create an access ID and key in Sumo Logic (Preferences → Access Keys).
 2. Copy `.env.example` to `.env` and fill it in.
 3. `python connectors/sumologic/run.py test`
+4. For `export`/`export-file`: `pip install openpyxl` (not needed for `query`/`test`/`saved`).
 
 ## Commands
 
@@ -18,6 +19,8 @@ To search application and infrastructure logs in Sumo Logic: find errors, count 
 | `saved` | Lists saved queries in `connectors/sumologic/queries/`. |
 | `query "<query>" [--from -15m] [--to now] [--limit 50]` | Runs a search and prints the results. |
 | `query @name ...` | Runs the saved query `queries/name.txt`. |
+| `export "<query>" [--output file.xlsx]` | Runs a search and saves every result row to an Excel file (default: `connectors/sumologic/exports/sumologic_<timestamp>.xlsx`). |
+| `export-file <path>` | Same as `export`, but reads the query text from a file. |
 
 Time values: `now`, `-15m`, `-2h`, `-1d`, `-1w`, or `2026-11-01T10:00:00` (local time).
 
@@ -39,4 +42,5 @@ Otherwise it prints messages: time, source category, host, and raw text.
 python connectors/sumologic/run.py query "_sourceCategory=prod/api error | count by _sourcehost" --from -1h
 python connectors/sumologic/run.py query "_sourceCategory=prod/api \"order 1042\" | limit 50" --from -1d
 python connectors/sumologic/run.py query @errors-by-source --from -4h
+python connectors/sumologic/run.py export "_sourceCategory=prod/api | count by _sourcehost" --from -1d -o errors.xlsx
 ```

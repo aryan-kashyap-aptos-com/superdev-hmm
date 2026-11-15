@@ -19,6 +19,7 @@ Works for Linux (shell) and Windows (PowerShell) servers that have the SSM agent
 | `list [--filter TEXT]` | Lists servers: ID, Name tag, SSM status, platform, IP. |
 | `run <id-or-name> "<command>"` | Runs a read-only command and prints its output. |
 | `run <id-or-name> "<command>" --write` | Runs any command. Needs the user's permission. |
+| `script <id-or-name> <path> --write` | Runs a local `.ps1` (Windows) or `.sh` (Linux) file on the server. Always needs `--write` — a whole script can't be checked line-by-line like a single command, so permission is required either way. |
 
 ## Read-only mode
 
@@ -57,4 +58,5 @@ python connectors/ec2-ssm/run.py list --filter web
 python connectors/ec2-ssm/run.py run web-01 "df -h"
 python connectors/ec2-ssm/run.py run web-01 "journalctl -u nginx --since '1 hour ago' --no-pager | tail -n 100"
 python connectors/ec2-ssm/run.py run i-0abc123 "Get-Service | Where-Object Status -eq Stopped | Select-Object -First 20"
+python connectors/ec2-ssm/run.py script web-01 ./fix-service.ps1 --write
 ```

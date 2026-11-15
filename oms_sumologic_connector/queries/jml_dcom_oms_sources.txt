@@ -1,1 +1,0 @@
-"JML" | where _sourceCategory matches /DCOM|OMS|PROD/ | count by _sourceCategory | sort by _count desc | limit 30

@@ -1,1 +1,0 @@
-"JML" AND (ERROR OR Exception OR FATAL OR WARN) | where _sourceCategory matches /DCOM|OMS|PROD/ | count by _sourceCategory, _loglevel | sort by _count desc | limit 30

@@ -1,1 +1,0 @@
-_sourceCategory=OMS/service AND "JML" | parse regex field=raw "(?i)(?<api>/api/[^\"\\s]+|(?<method>GET|POST|PUT|DELETE|PATCH)[^\"\\s]* (?<path>/[^\"\\s?]+))" nodrop | count_distinct(path)

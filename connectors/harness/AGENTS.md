@@ -3,7 +3,7 @@
 Use the **harness** MCP server ([github.com/harness/mcp-server](https://github.com/harness/mcp-server)) for CI/CD investigation on OMS.
 
 **Durable pipeline notes:** [docs/OMS-HARNESS-PIPELINE-REFERENCE.md](./docs/OMS-HARNESS-PIPELINE-REFERENCE.md)  
-**Chat session:** [../tickets/RANDOM/oms-harness-connector-and-odx-ci/](../tickets/RANDOM/oms-harness-connector-and-odx-ci/)
+**Chat session:** [chat-sessions/tickets/RANDOM/oms-harness-connector-and-odx-ci/](../../chat-sessions/tickets/RANDOM/oms-harness-connector-and-odx-ci/)
 
 ## When to use
 
@@ -14,10 +14,10 @@ Use the **harness** MCP server ([github.com/harness/mcp-server](https://github.c
 
 ## Rules
 
-1. **Never read or print** `oms_harness_connector/.env` or API keys.
+1. **Never read or print** `connectors/harness/.env` or API keys.
 2. **Confirm scope** — org, project, pipeline name, time range — before write actions.
 3. **Read before write** — prefer `harness_list` / `harness_get` over create/update/trigger unless the user asks to run or change something.
-4. **OMS context** — pod deploys often use registry key `pod2` when Harness env is `pod2-dev` (see `tickets/DCOMS-29691-pod2dev-ec2-shutdown-restart-validation` runbooks).
+4. **OMS context** — pod deploys often use registry key `pod2` when Harness env is `pod2-dev` (see `chat-sessions/tickets/DCOMS-29691-pod2dev-ec2-shutdown-restart-validation` runbooks).
 
 ## Typical flow
 

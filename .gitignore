@@ -22,6 +22,7 @@ Thumbs.db
 
 # connector run output
 connectors/results/
+connectors/sumologic/exports/
 
 # saved chats stay on this machine
 chat-sessions/2*.md

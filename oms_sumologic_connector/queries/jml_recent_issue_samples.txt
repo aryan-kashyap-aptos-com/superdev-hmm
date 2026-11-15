@@ -1,1 +1,0 @@
-"JML" AND (ERROR OR Exception OR FATAL OR WARN) | where _sourceCategory matches /DCOM|OMS|PROD/ | fields _messagetime, _sourceCategory, _loglevel, _raw | sort by _messagetime desc | limit 20

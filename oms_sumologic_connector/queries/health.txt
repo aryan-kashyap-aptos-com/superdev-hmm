@@ -1,1 +1,0 @@
-(_sourceCategory=DCOMS/API/PROD/{client} OR _collector=OMS-{client}-*) | where _loglevel in ("ERROR","WARN") | count by _loglevel

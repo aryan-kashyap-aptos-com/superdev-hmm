@@ -1,5 +1,5 @@
 # Starts Harness official MCP server (stdio) for Cursor.
-# Loads secrets from ..\..\.env (oms_harness_connector\.env).
+# Loads secrets from ..\.env (connectors\harness\.env).
 
 $ErrorActionPreference = 'Stop'
 $ConnectorRoot = Split-Path -Parent $PSScriptRoot

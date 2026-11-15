@@ -1,4 +1,4 @@
-# OMS Harness pipelines — reference (ConnectorSuite)
+# OMS Harness pipelines — reference
 
 **Last updated:** 2026-09-21  
 **Account:** parsed from PAT (`82alj-w-QGSN-OFFBTv9Ew` in our sessions)  
@@ -17,7 +17,7 @@ Durable notes from API/MCP investigation. For live runs, use `scripts/Fetch-Pipe
 | Project **OMS DevOps** | **`OMS_DevOps`** | Release / Harness maintenance (e.g. **OMS-App-Deploy**, DFS) |
 | Client pod projects | e.g. `omstommybahamadev` | Under same org `OMS_CICD`; use only for client-specific CD |
 
-Set in `oms_harness_connector/.env`:
+Set in `connectors/harness/.env`:
 
 ```env
 HARNESS_ORG=OMS_CICD
@@ -74,8 +74,8 @@ Use this when you want **`oms release pipeline`** to build a **Bitbucket branch*
 ### After you trigger: quick checks
 
 ```powershell
-powershell -File C:\PROD\ConnectorSuite\oms_harness_connector\scripts\Fetch-PipelineData.ps1 -ExecutionLimit 10
-powershell -File C:\PROD\ConnectorSuite\oms_harness_connector\scripts\Get-ExecutionMeta.ps1 -ExecId <planExecutionId>
+powershell -File connectors\harness\scripts\Fetch-PipelineData.ps1 -ExecutionLimit 10
+powershell -File connectors\harness\scripts\Get-ExecutionMeta.ps1 -ExecId <planExecutionId>
 ```
 
 Confirm **branch** on the execution, **`inputSetIdentifiers` includes `oms_push`**, and stage graph (**`alpha_common`** vs **`alpha_windows`**).
@@ -177,9 +177,9 @@ Paste a **Harness execution URL** into tools that support `url` for auto scope.
 
 | Topic | Path |
 |-------|------|
-| ODX monitor epic | `tickets/DCOMS-29203-odx-feed-pipeline-monitor/` |
+| ODX monitor epic | `chat-sessions/tickets/DCOMS-29203-odx-feed-pipeline-monitor/` |
 | OMS branch (CI) | `c:\oms` — `feature/akashyap/DCOMS-29203-odx-feed-pipeline-ci` |
 | OMS branch (e2e) | `feature/akashyap/DCOMS-29203-odx-feed-pipeline-e2e` (same code; `-ci` has prep commit for builds) |
-| Local NuGet/build | `oms-nuget-aws-setup/` |
-| Pod2 deploy runbooks | `tickets/DCOMS-29691-pod2dev-ec2-shutdown-restart-validation/` |
-| Chat session folder | `tickets/RANDOM/oms-harness-connector-and-odx-ci/` |
+| Local NuGet/build | `oms-nuget-aws-setup/` on the `oms-knowledge` branch, not here |
+| Pod2 deploy runbooks | `chat-sessions/tickets/DCOMS-29691-pod2dev-ec2-shutdown-restart-validation/` |
+| Chat session folder | `chat-sessions/tickets/RANDOM/oms-harness-connector-and-odx-ci/` |

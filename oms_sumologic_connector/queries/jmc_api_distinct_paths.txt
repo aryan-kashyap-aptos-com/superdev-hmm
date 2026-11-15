@@ -1,1 +1,0 @@
-(_sourceCategory=DCOMS/API/PROD/jmc* OR _collector=OMS-jmc*) | parse regex field=raw "\"(?<method>GET|POST|PUT|DELETE|PATCH)[^\"]* (?<path>/[^\"\\s?]+)" nodrop | count_distinct(path)
