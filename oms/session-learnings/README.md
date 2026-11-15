@@ -29,6 +29,8 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [odx-feeds-omsfeed-pipeline.md](./odx-feeds-omsfeed-pipeline.md) | Job steps vs `omsfeedexport`; queue consumer recycle |
 | [simfa-lambda-deploy-rollback.md](./simfa-lambda-deploy-rollback.md) | POD QA Lambda deploy, manual rollback, SNOWPA / digital delivery patterns |
 | [misc-ops-gotchas.md](./misc-ops-gotchas.md) | DB connector `PGDATABASE`, timezone / JobManager, CloudTrail MQ delete, OMS Engine GUI |
+| [toronado-hosts.md](./toronado-hosts.md) | Shared multi-tenant Toronado vs standalone stacks, instance inventory, service naming (from ConnectorSuite's `oms-infra-knowledge/`) |
+| [databases-and-local-access.md](./databases-and-local-access.md) | Postgres DB names vs Toronado host, SSH tunnel / MCP notes (from ConnectorSuite's `oms-infra-knowledge/`) |
 
 ---
 
