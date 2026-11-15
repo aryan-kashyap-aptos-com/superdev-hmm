@@ -9,10 +9,24 @@ reads the note and carries on.
 | File | What it is | Pushed to git? |
 |------|------------|----------------|
 | `TEMPLATE.md` | The shape of a session note | Yes |
+| `EXAMPLE.md` | A filled-in worked example (ticket-tied) to copy the pattern from | Yes |
 | `save-session.py` | The command that writes and updates the notes (below) | Yes |
 | `LATEST.md` | Names the session file to continue from | No (private) |
-| `INDEX.md` | One line per saved session: date, topic, goal, next step | No (private) |
+| `INDEX.md` | One line per saved session: date, ticket, topic, goal, next step | No (private) |
 | `YYYY-MM-DD-topic.md` | One note per piece of work | No (private: they can hold client details) |
+| `tickets/<TICKET-ID>/` | Real deliverables for a ticket (specs, queries, runbooks) — not chat notes | Yes (unless a file inside names real hosts/creds) |
+
+## Ticket-tied vs. non-ticket work
+
+Every session can optionally name a `Ticket:` (e.g. `DCOMS-29203`). Use `--ticket` on `start` and the script
+creates `tickets/<TICKET-ID>/` for you. Put real work product there (epic notes, technical specs, SQL, runbooks,
+test results) — the session file itself stays a short status note, not the deliverable.
+
+Work with no ticket (exploration, internal tooling, "RANDOM" chats) just omits `--ticket`. `INDEX.md` shows
+`(none)` for these — that's expected, not an error. Don't force a ticket ID onto work that doesn't have one.
+
+See `tickets/README.md` for the workspace conventions, and `EXAMPLE.md` for a full worked example of both
+pieces together.
 
 ## Why `save-session.py` exists
 

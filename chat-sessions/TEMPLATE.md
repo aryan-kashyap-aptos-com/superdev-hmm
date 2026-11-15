@@ -2,6 +2,7 @@
 
 Date: YYYY-MM-DD
 Project / product: <name>
+Ticket: <Jira ID, or (none) for work not tied to a ticket>
 
 ## Session 1
 

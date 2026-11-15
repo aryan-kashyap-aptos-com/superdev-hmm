@@ -8,7 +8,7 @@ Goal: a short file, always current, that lets a new chat with any AI continue th
 `chat-sessions/save-session.py` creates and edits the file for you. Run it from the toolkit folder.
 
 ```
-python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" --product shop
+python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" --product shop --ticket DCOMS-29203
 python chat-sessions/save-session.py note --section "Where we are" --replace --text "Cause found" --text "Fix in progress"
 python chat-sessions/save-session.py note --section "Decisions" --text "Round per line, because the spec says so"
 python chat-sessions/save-session.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
@@ -16,6 +16,10 @@ python chat-sessions/save-session.py note --section "Next steps" --replace --tex
 
 - `start` makes `chat-sessions/YYYY-MM-DD-topic.md`, points `LATEST.md` at it, and rebuilds `INDEX.md` (one line per session).
   If `LATEST.md` already names a file for this same work, do not run `start` again; use `note`.
+- `--ticket <ID>` (optional): when the work is for a Jira ticket, pass its ID. This creates
+  `chat-sessions/tickets/<ID>/` for the ticket's real deliverables (specs, queries, runbooks, test results) —
+  keep those out of the session note itself, just point to the folder under "Files and systems touched".
+  Omit `--ticket` for work that isn't tied to one; see `chat-sessions/EXAMPLE.md` for a full worked example.
 - `note` edits the newest session block. `--replace` swaps the section; without it the line is added.
   Sections: Goal, Where we are, Decisions, Tried and failed, Files and systems touched, Evidence, Open questions, Next steps, Watch out.
 - If you cannot run commands, copy `chat-sessions/TEMPLATE.md` by hand and set `File:` in `LATEST.md`.

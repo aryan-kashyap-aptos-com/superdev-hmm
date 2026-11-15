@@ -1,6 +1,6 @@
 """Save chat sessions with one command. Standard library only.
 
-    python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" [--product shop]
+    python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" [--product shop] [--ticket DCOMS-29203]
     python chat-sessions/save-session.py note --section "Where we are" --replace --text "Found the cause" --text "Fix in progress"
     python chat-sessions/save-session.py note --section "Decisions" --text "Use rounding at line level, because the spec says so"
     python chat-sessions/save-session.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
@@ -21,7 +21,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 LATEST = HERE / "LATEST.md"
 INDEX = HERE / "INDEX.md"
-SKIP = {"LATEST.md", "TEMPLATE.md", "INDEX.md", "README.md"}
+SKIP = {"LATEST.md", "TEMPLATE.md", "INDEX.md", "README.md", "EXAMPLE.md"}
 EMPTY = "(none yet)"
 SECTIONS = ["Goal", "Where we are", "Decisions", "Tried and failed", "Files and systems touched",
             "Evidence", "Open questions", "Next steps", "Watch out"]
@@ -68,9 +68,15 @@ def cmd_start(args):
         path.write_text(text.rstrip() + "\n\n" + block(n, args.goal), encoding="utf-8")
         print(f"Added Session {n} to {path.relative_to(ROOT).as_posix()}")
     else:
-        head = f"# {args.topic}\n\nDate: {datetime.date.today().isoformat()}\nProject / product: {args.product or 'unknown'}\n\n"
+        ticket = args.ticket or "(none)"
+        head = (f"# {args.topic}\n\nDate: {datetime.date.today().isoformat()}\n"
+                f"Project / product: {args.product or 'unknown'}\nTicket: {ticket}\n\n")
         path.write_text(head + block(1, args.goal), encoding="utf-8")
         print(f"Created {path.relative_to(ROOT).as_posix()}")
+        if args.ticket:
+            tdir = HERE / "tickets" / args.ticket
+            tdir.mkdir(parents=True, exist_ok=True)
+            print(f"Ticket workspace: {tdir.relative_to(ROOT).as_posix()}/ (put deliverables here, not in the session note)")
     set_latest(path)
     build_index()
 
@@ -126,11 +132,15 @@ def build_index():
             continue
         text = p.read_text(encoding="utf-8")
         title = (re.match(r"#\s+(.+)", text) or [None, p.stem])[1]
+        tm = re.search(r"^Ticket:\s*(.+)$", text, re.M)
+        ticket = tm.group(1).strip() if tm else "(none)"
+        ticket_cell = f"[{ticket}](tickets/{ticket}/)" if ticket != "(none)" and (HERE / "tickets" / ticket).is_dir() else ticket
         goal = first_line(text.split("## Session")[-1] if "## Session" in text else text, "Goal")
         nxt = first_line(text.split("## Session")[-1] if "## Session" in text else text, "Next steps")
-        rows.append(f"| {p.stem[:10]} | [{title}]({p.name}) | {goal} | {nxt} |".replace("\n", " "))
-    out = ["# All sessions", "", "Newest first. Open a file only when you need its detail.", "",
-           "| Date | Session | Goal | Next step |", "|------|---------|------|-----------|"] + rows
+        rows.append(f"| {p.stem[:10]} | {ticket_cell} | [{title}]({p.name}) | {goal} | {nxt} |".replace("\n", " "))
+    out = ["# All sessions", "", "Newest first. Open a file only when you need its detail. "
+           "Ticket is `(none)` for work not tied to a Jira ticket; otherwise it links to `tickets/<id>/`.", "",
+           "| Date | Ticket | Session | Goal | Next step |", "|------|--------|---------|------|-----------|"] + rows
     INDEX.write_text("\n".join(out) + "\n", encoding="utf-8")
 
 
@@ -141,6 +151,7 @@ def main():
     s.add_argument("topic")
     s.add_argument("--goal", required=True)
     s.add_argument("--product")
+    s.add_argument("--ticket", help="Jira ticket ID, e.g. DCOMS-29203. Creates chat-sessions/tickets/<id>/ for deliverables. Omit for non-ticket work.")
     s.set_defaults(fn=cmd_start)
     n = sub.add_parser("note", help="add to or replace a section of the newest session")
     n.add_argument("--section", required=True)
