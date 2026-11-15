@@ -1,0 +1,315 @@
+{
+  "generated_at": "20260918T213838Z",
+  "region": "us-east-1",
+  "dry_run": true,
+  "scanned": 20662,
+  "already_had_Name": 20606,
+  "applied": 0,
+  "would_apply": 71,
+  "failed": 0,
+  "by_type": {
+    "acm:certificate": {
+      "total": 3,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 3,
+      "failed": 0
+    },
+    "apigateway:apis": {
+      "total": 395,
+      "applied": 0,
+      "would_apply": 36,
+      "skipped_had_Name": 359,
+      "failed": 0
+    },
+    "apigateway:restapis": {
+      "total": 42,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 42,
+      "failed": 0
+    },
+    "backup:backup-plan": {
+      "total": 1,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1,
+      "failed": 0
+    },
+    "backup:backup-vault": {
+      "total": 1,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1,
+      "failed": 0
+    },
+    "cloudformation:stack": {
+      "total": 70,
+      "applied": 0,
+      "would_apply": 22,
+      "skipped_had_Name": 48,
+      "failed": 0
+    },
+    "cloudfront:distribution": {
+      "total": 2,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 2,
+      "failed": 0
+    },
+    "cloudwatch:alarm": {
+      "total": 104,
+      "applied": 0,
+      "would_apply": 1,
+      "skipped_had_Name": 103,
+      "failed": 0
+    },
+    "dynamodb:table": {
+      "total": 17,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 17,
+      "failed": 0
+    },
+    "ec2:elastic-ip": {
+      "total": 32,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 32,
+      "failed": 0
+    },
+    "ec2:image": {
+      "total": 34,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 34,
+      "failed": 0
+    },
+    "ec2:instance": {
+      "total": 90,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 90,
+      "failed": 0
+    },
+    "ec2:natgateway": {
+      "total": 26,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 26,
+      "failed": 0
+    },
+    "ec2:network-interface": {
+      "total": 396,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 396,
+      "failed": 0
+    },
+    "ec2:security-group": {
+      "total": 460,
+      "applied": 0,
+      "would_apply": 1,
+      "skipped_had_Name": 459,
+      "failed": 0
+    },
+    "ec2:snapshot": {
+      "total": 591,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 591,
+      "failed": 0
+    },
+    "ec2:volume": {
+      "total": 131,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 131,
+      "failed": 0
+    },
+    "ec2:vpc-endpoint": {
+      "total": 27,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 27,
+      "failed": 0
+    },
+    "ecr:repository": {
+      "total": 38,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 38,
+      "failed": 0
+    },
+    "ecs:cluster": {
+      "total": 20,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 20,
+      "failed": 0
+    },
+    "ecs:service": {
+      "total": 223,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 223,
+      "failed": 0
+    },
+    "ecs:task-definition": {
+      "total": 3335,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 3335,
+      "failed": 0
+    },
+    "eks:cluster": {
+      "total": 2,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 2,
+      "failed": 0
+    },
+    "elasticache:cluster": {
+      "total": 1,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1,
+      "failed": 0
+    },
+    "elasticfilesystem:file-system": {
+      "total": 20,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 20,
+      "failed": 0
+    },
+    "elasticloadbalancing:loadbalancer": {
+      "total": 66,
+      "applied": 0,
+      "would_apply": 1,
+      "skipped_had_Name": 65,
+      "failed": 0
+    },
+    "elasticloadbalancing:targetgroup": {
+      "total": 42,
+      "applied": 0,
+      "would_apply": 1,
+      "skipped_had_Name": 41,
+      "failed": 0
+    },
+    "events:rule": {
+      "total": 173,
+      "applied": 0,
+      "would_apply": 9,
+      "skipped_had_Name": 164,
+      "failed": 0
+    },
+    "kinesis:stream": {
+      "total": 1,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1,
+      "failed": 0
+    },
+    "kms:key": {
+      "total": 130,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 130,
+      "failed": 0
+    },
+    "lambda:function": {
+      "total": 792,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 792,
+      "failed": 0
+    },
+    "logs:log-group": {
+      "total": 1771,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1771,
+      "failed": 0
+    },
+    "rds:cluster": {
+      "total": 10,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 10,
+      "failed": 0
+    },
+    "rds:db": {
+      "total": 5,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 5,
+      "failed": 0
+    },
+    "rds:pg": {
+      "total": 10,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 10,
+      "failed": 0
+    },
+    "rds:snapshot": {
+      "total": 1,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 1,
+      "failed": 0
+    },
+    "rds:subgrp": {
+      "total": 18,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 18,
+      "failed": 0
+    },
+    "s3:bucket": {
+      "total": 138,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 138,
+      "failed": 0
+    },
+    "secretsmanager:secret": {
+      "total": 249,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 249,
+      "failed": 0
+    },
+    "sns:topic": {
+      "total": 57,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 57,
+      "failed": 0
+    },
+    "sqs:queue": {
+      "total": 51,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 51,
+      "failed": 0
+    },
+    "ssm:parameter": {
+      "total": 11001,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 11001,
+      "failed": 0
+    },
+    "states:stateMachine": {
+      "total": 86,
+      "applied": 0,
+      "would_apply": 0,
+      "skipped_had_Name": 86,
+      "failed": 0
+    }
+  },
+  "ecs_in_use_taskdefs_total": 223,
+  "ecs_in_use_taskdefs_missing_Name": 0
+}

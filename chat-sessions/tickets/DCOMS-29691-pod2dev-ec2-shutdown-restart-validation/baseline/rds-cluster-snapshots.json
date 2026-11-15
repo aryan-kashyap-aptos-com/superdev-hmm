@@ -1,0 +1,47 @@
+﻿[
+    {
+        "Id": "rds:oms-pod2-dev-aurora-2026-08-31-02-23",
+        "Type": "automated",
+        "Status": "available",
+        "Created": "2026-08-31T02:24:46.744000+00:00",
+        "Engine": "aurora-postgresql",
+        "AllocatedStorage": 24,
+        "Encrypted": true
+    },
+    {
+        "Id": "rds:oms-pod2-dev-aurora-2026-09-01-03-03",
+        "Type": "automated",
+        "Status": "available",
+        "Created": "2026-09-01T03:04:42.099000+00:00",
+        "Engine": "aurora-postgresql",
+        "AllocatedStorage": 24,
+        "Encrypted": true
+    },
+    {
+        "Id": "rds:oms-pod2-dev-aurora-2026-09-02-03-04",
+        "Type": "automated",
+        "Status": "available",
+        "Created": "2026-09-02T03:05:27.183000+00:00",
+        "Engine": "aurora-postgresql",
+        "AllocatedStorage": 24,
+        "Encrypted": true
+    },
+    {
+        "Id": "rds:oms-pod2-dev-aurora-2026-09-03-03-04",
+        "Type": "automated",
+        "Status": "available",
+        "Created": "2026-09-03T03:05:28.385000+00:00",
+        "Engine": "aurora-postgresql",
+        "AllocatedStorage": 24,
+        "Encrypted": true
+    },
+    {
+        "Id": "rds:oms-pod2-dev-aurora-2026-09-04-03-04",
+        "Type": "automated",
+        "Status": "available",
+        "Created": "2026-09-04T03:05:28.175000+00:00",
+        "Engine": "aurora-postgresql",
+        "AllocatedStorage": 24,
+        "Encrypted": true
+    }
+]

@@ -1,0 +1,297 @@
+﻿{
+    "ResourceRecordSets": [
+        {
+            "Name": "oms-pod2-dev.local.",
+            "Type": "NS",
+            "TTL": 172800,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-1536.awsdns-00.co.uk."
+                },
+                {
+                    "Value": "ns-0.awsdns-00.com."
+                },
+                {
+                    "Value": "ns-1024.awsdns-00.org."
+                },
+                {
+                    "Value": "ns-512.awsdns-00.net."
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev.local.",
+            "Type": "SOA",
+            "TTL": 15,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-1536.awsdns-00.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-configrulemanager-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "200989e4ba1846b6aa9fd0e80eba1620",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 8080 200989e4ba1846b6aa9fd0e80eba1620.oms-pod2-dev-configrulemanager-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "200989e4ba1846b6aa9fd0e80eba1620.oms-pod2-dev-configrulemanager-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "200989e4ba1846b6aa9fd0e80eba1620",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.11"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-inventory-export-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "771b6e2cefc74d3fb68e2714bb3126b0",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 771b6e2cefc74d3fb68e2714bb3126b0.oms-pod2-dev-inventory-export-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "771b6e2cefc74d3fb68e2714bb3126b0.oms-pod2-dev-inventory-export-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "771b6e2cefc74d3fb68e2714bb3126b0",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.12"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-inventory-facade-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "a993262482ee4f30b27404992119f8d9",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 a993262482ee4f30b27404992119f8d9.oms-pod2-dev-inventory-facade-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "a993262482ee4f30b27404992119f8d9.oms-pod2-dev-inventory-facade-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "a993262482ee4f30b27404992119f8d9",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.13"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-keycloak-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "b6ac9e17f80b4eef8489847a6597eeea",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 8080 b6ac9e17f80b4eef8489847a6597eeea.oms-pod2-dev-keycloak-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "b6ac9e17f80b4eef8489847a6597eeea.oms-pod2-dev-keycloak-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "b6ac9e17f80b4eef8489847a6597eeea",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.14"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-omsfeeds-export-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "6ec102b6bf2041eb83ea7971229fd87d",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 6ec102b6bf2041eb83ea7971229fd87d.oms-pod2-dev-omsfeeds-export-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "6ec102b6bf2041eb83ea7971229fd87d.oms-pod2-dev-omsfeeds-export-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "6ec102b6bf2041eb83ea7971229fd87d",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.15"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-order-facade-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "04b6d247aa5447c0a24e01a80a7d3b3f",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 04b6d247aa5447c0a24e01a80a7d3b3f.oms-pod2-dev-order-facade-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "04b6d247aa5447c0a24e01a80a7d3b3f.oms-pod2-dev-order-facade-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "04b6d247aa5447c0a24e01a80a7d3b3f",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.16"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-printing-eformz-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "c047bd12be914a5d9ca0da0c5bd12966",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 c047bd12be914a5d9ca0da0c5bd12966.oms-pod2-dev-printing-eformz-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "c047bd12be914a5d9ca0da0c5bd12966.oms-pod2-dev-printing-eformz-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "c047bd12be914a5d9ca0da0c5bd12966",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.17"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-taskprocessor-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "46249e690ccc4cc3b4d21af19e611d5d",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 46249e690ccc4cc3b4d21af19e611d5d.oms-pod2-dev-taskprocessor-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "46249e690ccc4cc3b4d21af19e611d5d.oms-pod2-dev-taskprocessor-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "46249e690ccc4cc3b4d21af19e611d5d",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.18"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-taskscheduler-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "f76c4bfb97824610865e20f9a470a06b",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 f76c4bfb97824610865e20f9a470a06b.oms-pod2-dev-taskscheduler-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "f76c4bfb97824610865e20f9a470a06b.oms-pod2-dev-taskscheduler-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "f76c4bfb97824610865e20f9a470a06b",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.19"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-taxation-facade-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "d885282c8b284a82a32a9152df4e3c07",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 d885282c8b284a82a32a9152df4e3c07.oms-pod2-dev-taxation-facade-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "d885282c8b284a82a32a9152df4e3c07.oms-pod2-dev-taxation-facade-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "d885282c8b284a82a32a9152df4e3c07",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.20"
+                }
+            ]
+        },
+        {
+            "Name": "oms-pod2-dev-taxation-service.oms-pod2-dev.local.",
+            "Type": "SRV",
+            "SetIdentifier": "f8cce2b5019a4920aa87a6ea5ecacb52",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "1 1 80 f8cce2b5019a4920aa87a6ea5ecacb52.oms-pod2-dev-taxation-service.oms-pod2-dev.local."
+                }
+            ]
+        },
+        {
+            "Name": "f8cce2b5019a4920aa87a6ea5ecacb52.oms-pod2-dev-taxation-service.oms-pod2-dev.local.",
+            "Type": "A",
+            "SetIdentifier": "f8cce2b5019a4920aa87a6ea5ecacb52",
+            "Weight": 1,
+            "TTL": 300,
+            "ResourceRecords": [
+                {
+                    "Value": "203.0.113.21"
+                }
+            ]
+        }
+    ]
+}

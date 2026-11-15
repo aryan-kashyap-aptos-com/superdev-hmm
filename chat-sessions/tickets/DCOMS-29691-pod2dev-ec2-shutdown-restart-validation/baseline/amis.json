@@ -1,0 +1,220 @@
+﻿{
+    "Images": [
+        {
+            "PlatformDetails": "Linux/UNIX",
+            "UsageOperation": "RunInstances",
+            "BlockDeviceMappings": [
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": true,
+                        "SnapshotId": "snap-0000000000000001f",
+                        "VolumeSize": 8,
+                        "VolumeType": "gp2",
+                        "Encrypted": false
+                    },
+                    "DeviceName": "/dev/sda1"
+                },
+                {
+                    "DeviceName": "/dev/sdb",
+                    "VirtualName": "ephemeral0"
+                },
+                {
+                    "DeviceName": "/dev/sdc",
+                    "VirtualName": "ephemeral1"
+                }
+            ],
+            "Description": "Canonical, Ubuntu, 22.04, amd64 jammy image",
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "ImageOwnerAlias": "amazon",
+            "Name": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20260826",
+            "RootDeviceName": "/dev/sda1",
+            "RootDeviceType": "ebs",
+            "SriovNetSupport": "simple",
+            "VirtualizationType": "hvm",
+            "BootMode": "uefi-preferred",
+            "DeprecationTime": "2028-08-26T07:52:58.000Z",
+            "FreeTierEligible": true,
+            "ImageId": "ami-00000000000000020",
+            "ImageLocation": "amazon/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20260826",
+            "State": "available",
+            "OwnerId": "123456789012",
+            "CreationDate": "2026-08-26T07:52:58.000Z",
+            "Public": true,
+            "Architecture": "x86_64",
+            "ImageType": "machine"
+        },
+        {
+            "PlatformDetails": "Linux/UNIX",
+            "UsageOperation": "RunInstances",
+            "BlockDeviceMappings": [
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": true,
+                        "SnapshotId": "snap-00000000000000021",
+                        "VolumeSize": 8,
+                        "VolumeType": "gp2",
+                        "Encrypted": false
+                    },
+                    "DeviceName": "/dev/xvda"
+                }
+            ],
+            "Description": "Amazon Linux 2 AMI 2.0.20260831.0 x86_64 HVM gp2",
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "ImageOwnerAlias": "amazon",
+            "Name": "amzn2-ami-hvm-2.0.20260831.0-x86_64-gp2",
+            "RootDeviceName": "/dev/xvda",
+            "RootDeviceType": "ebs",
+            "SriovNetSupport": "simple",
+            "VirtualizationType": "hvm",
+            "DeprecationTime": "2026-11-24T21:49:00.000Z",
+            "SourceImageId": "ami-00000000000000022",
+            "SourceImageRegion": "us-west-2",
+            "FreeTierEligible": true,
+            "ImageId": "ami-00000000000000023",
+            "ImageLocation": "amazon/amzn2-ami-hvm-2.0.20260831.0-x86_64-gp2",
+            "State": "available",
+            "OwnerId": "123456789012",
+            "CreationDate": "2026-08-26T21:47:16.000Z",
+            "Public": true,
+            "Architecture": "x86_64",
+            "ImageType": "machine"
+        },
+        {
+            "PlatformDetails": "Windows",
+            "UsageOperation": "RunInstances:0002",
+            "BlockDeviceMappings": [
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": true,
+                        "Iops": 3000,
+                        "SnapshotId": "snap-00000000000000024",
+                        "VolumeSize": 75,
+                        "VolumeType": "gp3",
+                        "Throughput": 125,
+                        "Encrypted": false
+                    },
+                    "DeviceName": "/dev/sda1"
+                }
+            ],
+            "Description": "oms-base-os-image-pre-sysprep-cont-v1-11262025",
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "Name": "oms-base-os-image-pre-sysprep-cont-v1-11262025",
+            "RootDeviceName": "/dev/sda1",
+            "RootDeviceType": "ebs",
+            "SriovNetSupport": "simple",
+            "VirtualizationType": "hvm",
+            "SourceInstanceId": "i-00000000000000025",
+            "SourceImageId": "ami-00000000000000026",
+            "SourceImageRegion": "us-east-1",
+            "FreeTierEligible": true,
+            "ImageId": "ami-00000000000000027",
+            "ImageLocation": "123456789012/oms-base-os-image-pre-sysprep-cont-v1-11262025",
+            "State": "available",
+            "OwnerId": "123456789012",
+            "CreationDate": "2025-11-26T09:25:01.000Z",
+            "Public": false,
+            "Architecture": "x86_64",
+            "ImageType": "machine",
+            "Platform": "windows"
+        },
+        {
+            "PlatformDetails": "Windows",
+            "UsageOperation": "RunInstances:0002",
+            "BlockDeviceMappings": [
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": true,
+                        "Iops": 3000,
+                        "SnapshotId": "snap-00000000000000028",
+                        "VolumeSize": 75,
+                        "VolumeType": "gp3",
+                        "Throughput": 125,
+                        "Encrypted": false
+                    },
+                    "DeviceName": "/dev/sda1"
+                },
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": false,
+                        "Iops": 3000,
+                        "SnapshotId": "snap-00000000000000029",
+                        "VolumeSize": 15,
+                        "VolumeType": "gp3",
+                        "Throughput": 125,
+                        "Encrypted": false
+                    },
+                    "DeviceName": "xvdb"
+                }
+            ],
+            "Description": "oms-base-os-image-pre-sysprep-web-v1-post-sysrep-09182025",
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "Name": "oms-base-os-image-pre-sysprep-web-v1-post-sysrep-09182025",
+            "RootDeviceName": "/dev/sda1",
+            "RootDeviceType": "ebs",
+            "SriovNetSupport": "simple",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "cd-oms-base-os-image-pre-sysprep-web-v1"
+                }
+            ],
+            "VirtualizationType": "hvm",
+            "SourceInstanceId": "i-0000000000000002a",
+            "SourceImageId": "ami-0000000000000002b",
+            "SourceImageRegion": "us-east-1",
+            "FreeTierEligible": true,
+            "ImageId": "ami-0000000000000002c",
+            "ImageLocation": "123456789012/oms-base-os-image-pre-sysprep-web-v1-post-sysrep-09182025",
+            "State": "available",
+            "OwnerId": "123456789012",
+            "CreationDate": "2025-09-18T10:04:28.000Z",
+            "Public": false,
+            "Architecture": "x86_64",
+            "ImageType": "machine",
+            "Platform": "windows"
+        },
+        {
+            "PlatformDetails": "Windows",
+            "UsageOperation": "RunInstances:0002",
+            "BlockDeviceMappings": [
+                {
+                    "Ebs": {
+                        "DeleteOnTermination": true,
+                        "Iops": 3000,
+                        "SnapshotId": "snap-0000000000000002d",
+                        "VolumeSize": 75,
+                        "VolumeType": "gp3",
+                        "Throughput": 125,
+                        "Encrypted": false
+                    },
+                    "DeviceName": "/dev/sda1"
+                }
+            ],
+            "Description": "oms-base-os-image-pre-sysprep-app-v1-post-sysprep-17092025",
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "Name": "oms-base-os-image-pre-sysprep-app-v1-post-sysprep-17092025",
+            "RootDeviceName": "/dev/sda1",
+            "RootDeviceType": "ebs",
+            "SriovNetSupport": "simple",
+            "VirtualizationType": "hvm",
+            "SourceInstanceId": "i-0000000000000002e",
+            "SourceImageId": "ami-0000000000000002f",
+            "SourceImageRegion": "us-east-1",
+            "FreeTierEligible": true,
+            "ImageId": "ami-00000000000000030",
+            "ImageLocation": "123456789012/oms-base-os-image-pre-sysprep-app-v1-post-sysprep-17092025",
+            "State": "available",
+            "OwnerId": "123456789012",
+            "CreationDate": "2025-09-17T14:11:07.000Z",
+            "Public": false,
+            "Architecture": "x86_64",
+            "ImageType": "machine",
+            "Platform": "windows"
+        }
+    ]
+}

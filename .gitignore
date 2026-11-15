@@ -22,6 +22,7 @@ Thumbs.db
 
 # connector run output
 connectors/results/
+connectors/sumologic/exports/
 
 # saved chats stay on this machine
 chat-sessions/2*.md
@@ -39,6 +40,17 @@ qa-tester/scenarios/*
 !qa-tester/scenarios/README.md
 # real product facts (real sites, real systems): keep them private, same reason as environments.local.md
 product-knowledge-local/
+
+# md-reader: files you dropped in to read are yours, not for the repo
+tools/md-reader/library/
+tools/md-reader/exports/
+tools/md-reader/assets/
+
+# api-client: imported collections/environments can hold real tokens and passwords; evidence can hold response data
+tools/api-client/data/*
+!tools/api-client/data/.gitkeep
+tools/api-client/evidence/*
+!tools/api-client/evidence/.gitkeep
 
 # One-off local audit dumps (large / machine-specific)
 ssm_params_v1_vs_v2_comparison.xlsx

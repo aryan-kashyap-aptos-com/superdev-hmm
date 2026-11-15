@@ -1,7 +1,8 @@
-# Optional packages. Only db-ssh, aws-rds, ec2-ssm and browser need them; everything else uses the Python standard library.
+# Optional packages. Only db-ssh, aws-rds, ec2-ssm, sumologic (export) and browser need them; everything else uses the Python standard library.
 # Install everything, or only the lines you need.
 psycopg[binary]>=3.1   # db-ssh: PostgreSQL
 PyMySQL>=1.1           # db-ssh: MySQL / MariaDB
 pymssql>=2.3           # db-ssh: SQL Server
 boto3>=1.28            # aws-rds, ec2-ssm
+openpyxl>=3.1          # sumologic: export / export-file (Excel output)
 playwright>=1.49       # browser: visible Chrome for QA testing

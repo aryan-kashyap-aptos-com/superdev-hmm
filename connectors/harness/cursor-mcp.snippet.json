@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "harness": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "<path-to-this-repo>\\connectors\\harness\\run-harness-mcp.js"
+      ],
+      "env": {
+        "PATH": "C:\\Program Files\\nodejs"
+      }
+    }
+  }
+}

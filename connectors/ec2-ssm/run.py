@@ -172,30 +172,27 @@ def cmd_list(args):
     c.show_table(rows, ["instance_id", "name", "ssm", "platform", "os", "ip", "computer"], "ec2-ssm", limit=args.limit)
 
 
-def cmd_run(args):
-    instance = resolve(args.target)
+def _resolve_online(target):
+    instance = resolve(target)
     infos = _managed([{"Key": "InstanceIds", "Values": [instance]}])
     if not infos:
         raise c.ConnectorError(f"{instance} is not managed by SSM.", "The SSM agent must be installed and the server must have an SSM role.")
     info = infos[0]
     if info.get("PingStatus") != "Online":
         raise c.ConnectorError(f"{instance} SSM status is {info.get('PingStatus')}.", "The server must be running and its SSM agent online.")
-    windows = info.get("PlatformType") == "Windows"
+    return instance, info
 
-    if args.write:
-        c.require_write(args, "run --write")
-    else:
-        check_read_only(args.command, windows)
 
+def _send_and_wait(instance, windows, command_text, timeout):
     ssm = _aws("ssm")
     sent = _aws_call(ssm.send_command, InstanceIds=[instance],
                      DocumentName="AWS-RunPowerShellScript" if windows else "AWS-RunShellScript",
-                     Parameters={"commands": [args.command], "executionTimeout": [str(args.timeout)]},
+                     Parameters={"commands": [command_text], "executionTimeout": [str(timeout)]},
                      Comment="super-dev ec2-ssm connector")
     command_id = sent["Command"]["CommandId"]
 
     from botocore.exceptions import ClientError
-    deadline = time.time() + args.timeout + 30
+    deadline = time.time() + timeout + 30
     while True:
         time.sleep(2)
         try:
@@ -205,15 +202,40 @@ def cmd_run(args):
                 continue
             raise c.ConnectorError(f"AWS error: {e}") from None
         if inv["Status"] not in ("Pending", "InProgress", "Delayed"):
-            break
+            return inv
         if time.time() > deadline:
-            raise c.ConnectorError(f"Command {command_id} still running after {args.timeout}s.", "Use a faster command, or raise --timeout.")
+            raise c.ConnectorError(f"Command {command_id} still running after {timeout}s.", "Use a faster command, or raise --timeout.")
 
+
+def _print_result(instance, info, inv, name):
     print(f"Server: {instance} ({info.get('PlatformType')})  Status: {inv['Status']}  Exit code: {inv.get('ResponseCode')}")
     out = inv.get("StandardOutputContent", "")
     err = inv.get("StandardErrorContent", "")
     text = out + (f"\n--- stderr ---\n{err}" if err.strip() else "")
-    c.show_text(text or "(no output)", "ec2-ssm-run")
+    c.show_text(text or "(no output)", name)
+
+
+def cmd_run(args):
+    instance, info = _resolve_online(args.target)
+    windows = info.get("PlatformType") == "Windows"
+    if args.write:
+        c.require_write(args, "run --write")
+    else:
+        check_read_only(args.command, windows)
+    inv = _send_and_wait(instance, windows, args.command, args.timeout)
+    _print_result(instance, info, inv, "ec2-ssm-run")
+
+
+def cmd_script(args):
+    instance, info = _resolve_online(args.target)
+    windows = info.get("PlatformType") == "Windows"
+    path = Path(args.script)
+    if not path.exists():
+        raise c.ConnectorError(f"Script not found: {path}", "Check the path.")
+    c.require_write(args, "script")
+    command_text = path.read_text(encoding="utf-8-sig")
+    inv = _send_and_wait(instance, windows, command_text, args.timeout)
+    _print_result(instance, info, inv, "ec2-ssm-script")
 
 
 def main():
@@ -233,6 +255,13 @@ def main():
     s.add_argument("--timeout", type=int, default=120, help="seconds (default 120)")
     s.add_argument("--write", action="store_true", help="allow any command; needs the user's permission")
     s.set_defaults(func=cmd_run)
+
+    s = sub.add_parser("script", help="run a local .ps1 (Windows) or .sh (Linux) file on one server")
+    s.add_argument("target", help="instance ID or Name tag")
+    s.add_argument("script", help="path to the script file")
+    s.add_argument("--timeout", type=int, default=300, help="seconds (default 300)")
+    s.add_argument("--write", action="store_true", help="needs the user's permission (a whole script can't be read-only checked)")
+    s.set_defaults(func=cmd_script)
 
     args = p.parse_args()
     args.func(args)

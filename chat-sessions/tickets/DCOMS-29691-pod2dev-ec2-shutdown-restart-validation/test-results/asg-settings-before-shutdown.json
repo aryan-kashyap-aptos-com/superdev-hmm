@@ -1,0 +1,56 @@
+{
+  "captured": "2026-09-04",
+  "purpose": "Restore ASG capacity after off-hours shutdown (DCOMS-29691)",
+  "auto_scaling_groups": [
+    {
+      "name": "oms-pod2-dev-sm-asg",
+      "tier": "sitemanager",
+      "min_size": 1,
+      "max_size": 3,
+      "desired_capacity": 1,
+      "suspended_processes": ["ReplaceUnhealthy", "HealthCheck"]
+    },
+    {
+      "name": "oms-pod2-dev-api-asg",
+      "tier": "api",
+      "min_size": 1,
+      "max_size": 3,
+      "desired_capacity": 1,
+      "suspended_processes": ["ReplaceUnhealthy", "HealthCheck"]
+    },
+    {
+      "name": "oms-pod2-dev-cnt-asg",
+      "tier": "content",
+      "min_size": 1,
+      "max_size": 3,
+      "desired_capacity": 1,
+      "suspended_processes": ["ReplaceUnhealthy", "HealthCheck"]
+    },
+    {
+      "name": "oms-pod2-dev-svc-asg",
+      "tier": "services",
+      "min_size": 1,
+      "max_size": 3,
+      "desired_capacity": 1,
+      "suspended_processes": ["HealthCheck", "ReplaceUnhealthy"]
+    },
+    {
+      "name": "oms-pod2-dev-toronado-asg",
+      "tier": "toronado",
+      "min_size": 1,
+      "max_size": 1,
+      "desired_capacity": 1,
+      "suspended_processes": []
+    }
+  ],
+  "standalone_ec2": [
+    {
+      "name": "oms-pod2-dev-BastionHost",
+      "instance_id": "i-00000000000000042"
+    },
+    {
+      "name": "oms-pod2-dev-rds-migration-host",
+      "instance_id": "i-00000000000000043"
+    }
+  ]
+}

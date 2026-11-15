@@ -1,0 +1,112 @@
+﻿[
+    {
+        "TargetGroupArn":  "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-api-tg/000000000000003f",
+        "TargetHealthDescriptions":  [
+                                         {
+                                             "Target":  {
+                                                            "Id":  "i-00000000000000035",
+                                                            "Port":  80
+                                                        },
+                                             "HealthCheckPort":  "80",
+                                             "TargetHealth":  {
+                                                                  "State":  "unhealthy",
+                                                                  "Reason":  "Target.ResponseCodeMismatch",
+                                                                  "Description":  "Health checks failed with these codes: [404]"
+                                                              },
+                                             "AdministrativeOverride":  {
+                                                                            "State":  "no_override",
+                                                                            "Reason":  "AdministrativeOverride.NoOverride",
+                                                                            "Description":  "No override is currently active on target"
+                                                                        }
+                                         }
+                                     ]
+    },
+    {
+        "TargetGroupArn":  "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-cnt-tg/0000000000000040",
+        "TargetHealthDescriptions":  [
+                                         {
+                                             "Target":  {
+                                                            "Id":  "i-00000000000000037",
+                                                            "Port":  80
+                                                        },
+                                             "HealthCheckPort":  "80",
+                                             "TargetHealth":  {
+                                                                  "State":  "unhealthy",
+                                                                  "Reason":  "Target.FailedHealthChecks",
+                                                                  "Description":  "Health checks failed"
+                                                              },
+                                             "AdministrativeOverride":  {
+                                                                            "State":  "no_override",
+                                                                            "Reason":  "AdministrativeOverride.NoOverride",
+                                                                            "Description":  "No override is currently active on target"
+                                                                        }
+                                         }
+                                     ]
+    },
+    {
+        "TargetGroupArn":  "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sftptg/000000000000003d",
+        "TargetHealthDescriptions":  [
+                                         {
+                                             "Target":  {
+                                                            "Id":  "i-00000000000000032",
+                                                            "Port":  22
+                                                        },
+                                             "HealthCheckPort":  "22",
+                                             "TargetHealth":  {
+                                                                  "State":  "unhealthy",
+                                                                  "Reason":  "Target.FailedHealthChecks",
+                                                                  "Description":  "Health checks failed"
+                                                              },
+                                             "AdministrativeOverride":  {
+                                                                            "State":  "no_override",
+                                                                            "Reason":  "AdministrativeOverride.NoOverride",
+                                                                            "Description":  "No override is currently active on target"
+                                                                        }
+                                         }
+                                     ]
+    },
+    {
+        "TargetGroupArn":  "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-sm-tg/000000000000003e",
+        "TargetHealthDescriptions":  [
+                                         {
+                                             "Target":  {
+                                                            "Id":  "i-00000000000000032",
+                                                            "Port":  80
+                                                        },
+                                             "HealthCheckPort":  "80",
+                                             "TargetHealth":  {
+                                                                  "State":  "unhealthy",
+                                                                  "Reason":  "Target.ResponseCodeMismatch",
+                                                                  "Description":  "Health checks failed with these codes: [404]"
+                                                              },
+                                             "AdministrativeOverride":  {
+                                                                            "State":  "no_override",
+                                                                            "Reason":  "AdministrativeOverride.NoOverride",
+                                                                            "Description":  "No override is currently active on target"
+                                                                        }
+                                         }
+                                     ]
+    },
+    {
+        "TargetGroupArn":  "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/oms-pod2-dev-svc-tg/0000000000000041",
+        "TargetHealthDescriptions":  [
+                                         {
+                                             "Target":  {
+                                                            "Id":  "i-00000000000000039",
+                                                            "Port":  80
+                                                        },
+                                             "HealthCheckPort":  "80",
+                                             "TargetHealth":  {
+                                                                  "State":  "unhealthy",
+                                                                  "Reason":  "Target.FailedHealthChecks",
+                                                                  "Description":  "Health checks failed"
+                                                              },
+                                             "AdministrativeOverride":  {
+                                                                            "State":  "no_override",
+                                                                            "Reason":  "AdministrativeOverride.NoOverride",
+                                                                            "Description":  "No override is currently active on target"
+                                                                        }
+                                         }
+                                     ]
+    }
+]

@@ -9,10 +9,26 @@ reads the note and carries on.
 | File | What it is | Pushed to git? |
 |------|------------|----------------|
 | `TEMPLATE.md` | The shape of a session note | Yes |
+| `EXAMPLE.md` | A filled-in worked example (ticket-tied) to copy the pattern from | Yes |
 | `save-session.py` | The command that writes and updates the notes (below) | Yes |
 | `LATEST.md` | Names the session file to continue from | No (private) |
-| `INDEX.md` | One line per saved session: date, topic, goal, next step | No (private) |
+| `INDEX.md` | One line per saved session: date, ticket, topic, goal, next step | No (private) |
 | `YYYY-MM-DD-topic.md` | One note per piece of work | No (private: they can hold client details) |
+| `tickets/<TICKET-ID>/` | Real deliverables for a ticket (specs, queries, runbooks) — not chat notes | Yes (unless a file inside names real hosts/creds) |
+
+## Ticket-tied vs. non-ticket work
+
+Every session gets a `Ticket:`. Pass `--ticket DCOMS-29203` for real Jira work; omit it for everything else
+(exploration, internal tooling) and `save-session.py` auto-assigns the next `SD-NNNN` id itself. Either way, the
+script creates `tickets/<id>/` for you. Put real work product there (epic notes, technical specs, SQL, runbooks,
+test results) — the session file itself stays a short status note, not the deliverable.
+
+Nobody has to invent or remember an ID — that's the point of auto-assigning one. `(none)` only shows up in
+`INDEX.md` for sessions saved before this existed.
+
+See `tickets/README.md` for the workspace conventions, and `EXAMPLE.md` for a full worked example of both
+pieces together. See `../scaffold-product.py` if you're setting this whole toolkit up fresh for a different
+product/team on its own branch.
 
 ## Why `save-session.py` exists
 
@@ -20,7 +36,7 @@ Saving must be quick enough to do after every step, by any AI. Editing a markdow
 The script makes it one command, keeps the format right, numbers the next steps, updates `LATEST.md`, and rebuilds `INDEX.md`.
 
 ```
-python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax"
+python chat-sessions/save-session.py start "Fix refund bug" --goal "Partial refunds double count tax" --ticket DCOMS-29203
 python chat-sessions/save-session.py note --section "Decisions" --text "Round per line, because the spec says so"
 python chat-sessions/save-session.py note --section "Next steps" --replace --text "Run the tests" --text "Open the PR"
 python chat-sessions/save-session.py index

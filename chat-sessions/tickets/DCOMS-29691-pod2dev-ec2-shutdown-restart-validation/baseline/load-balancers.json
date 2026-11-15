@@ -1,0 +1,50 @@
+﻿[
+    {
+        "Name": "oms-pod2-dev-sftp",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/oms-pod2-dev-sftp/00000000000000f4",
+        "DNS": "oms-pod2-dev-sftp-86bee7bd6535b74c.elb.us-east-1.amazonaws.com",
+        "Scheme": "internet-facing",
+        "Type": "network",
+        "State": "active"
+    },
+    {
+        "Name": "oms-pod2-dev-cnt-alb",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/oms-pod2-dev-cnt-alb/00000000000000f5",
+        "DNS": "internal-oms-pod2-dev-cnt-alb-27263045.us-east-1.elb.amazonaws.com",
+        "Scheme": "internal",
+        "Type": "application",
+        "State": "active"
+    },
+    {
+        "Name": "oms-pod2-dev-svc-alb",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/oms-pod2-dev-svc-alb/00000000000000f6",
+        "DNS": "internal-oms-pod2-dev-svc-alb-1099341890.us-east-1.elb.amazonaws.com",
+        "Scheme": "internal",
+        "Type": "application",
+        "State": "active"
+    },
+    {
+        "Name": "oms-pod2-dev-sm-alb",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/oms-pod2-dev-sm-alb/00000000000000f7",
+        "DNS": "oms-pod2-dev-sm-alb-1688951370.us-east-1.elb.amazonaws.com",
+        "Scheme": "internet-facing",
+        "Type": "application",
+        "State": "active"
+    },
+    {
+        "Name": "oms-pod2-dev-api-alb",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/oms-pod2-dev-api-alb/00000000000000f8",
+        "DNS": "oms-pod2-dev-api-alb-562222664.us-east-1.elb.amazonaws.com",
+        "Scheme": "internet-facing",
+        "Type": "application",
+        "State": "active"
+    },
+    {
+        "Name": "oms-pod2-dev-alb",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/oms-pod2-dev-alb/00000000000000f9",
+        "DNS": "oms-pod2-dev-alb-1607849835.us-east-1.elb.amazonaws.com",
+        "Scheme": "internet-facing",
+        "Type": "application",
+        "State": "active"
+    }
+]

@@ -1,0 +1,1648 @@
+﻿{
+    "Reservations": [
+        {
+            "ReservationId": "r-0a192792121a4e9db",
+            "OwnerId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2026-09-03T15:36:00+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000d8"
+                            }
+                        }
+                    ],
+                    "ClientToken": "terraform-ZKnrIbQ6QO4EmFO7N1N7neTRmD",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/oms-pod2-dev-rds-bast-2026061809225801520000001c",
+                        "Id": "AIPAT44DGFI2SDFGQ6C2T"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Association": {
+                                "IpOwnerId": "amazon",
+                                "PublicDnsName": "ec2-44-212-64-148.compute-1.amazonaws.com",
+                                "PublicIp": "203.0.113.8"
+                            },
+                            "Attachment": {
+                                "AttachTime": "2026-09-03T15:36:00+00:00",
+                                "AttachmentId": "eni-attach-033cc040d20ea1a72",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e3",
+                                    "GroupName": "oms-pod2-dev-rds-bast-20260618092235721100000019"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:01",
+                            "NetworkInterfaceId": "eni-000000000000000e4",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-111-220.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.5",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Association": {
+                                        "IpOwnerId": "amazon",
+                                        "PublicDnsName": "ec2-44-212-64-148.compute-1.amazonaws.com",
+                                        "PublicIp": "203.0.113.8"
+                                    },
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-111-220.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.5"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-000000000000000e5",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e3",
+                            "GroupName": "oms-pod2-dev-rds-bast-20260618092235721100000019"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-BastionHost"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-09-03T15:36:00+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000042",
+                    "ImageId": "ami-00000000000000023",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-111-220.ec2.internal",
+                    "PublicDnsName": "ec2-44-212-64-148.compute-1.amazonaws.com",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.micro",
+                    "LaunchTime": "2026-09-04T07:54:40+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-000000000000000e5",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.5",
+                    "PublicIpAddress": "203.0.113.8"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-01cc484e013769a83",
+            "OwnerId": "123456789012",
+            "RequesterId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:29+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000df"
+                            }
+                        },
+                        {
+                            "DeviceName": "xvdb",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:27.951000+00:00",
+                                "DeleteOnTermination": false,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000e0"
+                            }
+                        }
+                    ],
+                    "ClientToken": "00000000-0000-0000-0000-000000000033",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/web_server",
+                        "Id": "AIPAINU6FMHCSFOA6KR4K"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-04T07:54:28+00:00",
+                                "AttachmentId": "eni-attach-0cc71478ac23b907e",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e7",
+                                    "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000e8",
+                                    "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:02",
+                            "NetworkInterfaceId": "eni-000000000000000e9",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-82.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.2",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-82.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.2"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e7",
+                            "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000e8",
+                            "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "SFTPUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "IISUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Api-unc",
+                            "Value": "\\\\omspod.aptos.com\\pod2-dev\\dev\\api"
+                        },
+                        {
+                            "Key": "Api-dns",
+                            "Value": "oms-pod2-dev-api.dev.eom.aptos.io"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "2"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-00000000000000034"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "Server-dns",
+                            "Value": "10.0.0.1,10.0.0.2"
+                        },
+                        {
+                            "Key": "Project",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Component",
+                            "Value": "api"
+                        },
+                        {
+                            "Key": "Payment-unc",
+                            "Value": "\\\\omspod.aptos.com\\pod2-dev\\dev\\payment"
+                        },
+                        {
+                            "Key": "Project3Letter",
+                            "Value": "pod"
+                        },
+                        {
+                            "Key": "Domain",
+                            "Value": "omspod.aptos.com"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "Domain-netbios",
+                            "Value": "omspod"
+                        },
+                        {
+                            "Key": "Role",
+                            "Value": "apiserver"
+                        },
+                        {
+                            "Key": "Payment-api-dns",
+                            "Value": "oms-pod2-dev-paymentapi.dev.eom.aptos.io"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-api"
+                        },
+                        {
+                            "Key": "ad-user-pwd",
+                            "Value": "aptosomspod123!"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "oms-pod2-dev-api-asg"
+                        },
+                        {
+                            "Key": "ToroUser",
+                            "Value": "NA"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Windows",
+                    "UsageOperation": "RunInstances:0002",
+                    "UsageOperationUpdateTime": "2026-09-04T07:54:28+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000035",
+                    "ImageId": "ami-0000000000000002c",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-82.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.medium",
+                    "LaunchTime": "2026-09-04T07:54:28+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Platform": "windows",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.2"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-0b65e7b1a823fe93d",
+            "OwnerId": "123456789012",
+            "RequesterId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:40+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000db"
+                            }
+                        },
+                        {
+                            "DeviceName": "xvdb",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:39.398000+00:00",
+                                "DeleteOnTermination": false,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000dd"
+                            }
+                        }
+                    ],
+                    "ClientToken": "00000000-0000-0000-0000-000000000034",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/services_server",
+                        "Id": "AIPAT44DGFI22TJGZ52AA"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-04T07:54:39+00:00",
+                                "AttachmentId": "eni-attach-0b64d70f5eec5ff14",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e7",
+                                    "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000e8",
+                                    "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:03",
+                            "NetworkInterfaceId": "eni-000000000000000ea",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-135.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.4",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-135.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.4"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e7",
+                            "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000e8",
+                            "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "ad-user-pwd",
+                            "Value": "aptosomspod123!"
+                        },
+                        {
+                            "Key": "Server-dns",
+                            "Value": "10.0.0.1,10.0.0.2"
+                        },
+                        {
+                            "Key": "ToroUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-00000000000000038"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "oms-pod2-dev-svc-asg"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "Role",
+                            "Value": "Services"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "IISUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Project3Letter",
+                            "Value": "pod"
+                        },
+                        {
+                            "Key": "SFTPUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Project",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Domain-netbios",
+                            "Value": "omspod"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "1"
+                        },
+                        {
+                            "Key": "Component",
+                            "Value": "services"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-services"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "Domain",
+                            "Value": "omspod.aptos.com"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Windows",
+                    "UsageOperation": "RunInstances:0002",
+                    "UsageOperationUpdateTime": "2026-09-04T07:54:39+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000039",
+                    "ImageId": "ami-0000000000000002c",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-135.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.medium",
+                    "LaunchTime": "2026-09-04T07:54:39+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Platform": "windows",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.4"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-0c0c4cce44f49f3c0",
+            "OwnerId": "123456789012",
+            "RequesterId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:17+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000dc"
+                            }
+                        },
+                        {
+                            "DeviceName": "xvdb",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:16.295000+00:00",
+                                "DeleteOnTermination": false,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000d7"
+                            }
+                        }
+                    ],
+                    "ClientToken": "00000000-0000-0000-0000-000000000035",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/web_server",
+                        "Id": "AIPAINU6FMHCSFOA6KR4K"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-04T07:54:16+00:00",
+                                "AttachmentId": "eni-attach-04a3ff02837cc5c5e",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e7",
+                                    "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000e8",
+                                    "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:04",
+                            "NetworkInterfaceId": "eni-000000000000000eb",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-102.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.1",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-102.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.1"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e7",
+                            "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000e8",
+                            "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "oms-pod2-dev-sm-asg"
+                        },
+                        {
+                            "Key": "Server-dns",
+                            "Value": "10.0.0.1,10.0.0.2"
+                        },
+                        {
+                            "Key": "ad-user-pwd",
+                            "Value": "aptosomspod123!"
+                        },
+                        {
+                            "Key": "Domain-netbios",
+                            "Value": "omspod"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "1"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "Project3Letter",
+                            "Value": "pod"
+                        },
+                        {
+                            "Key": "SFTPUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Domain",
+                            "Value": "omspod.aptos.com"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-00000000000000031"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "sm-unc",
+                            "Value": "\\\\omspod.aptos.com\\pod2-dev\\dev\\sm"
+                        },
+                        {
+                            "Key": "sm-dns",
+                            "Value": "oms-pod2-dev-sm.dev.eom.aptos.io"
+                        },
+                        {
+                            "Key": "IISUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "Role",
+                            "Value": "sitemanagerserver"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "Project",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-sitemanager"
+                        },
+                        {
+                            "Key": "ToroUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Component",
+                            "Value": "sitemanager"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Windows",
+                    "UsageOperation": "RunInstances:0002",
+                    "UsageOperationUpdateTime": "2026-09-04T07:54:16+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000032",
+                    "ImageId": "ami-0000000000000002c",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-102.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.medium",
+                    "LaunchTime": "2026-09-04T07:54:16+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Platform": "windows",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.1"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-080052c98eaba2f62",
+            "OwnerId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-03T15:36:27+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000d9"
+                            }
+                        }
+                    ],
+                    "ClientToken": "terraform-b53zMgn7vlSgroRiLyb7HeZPLI",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/oms-pod2-dev-rds-mig-ip-20260618092907374900000031",
+                        "Id": "AIPAT44DGFI23CRFSQZJS"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-03T15:36:26+00:00",
+                                "AttachmentId": "eni-attach-037c8815c936a21f8",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000ec",
+                                    "GroupName": "oms-pod2-dev-rds-mig-2026061809290696670000002e"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:05",
+                            "NetworkInterfaceId": "eni-000000000000000ed",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-208.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.6",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-208.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.6"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000ec",
+                            "GroupName": "oms-pod2-dev-rds-mig-2026061809290696670000002e"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-rds-migration-host"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-09-03T15:36:26+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000043",
+                    "ImageId": "ami-00000000000000020",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-208.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2026-09-04T07:54:45+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.6"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-016db620d06a92099",
+            "OwnerId": "123456789012",
+            "RequesterId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:30+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000e2"
+                            }
+                        },
+                        {
+                            "DeviceName": "/dev/sdf",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:29.099000+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000da"
+                            }
+                        }
+                    ],
+                    "ClientToken": "00000000-0000-0000-0000-000000000036",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/content_server",
+                        "Id": "AIPAJKYSRPWVTA7WYMJQE"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-04T07:54:29+00:00",
+                                "AttachmentId": "eni-attach-0a471564584959065",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e7",
+                                    "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000e8",
+                                    "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:06",
+                            "NetworkInterfaceId": "eni-000000000000000ee",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-54.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.3",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-54.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.3"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e7",
+                            "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000e8",
+                            "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-content"
+                        },
+                        {
+                            "Key": "Project",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Project3Letter",
+                            "Value": "pod"
+                        },
+                        {
+                            "Key": "SFTPUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-00000000000000036"
+                        },
+                        {
+                            "Key": "IISUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Role",
+                            "Value": "Content"
+                        },
+                        {
+                            "Key": "ad-user-pwd",
+                            "Value": "aptosomspod123!"
+                        },
+                        {
+                            "Key": "Server-dns",
+                            "Value": "10.0.0.1,10.0.0.2"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "oms-pod2-dev-cnt-asg"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        },
+                        {
+                            "Key": "ToroUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "Domain",
+                            "Value": "omspod.aptos.com"
+                        },
+                        {
+                            "Key": "Component",
+                            "Value": "content"
+                        },
+                        {
+                            "Key": "Domain-netbios",
+                            "Value": "omspod"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "1"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Windows",
+                    "UsageOperation": "RunInstances:0002",
+                    "UsageOperationUpdateTime": "2026-09-04T07:54:29+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-00000000000000037",
+                    "ImageId": "ami-00000000000000027",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-54.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.medium",
+                    "LaunchTime": "2026-09-04T07:54:29+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Platform": "windows",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.3"
+                }
+            ]
+        },
+        {
+            "ReservationId": "r-04a84030b8b1d91b4",
+            "OwnerId": "123456789012",
+            "RequesterId": "123456789012",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sda1",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:49+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000de"
+                            }
+                        },
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "AttachTime": "2026-09-04T07:54:48.277000+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-000000000000000e1"
+                            }
+                        }
+                    ],
+                    "ClientToken": "00000000-0000-0000-0000-000000000037",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::123456789012:instance-profile/content_server",
+                        "Id": "AIPAJKYSRPWVTA7WYMJQE"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2026-09-04T07:54:48+00:00",
+                                "AttachmentId": "eni-attach-0cfd65ea6f5c91331",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupId": "sg-000000000000000e7",
+                                    "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000ef",
+                                    "GroupName": "oms-pod2-dev-toro-2026061809223998160000001b"
+                                },
+                                {
+                                    "GroupId": "sg-000000000000000e8",
+                                    "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:00:00:00:00:07",
+                            "NetworkInterfaceId": "eni-000000000000000f0",
+                            "OwnerId": "123456789012",
+                            "PrivateDnsName": "ip-20-115-11-213.ec2.internal",
+                            "PrivateIpAddress": "203.0.113.7",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-20-115-11-213.ec2.internal",
+                                    "PrivateIpAddress": "203.0.113.7"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-00000000000000033",
+                            "VpcId": "vpc-000000000000000e6",
+                            "InterfaceType": "interface",
+                            "Operator": {
+                                "Managed": false
+                            }
+                        }
+                    ],
+                    "RootDeviceName": "/dev/sda1",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupId": "sg-000000000000000e7",
+                            "GroupName": "oms-pod2-dev-windm-20260618091120487500000003"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000ef",
+                            "GroupName": "oms-pod2-dev-toro-2026061809223998160000001b"
+                        },
+                        {
+                            "GroupId": "sg-000000000000000e8",
+                            "GroupName": "oms-pod2-dev-windows-20260618091124666800000009"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "oms-pod2-dev-toronado"
+                        },
+                        {
+                            "Key": "Space",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "Terraform",
+                            "Value": "true"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-0000000000000003a"
+                        },
+                        {
+                            "Key": "Domain",
+                            "Value": "omspod.aptos.com"
+                        },
+                        {
+                            "Key": "IISUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Server-dns",
+                            "Value": "10.0.0.1,10.0.0.2"
+                        },
+                        {
+                            "Key": "Project3Letter",
+                            "Value": "pod"
+                        },
+                        {
+                            "Key": "Role",
+                            "Value": "Toronado"
+                        },
+                        {
+                            "Key": "SFTPUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Department",
+                            "Value": "ops"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "oms-pod2-dev-toronado-asg"
+                        },
+                        {
+                            "Key": "Component",
+                            "Value": "toronado"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "3"
+                        },
+                        {
+                            "Key": "Domain-netbios",
+                            "Value": "omspod"
+                        },
+                        {
+                            "Key": "ad-user-pwd",
+                            "Value": "aptosomspod123!"
+                        },
+                        {
+                            "Key": "business_division",
+                            "Value": "oms"
+                        },
+                        {
+                            "Key": "Environment",
+                            "Value": "dev"
+                        },
+                        {
+                            "Key": "ToroUser",
+                            "Value": "NA"
+                        },
+                        {
+                            "Key": "Project",
+                            "Value": "pod2"
+                        },
+                        {
+                            "Key": "cat_environment",
+                            "Value": "oms_pod2_dev"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "enabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Windows",
+                    "UsageOperation": "RunInstances:0002",
+                    "UsageOperationUpdateTime": "2026-09-04T07:54:48+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": false,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false
+                    },
+                    "InstanceId": "i-0000000000000003b",
+                    "ImageId": "ami-00000000000000030",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "PrivateDnsName": "ip-20-115-11-213.ec2.internal",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "",
+                    "KeyName": "cicd-harness-key-pair",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "t3.medium",
+                    "LaunchTime": "2026-09-04T07:54:48+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use1-az2",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-1d"
+                    },
+                    "Platform": "windows",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "SubnetId": "subnet-00000000000000033",
+                    "VpcId": "vpc-000000000000000e6",
+                    "PrivateIpAddress": "203.0.113.7"
+                }
+            ]
+        }
+    ]
+}

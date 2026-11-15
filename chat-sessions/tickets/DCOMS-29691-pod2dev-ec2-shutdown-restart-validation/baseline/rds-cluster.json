@@ -1,0 +1,98 @@
+﻿{
+    "DBClusters": [
+        {
+            "AllocatedStorage": 1,
+            "AvailabilityZones": [
+                "us-east-1f",
+                "us-east-1c",
+                "us-east-1d"
+            ],
+            "BackupRetentionPeriod": 7,
+            "DBClusterIdentifier": "oms-pod2-dev-aurora",
+            "DBClusterParameterGroup": "default.aurora-postgresql16",
+            "DBSubnetGroup": "oms-pod2-dev-vpc",
+            "Status": "available",
+            "EarliestRestorableTime": "2026-08-28T03:05:27.602000+00:00",
+            "Endpoint": "oms-pod2-dev-aurora.cluster-c39204eaex68.us-east-1.rds.amazonaws.com",
+            "ReaderEndpoint": "oms-pod2-dev-aurora.cluster-ro-c39204eaex68.us-east-1.rds.amazonaws.com",
+            "MultiAZ": false,
+            "Engine": "aurora-postgresql",
+            "EngineVersion": "16.11",
+            "LatestRestorableTime": "2026-09-04T12:12:32.718000+00:00",
+            "Port": 5432,
+            "MasterUsername": "omsadmin",
+            "PreferredBackupWindow": "03:00-04:00",
+            "PreferredMaintenanceWindow": "sun:05:00-sun:06:00",
+            "UpgradeRolloutOrder": "second",
+            "ReadReplicaIdentifiers": [],
+            "DBClusterMembers": [
+                {
+                    "DBInstanceIdentifier": "oms-pod2-dev-aurora-cluster-one",
+                    "IsClusterWriter": true,
+                    "DBClusterParameterGroupStatus": "in-sync",
+                    "PromotionTier": 0
+                }
+            ],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-000000000000000fa",
+                    "Status": "active"
+                }
+            ],
+            "HostedZoneId": "Z2R2ITUGPM61AM",
+            "StorageEncrypted": true,
+            "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000038",
+            "DbClusterResourceId": "cluster-3TVQXBHRAC7BKWO2ENBAPZTK6Q",
+            "DBClusterArn": "arn:aws:rds:us-east-1:123456789012:cluster:oms-pod2-dev-aurora",
+            "AssociatedRoles": [],
+            "IAMDatabaseAuthenticationEnabled": false,
+            "ClusterCreateTime": "2026-06-18T09:11:29.199000+00:00",
+            "EngineMode": "provisioned",
+            "StorageType": "aurora-iopt1",
+            "IOOptimizedNextAllowedModificationTime": "2026-08-07T13:29:07.215000+00:00",
+            "AutoMinorVersionUpgrade": true,
+            "DeletionProtection": true,
+            "HttpEndpointEnabled": true,
+            "ActivityStreamStatus": "stopped",
+            "CopyTagsToSnapshot": false,
+            "CrossAccountClone": false,
+            "DomainMemberships": [],
+            "TagList": [
+                {
+                    "Key": "Space",
+                    "Value": "pod2"
+                },
+                {
+                    "Key": "Department",
+                    "Value": "ops"
+                },
+                {
+                    "Key": "Terraform",
+                    "Value": "true"
+                },
+                {
+                    "Key": "business_division",
+                    "Value": "oms"
+                },
+                {
+                    "Key": "cat_environment",
+                    "Value": "oms_pod2_dev"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "dev"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "oms-pod2-dev-aurora"
+                }
+            ],
+            "NetworkType": "IPV4",
+            "DatabaseInsightsMode": "standard",
+            "PerformanceInsightsEnabled": false,
+            "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000039",
+            "LocalWriteForwardingStatus": "disabled",
+            "EngineLifecycleSupport": "open-source-rds-extended-support"
+        }
+    ]
+}

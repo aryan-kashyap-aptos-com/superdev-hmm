@@ -124,6 +124,77 @@ def cmd_saved(args):
     c.show_table(rows, ["name", "first line"], "saved-queries", limit=200)
 
 
+def _openpyxl():
+    try:
+        import openpyxl
+        return openpyxl
+    except ImportError:
+        raise c.ConnectorError("The openpyxl package is not installed.",
+                               "Run: pip install openpyxl") from None
+
+
+def _write_excel(columns, rows, output_path, query, metadata):
+    openpyxl = _openpyxl()
+    from openpyxl.styles import Font
+    from openpyxl.utils import get_column_letter
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Results"
+    ws.append(columns)
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+    for row in rows:
+        ws.append(row)
+    for i, col in enumerate(columns, start=1):
+        width = max([len(str(col))] + [len(str(r[i - 1])) for r in rows], default=0)
+        ws.column_dimensions[get_column_letter(i)].width = min(width + 2, 60)
+    meta = wb.create_sheet("Query")
+    meta["A1"], meta["A1"].font = "Query", Font(bold=True)
+    meta["B1"] = query
+    for i, (k, v) in enumerate(metadata.items(), start=3):
+        meta[f"A{i}"], meta[f"A{i}"].font = str(k), Font(bold=True)
+        meta[f"B{i}"] = str(v)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(output_path)
+
+
+def _run_search_for_export(args):
+    query = _load_query(args.query)
+    start, end = parse_time(args.start), parse_time(args.end)
+    if start >= end:
+        raise c.ConnectorError("--from must be earlier than --to.")
+    print(f"Searching {c.fmt_ms(start)} to {c.fmt_ms(end)} (local time)...", file=sys.stderr)
+    kind, items, status = Sumo().search(query, start, end, args.wait)
+    columns = list(dict.fromkeys(k for item in items[:100] for k in item)) if items else []
+    rows = [[item.get(col, "") for col in columns] for item in items]
+    return query, columns, rows, status
+
+
+def cmd_export(args):
+    query, columns, rows, status = _run_search_for_export(args)
+    if args.output:
+        output = Path(args.output)
+        if not output.is_absolute():
+            output = HERE / "exports" / output
+    else:
+        output = HERE / "exports" / f"sumologic_{time.strftime('%Y%m%d_%H%M%S')}.xlsx"
+    metadata = {"from": args.start, "to": args.end, "messageCount": status.get("messageCount", 0),
+                "recordCount": status.get("recordCount", 0), "exportedRows": len(rows)}
+    _write_excel(columns, rows, output, query, metadata)
+    print(f"Exported {len(rows)} rows to {output}")
+
+
+def cmd_export_file(args):
+    path = Path(args.query_file)
+    if not path.exists():
+        raise c.ConnectorError(f"Query file not found: {path}", "Check the path.")
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        raise c.ConnectorError(f"Query file is empty: {path}")
+    args.query = text
+    cmd_export(args)
+
+
 def cmd_query(args):
     query = _load_query(args.query)
     start, end = parse_time(args.start), parse_time(args.end)
@@ -164,6 +235,22 @@ def main():
     s.add_argument("--limit", type=int, default=c.MAX_ROWS, help="rows to print (all rows go to a file)")
     s.add_argument("--wait", type=int, default=120, help="max seconds to wait for the search (default 120)")
     s.set_defaults(func=cmd_query)
+
+    s = sub.add_parser("export", help="run a search and save results to an Excel file")
+    s.add_argument("query", help="query text, or @name for a saved query")
+    s.add_argument("--output", "-o", help="output .xlsx path (default: sumologic/exports/sumologic_<timestamp>.xlsx)")
+    s.add_argument("--from", dest="start", default="-15m", help="start: -15m, -2h, -1d, or 2026-11-01T10:00:00 (default -15m)")
+    s.add_argument("--to", dest="end", default="now", help="end (default now)")
+    s.add_argument("--wait", type=int, default=120, help="max seconds to wait for the search (default 120)")
+    s.set_defaults(func=cmd_export)
+
+    s = sub.add_parser("export-file", help="run a query from a text file and save results to Excel")
+    s.add_argument("query_file", help="path to a file holding the query text")
+    s.add_argument("--output", "-o", help="output .xlsx path (default: sumologic/exports/sumologic_<timestamp>.xlsx)")
+    s.add_argument("--from", dest="start", default="-15m", help="start: -15m, -2h, -1d, or 2026-11-01T10:00:00 (default -15m)")
+    s.add_argument("--to", dest="end", default="now", help="end (default now)")
+    s.add_argument("--wait", type=int, default=120, help="max seconds to wait for the search (default 120)")
+    s.set_defaults(func=cmd_export_file)
 
     args = p.parse_args()
     args.func(args)

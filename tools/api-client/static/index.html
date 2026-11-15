@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMS API Client</title>
+<style>html,body{margin:0;background:#080702;color:#ECE6D6}</style>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="ac">
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="side" id="side" aria-label="Collection">
+    <div class="brand"><b>API</b><span>Client</span>
+      <div class="seg sm" id="themeSeg" role="group" aria-label="Theme" style="margin-left:auto">
+        <button type="button" data-v="dark" aria-pressed="true">Dark</button>
+        <button type="button" data-v="light" aria-pressed="false">Light</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="cap">Environment</span>
+        <label class="link" style="cursor:pointer">Import<input id="envInput" type="file" accept=".json" multiple hidden></label>
+      </div>
+      <select class="env-select" id="envSelect"></select>
+      <button class="vars-toggle" id="varsToggle" aria-expanded="false"><span id="varsSummary">no variables</span><span class="tri mono" aria-hidden>&rsaquo;</span></button>
+      <div class="vars-edit" id="varsEdit" hidden>
+        <input type="search" id="varsFilter" class="vars-filter" placeholder="Filter variables">
+        <div class="vars-rows" id="varsRows"></div>
+        <p class="hint" style="margin-top:var(--s-2)">Editing the active environment's saved values. Collection-level variables aren't editable here.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="search">
+        <span class="mono" aria-hidden style="color:var(--ink-3)">/</span>
+        <input id="searchInput" type="search" placeholder="Filter requests" aria-label="Filter requests">
+        <kbd>Ctrl K</kbd>
+      </div>
+    </div>
+
+    <nav class="list" id="list"></nav>
+
+    <div class="side-foot">
+      <button class="btn-line" id="newReqBtn">+ New request</button>
+      <label class="btn-line" style="cursor:pointer">Import<input id="colInput" type="file" accept=".json,.postman_collection" multiple hidden></label>
+    </div>
+  </aside>
+
+  <div class="resize-v" id="sideResizer" role="separator" aria-orientation="vertical" aria-label="Resize sidebar"></div>
+  <main class="main" id="main"></main>
+  <div class="ac-toast" id="toast"></div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
