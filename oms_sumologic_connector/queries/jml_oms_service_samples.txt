@@ -1,0 +1,1 @@
+_sourceCategory=OMS/service AND "JML" | fields _messagetime, _raw | sort by _messagetime desc | limit 10

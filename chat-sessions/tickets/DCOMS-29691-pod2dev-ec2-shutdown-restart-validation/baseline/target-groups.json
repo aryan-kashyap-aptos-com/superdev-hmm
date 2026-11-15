@@ -1,0 +1,42 @@
+﻿[
+    {
+        "Name": "oms-pod2-dev-api-tg",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-api-tg/baa2ac4086597929",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "HealthCheckPath": "/orderservice.amx"
+    },
+    {
+        "Name": "oms-pod2-dev-cnt-tg",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-cnt-tg/ce191efaf850200f",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "HealthCheckPath": "/"
+    },
+    {
+        "Name": "oms-pod2-dev-sftptg",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sftptg/b7f93b0411dfa182",
+        "Port": 22,
+        "Protocol": "TCP",
+        "TargetType": "instance",
+        "HealthCheckPath": null
+    },
+    {
+        "Name": "oms-pod2-dev-sm-tg",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "HealthCheckPath": "/hashcheck.asp"
+    },
+    {
+        "Name": "oms-pod2-dev-svc-tg",
+        "ARN": "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-svc-tg/34bffc65beb3c2d1",
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "instance",
+        "HealthCheckPath": "/hashcheck.asp"
+    }
+]

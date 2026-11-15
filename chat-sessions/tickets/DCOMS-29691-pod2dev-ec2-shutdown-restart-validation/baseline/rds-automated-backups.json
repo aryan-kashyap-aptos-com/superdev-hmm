@@ -1,0 +1,33 @@
+﻿{
+    "DBClusterAutomatedBackups": [
+        {
+            "Engine": "aurora-postgresql",
+            "DBClusterAutomatedBackupsArn": "arn:aws:rds:us-east-1:268173716021:cluster-auto-backup:cab-3tvqxbhrac7bkwo2enbapztk6q36bd3v6g7kw5hn6qdgbefojftlrpz65lt3wxdl",
+            "DBClusterIdentifier": "oms-pod2-dev-aurora",
+            "RestoreWindow": {
+                "EarliestTime": "2026-08-28T03:05:27.602000+00:00",
+                "LatestTime": "2026-09-04T12:12:32.718000+00:00"
+            },
+            "MasterUsername": "omsadmin",
+            "DbClusterResourceId": "cluster-3TVQXBHRAC7BKWO2ENBAPZTK6Q",
+            "Region": "us-east-1",
+            "Status": "active",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "ClusterCreateTime": "2026-06-18T09:11:29+00:00",
+            "StorageEncrypted": true,
+            "AllocatedStorage": 1,
+            "EngineVersion": "16.11",
+            "DBClusterArn": "arn:aws:rds:us-east-1:268173716021:cluster:oms-pod2-dev-aurora",
+            "BackupRetentionPeriod": 7,
+            "EngineMode": "provisioned",
+            "AvailabilityZones": [
+                "us-east-1f",
+                "us-east-1c",
+                "us-east-1d"
+            ],
+            "Port": 5432,
+            "KmsKeyId": "arn:aws:kms:us-east-1:268173716021:key/a42a6f8c-3327-4a90-b371-5f4cc016e901",
+            "TagList": []
+        }
+    ]
+}

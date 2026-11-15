@@ -1,0 +1,646 @@
+﻿[
+    {
+        "AutoScalingGroups":  [
+                                  {
+                                      "AutoScalingGroupName":  "oms-pod2-dev-sm-asg",
+                                      "AutoScalingGroupARN":  "arn:aws:autoscaling:us-east-1:268173716021:autoScalingGroup:5d9eab4d-7bae-475b-803a-3b0f4307fde9:autoScalingGroupName/oms-pod2-dev-sm-asg",
+                                      "LaunchTemplate":  {
+                                                             "LaunchTemplateId":  "lt-0b855c87419c04a38",
+                                                             "LaunchTemplateName":  "oms-pod2-dev-sm-20260618092229552500000011",
+                                                             "Version":  "1"
+                                                         },
+                                      "MinSize":  1,
+                                      "MaxSize":  3,
+                                      "DesiredCapacity":  1,
+                                      "DefaultCooldown":  300,
+                                      "AvailabilityZones":  [
+                                                                "us-east-1d"
+                                                            ],
+                                      "LoadBalancerNames":  [
+
+                                                            ],
+                                      "TargetGroupARNs":  [
+                                                              "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sftptg/b7f93b0411dfa182",
+                                                              "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7"
+                                                          ],
+                                      "HealthCheckType":  "ELB",
+                                      "HealthCheckGracePeriod":  1200,
+                                      "Instances":  [
+                                                        {
+                                                            "InstanceId":  "i-036505377f8ad5c6e",
+                                                            "InstanceType":  "t3.medium",
+                                                            "AvailabilityZone":  "us-east-1d",
+                                                            "LifecycleState":  "InService",
+                                                            "HealthStatus":  "Healthy",
+                                                            "LaunchTemplate":  {
+                                                                                   "LaunchTemplateId":  "lt-0b855c87419c04a38",
+                                                                                   "LaunchTemplateName":  "oms-pod2-dev-sm-20260618092229552500000011",
+                                                                                   "Version":  "1"
+                                                                               },
+                                                            "ProtectedFromScaleIn":  false
+                                                        }
+                                                    ],
+                                      "CreatedTime":  "2026-06-18T09:25:37.284000+00:00",
+                                      "SuspendedProcesses":  [
+                                                                 {
+                                                                     "ProcessName":  "ReplaceUnhealthy",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:25:52Z"
+                                                                 },
+                                                                 {
+                                                                     "ProcessName":  "HealthCheck",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:25:52Z"
+                                                                 }
+                                                             ],
+                                      "VPCZoneIdentifier":  "subnet-0991643926b5b323f",
+                                      "EnabledMetrics":  [
+
+                                                         ],
+                                      "Tags":  [
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Component",
+                                                       "Value":  "sitemanager",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Department",
+                                                       "Value":  "ops",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Environment",
+                                                       "Value":  "dev",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Name",
+                                                       "Value":  "oms-pod2-dev-sitemanager",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Space",
+                                                       "Value":  "pod2",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Terraform",
+                                                       "Value":  "true",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "business_division",
+                                                       "Value":  "oms",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-sm-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "cat_environment",
+                                                       "Value":  "oms_pod2_dev",
+                                                       "PropagateAtLaunch":  true
+                                                   }
+                                               ],
+                                      "TerminationPolicies":  [
+                                                                  "Default"
+                                                              ],
+                                      "NewInstancesProtectedFromScaleIn":  false,
+                                      "ServiceLinkedRoleARN":  "arn:aws:iam::268173716021:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                                      "TrafficSources":  [
+                                                             {
+                                                                 "Identifier":  "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sftptg/b7f93b0411dfa182",
+                                                                 "Type":  "elbv2"
+                                                             },
+                                                             {
+                                                                 "Identifier":  "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-sm-tg/bcdb7dbabebe30b7",
+                                                                 "Type":  "elbv2"
+                                                             }
+                                                         ],
+                                      "AvailabilityZoneDistribution":  {
+                                                                           "CapacityDistributionStrategy":  "balanced-best-effort"
+                                                                       },
+                                      "CapacityReservationSpecification":  {
+                                                                               "CapacityReservationPreference":  "default"
+                                                                           },
+                                      "InstanceLifecyclePolicy":  {
+                                                                      "RetentionTriggers":  {
+                                                                                                "TerminateHookAbandon":  "terminate"
+                                                                                            }
+                                                                  }
+                                  }
+                              ]
+    },
+    {
+        "AutoScalingGroups":  [
+                                  {
+                                      "AutoScalingGroupName":  "oms-pod2-dev-api-asg",
+                                      "AutoScalingGroupARN":  "arn:aws:autoscaling:us-east-1:268173716021:autoScalingGroup:9de41014-e9d3-42ea-9a4d-9c4db7e0e0ac:autoScalingGroupName/oms-pod2-dev-api-asg",
+                                      "LaunchTemplate":  {
+                                                             "LaunchTemplateId":  "lt-04c16343634afedfa",
+                                                             "LaunchTemplateName":  "oms-pod2-dev-api-20260618092229774300000015",
+                                                             "Version":  "2"
+                                                         },
+                                      "MinSize":  1,
+                                      "MaxSize":  3,
+                                      "DesiredCapacity":  1,
+                                      "DefaultCooldown":  300,
+                                      "AvailabilityZones":  [
+                                                                "us-east-1d"
+                                                            ],
+                                      "LoadBalancerNames":  [
+
+                                                            ],
+                                      "TargetGroupARNs":  [
+                                                              "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-api-tg/baa2ac4086597929"
+                                                          ],
+                                      "HealthCheckType":  "ELB",
+                                      "HealthCheckGracePeriod":  1200,
+                                      "Instances":  [
+                                                        {
+                                                            "InstanceId":  "i-02b70bcb094c2dcec",
+                                                            "InstanceType":  "t3.medium",
+                                                            "AvailabilityZone":  "us-east-1d",
+                                                            "LifecycleState":  "InService",
+                                                            "HealthStatus":  "Healthy",
+                                                            "LaunchTemplate":  {
+                                                                                   "LaunchTemplateId":  "lt-04c16343634afedfa",
+                                                                                   "LaunchTemplateName":  "oms-pod2-dev-api-20260618092229774300000015",
+                                                                                   "Version":  "2"
+                                                                               },
+                                                            "ProtectedFromScaleIn":  false
+                                                        }
+                                                    ],
+                                      "CreatedTime":  "2026-06-18T09:22:42.472000+00:00",
+                                      "SuspendedProcesses":  [
+                                                                 {
+                                                                     "ProcessName":  "HealthCheck",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:22:56Z"
+                                                                 },
+                                                                 {
+                                                                     "ProcessName":  "ReplaceUnhealthy",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:22:56Z"
+                                                                 }
+                                                             ],
+                                      "VPCZoneIdentifier":  "subnet-0991643926b5b323f",
+                                      "EnabledMetrics":  [
+
+                                                         ],
+                                      "Tags":  [
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Component",
+                                                       "Value":  "api",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Department",
+                                                       "Value":  "ops",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Environment",
+                                                       "Value":  "dev",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Name",
+                                                       "Value":  "oms-pod2-dev-api",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Space",
+                                                       "Value":  "pod2",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Terraform",
+                                                       "Value":  "true",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "business_division",
+                                                       "Value":  "oms",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-api-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "cat_environment",
+                                                       "Value":  "oms_pod2_dev",
+                                                       "PropagateAtLaunch":  true
+                                                   }
+                                               ],
+                                      "TerminationPolicies":  [
+                                                                  "Default"
+                                                              ],
+                                      "NewInstancesProtectedFromScaleIn":  false,
+                                      "ServiceLinkedRoleARN":  "arn:aws:iam::268173716021:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                                      "TrafficSources":  [
+                                                             {
+                                                                 "Identifier":  "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-api-tg/baa2ac4086597929",
+                                                                 "Type":  "elbv2"
+                                                             }
+                                                         ],
+                                      "AvailabilityZoneDistribution":  {
+                                                                           "CapacityDistributionStrategy":  "balanced-best-effort"
+                                                                       },
+                                      "CapacityReservationSpecification":  {
+                                                                               "CapacityReservationPreference":  "default"
+                                                                           },
+                                      "InstanceLifecyclePolicy":  {
+                                                                      "RetentionTriggers":  {
+                                                                                                "TerminateHookAbandon":  "terminate"
+                                                                                            }
+                                                                  }
+                                  }
+                              ]
+    },
+    {
+        "AutoScalingGroups":  [
+                                  {
+                                      "AutoScalingGroupName":  "oms-pod2-dev-cnt-asg",
+                                      "AutoScalingGroupARN":  "arn:aws:autoscaling:us-east-1:268173716021:autoScalingGroup:f81c5b7d-9dbc-4dcb-9d4d-d0bd7b7cdfdf:autoScalingGroupName/oms-pod2-dev-cnt-asg",
+                                      "LaunchTemplate":  {
+                                                             "LaunchTemplateId":  "lt-02014b02af5f5f34d",
+                                                             "LaunchTemplateName":  "oms-pod2-dev-cnt-20260618092235370100000017",
+                                                             "Version":  "1"
+                                                         },
+                                      "MinSize":  1,
+                                      "MaxSize":  3,
+                                      "DesiredCapacity":  1,
+                                      "DefaultCooldown":  300,
+                                      "AvailabilityZones":  [
+                                                                "us-east-1d"
+                                                            ],
+                                      "LoadBalancerNames":  [
+
+                                                            ],
+                                      "TargetGroupARNs":  [
+                                                              "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-cnt-tg/ce191efaf850200f"
+                                                          ],
+                                      "HealthCheckType":  "ELB",
+                                      "HealthCheckGracePeriod":  1200,
+                                      "Instances":  [
+                                                        {
+                                                            "InstanceId":  "i-0d23caf16cd2c5adb",
+                                                            "InstanceType":  "t3.medium",
+                                                            "AvailabilityZone":  "us-east-1d",
+                                                            "LifecycleState":  "InService",
+                                                            "HealthStatus":  "Healthy",
+                                                            "LaunchTemplate":  {
+                                                                                   "LaunchTemplateId":  "lt-02014b02af5f5f34d",
+                                                                                   "LaunchTemplateName":  "oms-pod2-dev-cnt-20260618092235370100000017",
+                                                                                   "Version":  "1"
+                                                                               },
+                                                            "ProtectedFromScaleIn":  false
+                                                        }
+                                                    ],
+                                      "CreatedTime":  "2026-06-18T09:23:11.496000+00:00",
+                                      "SuspendedProcesses":  [
+                                                                 {
+                                                                     "ProcessName":  "HealthCheck",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:23:26Z"
+                                                                 },
+                                                                 {
+                                                                     "ProcessName":  "ReplaceUnhealthy",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:23:26Z"
+                                                                 }
+                                                             ],
+                                      "VPCZoneIdentifier":  "subnet-0991643926b5b323f",
+                                      "EnabledMetrics":  [
+
+                                                         ],
+                                      "Tags":  [
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Component",
+                                                       "Value":  "content",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Department",
+                                                       "Value":  "ops",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Environment",
+                                                       "Value":  "dev",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Name",
+                                                       "Value":  "oms-pod2-dev-content",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Space",
+                                                       "Value":  "pod2",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Terraform",
+                                                       "Value":  "true",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "business_division",
+                                                       "Value":  "oms",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-cnt-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "cat_environment",
+                                                       "Value":  "oms_pod2_dev",
+                                                       "PropagateAtLaunch":  true
+                                                   }
+                                               ],
+                                      "TerminationPolicies":  [
+                                                                  "Default"
+                                                              ],
+                                      "NewInstancesProtectedFromScaleIn":  false,
+                                      "ServiceLinkedRoleARN":  "arn:aws:iam::268173716021:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                                      "TrafficSources":  [
+                                                             {
+                                                                 "Identifier":  "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-cnt-tg/ce191efaf850200f",
+                                                                 "Type":  "elbv2"
+                                                             }
+                                                         ],
+                                      "AvailabilityZoneDistribution":  {
+                                                                           "CapacityDistributionStrategy":  "balanced-best-effort"
+                                                                       },
+                                      "CapacityReservationSpecification":  {
+                                                                               "CapacityReservationPreference":  "default"
+                                                                           },
+                                      "InstanceLifecyclePolicy":  {
+                                                                      "RetentionTriggers":  {
+                                                                                                "TerminateHookAbandon":  "terminate"
+                                                                                            }
+                                                                  }
+                                  }
+                              ]
+    },
+    {
+        "AutoScalingGroups":  [
+                                  {
+                                      "AutoScalingGroupName":  "oms-pod2-dev-svc-asg",
+                                      "AutoScalingGroupARN":  "arn:aws:autoscaling:us-east-1:268173716021:autoScalingGroup:d8580995-c44e-486e-b4b3-484bfb93312f:autoScalingGroupName/oms-pod2-dev-svc-asg",
+                                      "LaunchTemplate":  {
+                                                             "LaunchTemplateId":  "lt-065ec85bdef1d20e6",
+                                                             "LaunchTemplateName":  "oms-pod2-dev-svc-20260618092229754000000013",
+                                                             "Version":  "1"
+                                                         },
+                                      "MinSize":  1,
+                                      "MaxSize":  3,
+                                      "DesiredCapacity":  1,
+                                      "DefaultCooldown":  300,
+                                      "AvailabilityZones":  [
+                                                                "us-east-1d"
+                                                            ],
+                                      "LoadBalancerNames":  [
+
+                                                            ],
+                                      "TargetGroupARNs":  [
+                                                              "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-svc-tg/34bffc65beb3c2d1"
+                                                          ],
+                                      "HealthCheckType":  "ELB",
+                                      "HealthCheckGracePeriod":  1200,
+                                      "Instances":  [
+                                                        {
+                                                            "InstanceId":  "i-0f603ed7f8f947bd7",
+                                                            "InstanceType":  "t3.medium",
+                                                            "AvailabilityZone":  "us-east-1d",
+                                                            "LifecycleState":  "InService",
+                                                            "HealthStatus":  "Healthy",
+                                                            "LaunchTemplate":  {
+                                                                                   "LaunchTemplateId":  "lt-065ec85bdef1d20e6",
+                                                                                   "LaunchTemplateName":  "oms-pod2-dev-svc-20260618092229754000000013",
+                                                                                   "Version":  "1"
+                                                                               },
+                                                            "ProtectedFromScaleIn":  false
+                                                        }
+                                                    ],
+                                      "CreatedTime":  "2026-06-18T09:22:43.713000+00:00",
+                                      "SuspendedProcesses":  [
+                                                                 {
+                                                                     "ProcessName":  "ReplaceUnhealthy",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:22:58Z"
+                                                                 },
+                                                                 {
+                                                                     "ProcessName":  "HealthCheck",
+                                                                     "SuspensionReason":  "User suspended at 2026-06-18T09:22:58Z"
+                                                                 }
+                                                             ],
+                                      "VPCZoneIdentifier":  "subnet-0991643926b5b323f",
+                                      "EnabledMetrics":  [
+
+                                                         ],
+                                      "Tags":  [
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Component",
+                                                       "Value":  "services",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Department",
+                                                       "Value":  "ops",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Environment",
+                                                       "Value":  "dev",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Name",
+                                                       "Value":  "oms-pod2-dev-services",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Space",
+                                                       "Value":  "pod2",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Terraform",
+                                                       "Value":  "true",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "business_division",
+                                                       "Value":  "oms",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-svc-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "cat_environment",
+                                                       "Value":  "oms_pod2_dev",
+                                                       "PropagateAtLaunch":  true
+                                                   }
+                                               ],
+                                      "TerminationPolicies":  [
+                                                                  "Default"
+                                                              ],
+                                      "NewInstancesProtectedFromScaleIn":  false,
+                                      "ServiceLinkedRoleARN":  "arn:aws:iam::268173716021:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                                      "TrafficSources":  [
+                                                             {
+                                                                 "Identifier":  "arn:aws:elasticloadbalancing:us-east-1:268173716021:targetgroup/oms-pod2-dev-svc-tg/34bffc65beb3c2d1",
+                                                                 "Type":  "elbv2"
+                                                             }
+                                                         ],
+                                      "AvailabilityZoneDistribution":  {
+                                                                           "CapacityDistributionStrategy":  "balanced-best-effort"
+                                                                       },
+                                      "CapacityReservationSpecification":  {
+                                                                               "CapacityReservationPreference":  "default"
+                                                                           },
+                                      "InstanceLifecyclePolicy":  {
+                                                                      "RetentionTriggers":  {
+                                                                                                "TerminateHookAbandon":  "terminate"
+                                                                                            }
+                                                                  }
+                                  }
+                              ]
+    },
+    {
+        "AutoScalingGroups":  [
+                                  {
+                                      "AutoScalingGroupName":  "oms-pod2-dev-toronado-asg",
+                                      "AutoScalingGroupARN":  "arn:aws:autoscaling:us-east-1:268173716021:autoScalingGroup:2a18a932-118a-4eb0-b5ff-4a8b587eb613:autoScalingGroupName/oms-pod2-dev-toronado-asg",
+                                      "LaunchTemplate":  {
+                                                             "LaunchTemplateId":  "lt-0f9dbbcc6d5feed47",
+                                                             "LaunchTemplateName":  "oms-pod2-dev-toro-2026061809231283220000001d",
+                                                             "Version":  "3"
+                                                         },
+                                      "MinSize":  1,
+                                      "MaxSize":  1,
+                                      "DesiredCapacity":  1,
+                                      "DefaultCooldown":  300,
+                                      "AvailabilityZones":  [
+                                                                "us-east-1d",
+                                                                "us-east-1f"
+                                                            ],
+                                      "LoadBalancerNames":  [
+
+                                                            ],
+                                      "TargetGroupARNs":  [
+
+                                                          ],
+                                      "HealthCheckType":  "EC2",
+                                      "HealthCheckGracePeriod":  1200,
+                                      "Instances":  [
+                                                        {
+                                                            "InstanceId":  "i-0aee83fe4726581e4",
+                                                            "InstanceType":  "t3.medium",
+                                                            "AvailabilityZone":  "us-east-1d",
+                                                            "LifecycleState":  "InService",
+                                                            "HealthStatus":  "Healthy",
+                                                            "LaunchTemplate":  {
+                                                                                   "LaunchTemplateId":  "lt-0f9dbbcc6d5feed47",
+                                                                                   "LaunchTemplateName":  "oms-pod2-dev-toro-2026061809231283220000001d",
+                                                                                   "Version":  "3"
+                                                                               },
+                                                            "ProtectedFromScaleIn":  false
+                                                        }
+                                                    ],
+                                      "CreatedTime":  "2026-06-18T09:23:41.034000+00:00",
+                                      "SuspendedProcesses":  [
+
+                                                             ],
+                                      "VPCZoneIdentifier":  "subnet-05df60e30ccb7672f,subnet-0991643926b5b323f",
+                                      "EnabledMetrics":  [
+
+                                                         ],
+                                      "Tags":  [
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-toronado-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Component",
+                                                       "Value":  "toronado",
+                                                       "PropagateAtLaunch":  true
+                                                   },
+                                                   {
+                                                       "ResourceId":  "oms-pod2-dev-toronado-asg",
+                                                       "ResourceType":  "auto-scaling-group",
+                                                       "Key":  "Name",
+                                                       "Value":  "oms-pod2-dev-toronado",
+                                                       "PropagateAtLaunch":  true
+                                                   }
+                                               ],
+                                      "TerminationPolicies":  [
+                                                                  "Default"
+                                                              ],
+                                      "NewInstancesProtectedFromScaleIn":  false,
+                                      "ServiceLinkedRoleARN":  "arn:aws:iam::268173716021:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                                      "TrafficSources":  [
+
+                                                         ],
+                                      "AvailabilityZoneDistribution":  {
+                                                                           "CapacityDistributionStrategy":  "balanced-best-effort"
+                                                                       },
+                                      "CapacityReservationSpecification":  {
+                                                                               "CapacityReservationPreference":  "default"
+                                                                           },
+                                      "InstanceLifecyclePolicy":  {
+                                                                      "RetentionTriggers":  {
+                                                                                                "TerminateHookAbandon":  "terminate"
+                                                                                            }
+                                                                  }
+                                  }
+                              ]
+    }
+]

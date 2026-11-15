@@ -1,0 +1,75 @@
+---
+description: How to run Sumo Logic queries for any OMS client via oms_sumologic_connector
+globs: oms_sumologic_connector/**
+alwaysApply: false
+---
+
+# Sumo Logic — Client Query Playbook
+
+Use `oms_sumologic_connector/sumologic.py`. Max **3 queries** per request unless user asks for detail.
+
+## Before querying — confirm (or infer from docs)
+
+| Field | Example |
+|-------|---------|
+| Client code | 3-letter lowercase: `jmc`, `tly`, `tbh`, `hft` |
+| Env | `PROD`, `UAT`, `DEV` |
+| Time range | Default `-24h` health, `-7d` API stats |
+| Question type | health / distinct APIs / top paths / export |
+
+**Never** search `*CLIENT*` text alone — hits CloudTrail noise.
+
+## Log locations (pick one scope)
+
+```
+API (cloud):    _sourceCategory=DCOMS/API/PROD/{client}
+API (legacy):   _collector=OMS-{client}-* AND _sourceCategory=OMS/api
+Payment:        _collector=OMS-{client}-* AND _sourceCategory=OMS/payment
+Services:       _collector=OMS-{client}-* AND _sourceCategory=OMS/service
+Toro/on-prem:   _sourceCategory=DCOM/Prod/Toro/{CLIENT}
+Collector:      _collector=OMS-{client}-*
+```
+
+If `DCOMS/API/PROD/{client}` returns 0 rows, fall back to legacy `OMS/api` scope.
+
+## Standard queries (replace `{client}`)
+
+**1. Health (24h)**
+```
+(_sourceCategory=DCOMS/API/PROD/{client} OR _collector=OMS-{client}-*)
+| where _loglevel in ("ERROR","WARN")
+| count by _loglevel
+```
+
+**2. Distinct API paths (7d)**
+```
+_sourceCategory=DCOMS/API/PROD/{client}
+| parse regex field=_raw "\"(?<method>GET|POST|PUT|DELETE|PATCH)[^\"]* (?<path>/[^\"\\s?]+)" nodrop
+| count_distinct(path)
+```
+
+**3. Top API paths (7d)**
+```
+_sourceCategory=DCOMS/API/PROD/{client}
+| parse regex field=_raw "\"(?<method>GET|POST|PUT|DELETE|PATCH)[^\"]* (?<path>/[^\"\\s?]+)" nodrop
+| count by path, method | sort by _count desc | limit 20
+```
+
+## CLI
+
+```powershell
+cd C:\PROD\ConnectorSuite\oms_sumologic_connector
+python sumologic.py query "<query>" --from -7d --limit 50
+python sumologic.py export "<query>" -o exports/{client}_report.xlsx --from -7d
+```
+
+Use `--result-type records` for aggregate queries (`count`, `count_distinct`).
+
+## Response format
+
+1. Scope used (client, env, time)
+2. Health: ERROR/WARN counts or "none"
+3. Metrics: distinct paths, total volume if relevant
+4. One-line recommendation
+
+Only drill deeper if user asks.

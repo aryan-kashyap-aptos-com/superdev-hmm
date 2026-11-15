@@ -1,8 +1,28 @@
+# Secrets and local env
 .env
+.env.*
+!.env.example
 .token.json
-connectors/results/
+.aws-temp-credentials
+TEMPAWSCREDS.env
+**/baselines/ssm-mq-baseline-*.json
+!**/baselines/ssm-mq-baseline-REDACTED.json
+**/baselines/pilot-app-credentials.json
+**/baselines/temp-mq-provision-output.json
+
+# Python
 __pycache__/
 *.pyc
+.venv/
+venv/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+
+# connector run output
+connectors/results/
+
 # saved chats stay on this machine
 chat-sessions/2*.md
 chat-sessions/INDEX.md
@@ -30,3 +50,8 @@ tools/api-client/data/*
 !tools/api-client/data/.gitkeep
 tools/api-client/evidence/*
 !tools/api-client/evidence/.gitkeep
+
+# One-off local audit dumps (large / machine-specific)
+ssm_params_v1_vs_v2_comparison.xlsx
+ssm_similar_value_diff_key.xlsx
+sv3-name-tag-audit-results.json

@@ -1,0 +1,1 @@
+(_sourceCategory=*JML* OR _sourceName=*JML* OR _collector=*JML*) AND (_loglevel=ERROR OR _loglevel=WARN OR _loglevel=FATAL OR "Exception" OR "error") | count by _loglevel
