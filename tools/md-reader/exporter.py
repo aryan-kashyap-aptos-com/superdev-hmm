@@ -6,15 +6,14 @@ from pathlib import Path
 import markdown as md_lib
 from bs4 import BeautifulSoup, NavigableString
 from docx import Document
-from docx.shared import Pt
+from docx.shared import Inches, Pt
 
 MD_EXTENSIONS = ["fenced_code", "tables", "sane_lists", "toc"]
+ASSETS = Path(__file__).resolve().parent / "assets"
 
-PAGE_CSS = """
-@import url('https://fonts.googleapis.com');
-"""
-
-HTML_WRAP = """<!doctype html><html><head><meta charset="utf-8"><style>
+HTML_WRAP = """<!doctype html><html><head><meta charset="utf-8">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
 body{{font:14px/1.65 -apple-system,"Segoe UI",Arial,sans-serif;color:#1d1d1f;max-width:760px;margin:0 auto;padding:48px 24px}}
 h1,h2,h3,h4{{font-weight:600;letter-spacing:-.01em;margin:1.4em 0 .5em}}
 h1{{font-size:28px;border-bottom:1px solid #e5e5e7;padding-bottom:.3em}}
@@ -26,20 +25,54 @@ pre code{{background:none;padding:0}}
 blockquote{{margin:0;padding:4px 16px;border-left:3px solid #c7c7cc;color:#4a4a4e}}
 table{{border-collapse:collapse;width:100%;margin:1em 0}}
 th,td{{border:1px solid #e5e5e7;padding:6px 10px;text-align:left;font-size:13px}}
+img{{max-width:100%}}
 .doc-break{{page-break-before:always}}
 .doc-title{{font-size:13px;color:#8e8e93;text-transform:uppercase;letter-spacing:.06em;margin-top:2.2em}}
-</style></head><body>{body}</body></html>"""
+.mermaid-diagram{{text-align:center}}
+</style></head><body>{body}
+<script>
+(async function(){{
+  try{{
+    mermaid.initialize({{startOnLoad:false}});
+    const blocks=[...document.querySelectorAll('pre code.language-mermaid')];
+    for(const code of blocks){{
+      try{{
+        const {{svg}}=await mermaid.render('mmd-'+Math.random().toString(36).slice(2), code.textContent);
+        const div=document.createElement('div');div.className='mermaid-diagram';div.innerHTML=svg;
+        code.parentElement.replaceWith(div);
+      }}catch(e){{}}
+    }}
+  }}finally{{ window.__mmdDone = true; }}
+}})();
+</script>
+</body></html>"""
 
 
 def render_html(markdown_text: str) -> str:
     return md_lib.markdown(markdown_text, extensions=MD_EXTENSIONS)
 
 
+def _asset_path(src: str) -> Path | None:
+    if not src or src.startswith(("http://", "https://", "data:", "file://")):
+        return None
+    path = ASSETS / Path(src).name
+    return path if path.exists() else None
+
+
+def _resolve_images_for_pdf(html: str) -> str:
+    soup = BeautifulSoup(html, "html.parser")
+    for img in soup.find_all("img"):
+        asset = _asset_path(img.get("src", ""))
+        if asset:
+            img["src"] = asset.resolve().as_uri()
+    return str(soup)
+
+
 def _combined_html(docs: list[tuple[str, str]]) -> str:
     parts = []
     for i, (name, text) in enumerate(docs):
         cls = "doc-break" if i > 0 else ""
-        parts.append(f'<div class="{cls}"><p class="doc-title">{name}</p>{render_html(text)}</div>')
+        parts.append(f'<div class="{cls}"><p class="doc-title">{name}</p>{_resolve_images_for_pdf(render_html(text))}</div>')
     return HTML_WRAP.format(body="".join(parts))
 
 
@@ -54,6 +87,10 @@ def export_pdf(docs: list[tuple[str, str]], out_path: Path) -> Path:
             browser = p.chromium.launch()
             page = browser.new_page()
             page.goto(tmp_html.resolve().as_uri())
+            try:
+                page.wait_for_function("window.__mmdDone === true", timeout=5000)
+            except Exception:
+                pass
             page.pdf(path=str(out_path), format="A4", print_background=True,
                      margin={"top": "0.4in", "bottom": "0.4in", "left": "0.4in", "right": "0.4in"})
             browser.close()
@@ -114,6 +151,12 @@ def _add_node(document: Document, node) -> None:
                     row[i].text = cell.get_text()
     elif name == "hr":
         document.add_paragraph("―" * 20)
+    elif name == "img":
+        asset = _asset_path(node.get("src", ""))
+        if asset:
+            document.add_picture(str(asset), width=Inches(5.5))
+        else:
+            document.add_paragraph(f"[image not available: {node.get('src', '')}]")
     else:
         for child in node.find_all(recursive=False):
             _add_node(document, child)

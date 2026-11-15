@@ -2,75 +2,57 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>API Client</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem('api_client_theme')||'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
-<link rel="stylesheet" href="/static/theme.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OMS API Client</title>
+<style>html,body{margin:0;background:#080702;color:#ECE6D6}</style>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<div class="app">
-  <aside class="side">
-    <div class="brand"><i></i>API Client</div>
+<div class="ac">
+  <div class="scrim" id="scrim"></div>
 
-    <div class="side-section">
-      <div class="side-head">
-        <span>Environment</span>
-        <label class="btn sm">Import<input id="envInput" type="file" accept=".json" multiple hidden></label>
+  <aside class="side" id="side" aria-label="Collection">
+    <div class="brand"><b>API</b><span>Client</span>
+      <div class="seg sm" id="themeSeg" role="group" aria-label="Theme" style="margin-left:auto">
+        <button type="button" data-v="dark" aria-pressed="true">Dark</button>
+        <button type="button" data-v="light" aria-pressed="false">Light</button>
       </div>
-      <select id="envSelect"></select>
     </div>
 
-    <div class="side-section" style="flex:1;min-height:0;display:flex;flex-direction:column">
-      <div class="side-head">
-        <span>Collections</span>
-        <label class="btn sm">Import<input id="colInput" type="file" accept=".json,.postman_collection" multiple hidden></label>
+    <div class="block">
+      <div class="block-head">
+        <span class="cap">Environment</span>
+        <label class="link" style="cursor:pointer">Import<input id="envInput" type="file" accept=".json" multiple hidden></label>
       </div>
-      <div id="tree" class="tree"></div>
+      <select class="env-select" id="envSelect"></select>
+      <button class="vars-toggle" id="varsToggle" aria-expanded="false"><span id="varsSummary">no variables</span><span class="tri mono" aria-hidden>&rsaquo;</span></button>
+      <div class="vars-edit" id="varsEdit" hidden>
+        <input type="search" id="varsFilter" class="vars-filter" placeholder="Filter variables">
+        <div class="vars-rows" id="varsRows"></div>
+        <p class="hint" style="margin-top:var(--s-2)">Editing the active environment's saved values. Collection-level variables aren't editable here.</p>
+      </div>
     </div>
 
-    <div class="appear" id="appear">
-      <button data-v="dark">Dark</button>
-      <button data-v="light">Light</button>
+    <div class="block">
+      <div class="search">
+        <span class="mono" aria-hidden style="color:var(--ink-3)">/</span>
+        <input id="searchInput" type="search" placeholder="Filter requests" aria-label="Filter requests">
+        <kbd>Ctrl K</kbd>
+      </div>
+    </div>
+
+    <nav class="list" id="list"></nav>
+
+    <div class="side-foot">
+      <button class="btn-line" id="newReqBtn">+ New request</button>
+      <label class="btn-line" style="cursor:pointer">Import<input id="colInput" type="file" accept=".json,.postman_collection" multiple hidden></label>
     </div>
   </aside>
 
-  <main class="main">
-    <div class="req-bar">
-      <select id="method">
-        <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option><option>HEAD</option>
-      </select>
-      <input id="url" placeholder="https://{{host}}/path?x=1">
-      <label class="pill warn" style="cursor:pointer;white-space:nowrap" title="For internal/self-signed hosts only">
-        <input type="checkbox" id="skipTls" style="width:auto"> skip TLS verify
-      </label>
-      <button class="btn primary" id="sendBtn">Send</button>
-    </div>
-
-    <div class="tabs">
-      <button class="tab on" data-tab="headers">Headers</button>
-      <button class="tab" data-tab="params">Params</button>
-      <button class="tab" data-tab="body">Body</button>
-      <button class="tab" data-tab="auth">Auth</button>
-    </div>
-    <div class="tab-panes">
-      <div class="pane on" id="pane-headers"><div class="rows" id="headerRows"></div><button class="btn sm" id="addHeader">+ header</button></div>
-      <div class="pane" id="pane-params"><div class="rows" id="paramRows"></div><button class="btn sm" id="addParam">+ param</button></div>
-      <div class="pane" id="pane-body"><textarea id="bodyText" rows="10" placeholder="Raw body (JSON, etc.)"></textarea></div>
-      <div class="pane" id="pane-auth">
-        <select id="authType"><option value="noauth">No auth</option><option value="bearer">Bearer token</option><option value="basic">Basic</option><option value="apikey">API key</option></select>
-        <div id="authFields" class="rows"></div>
-      </div>
-    </div>
-
-    <div class="resp" id="resp">
-      <div class="empty">Pick a request from the sidebar, or build one above, then Send.</div>
-    </div>
-  </main>
+  <div class="resize-v" id="sideResizer" role="separator" aria-orientation="vertical" aria-label="Resize sidebar"></div>
+  <main class="main" id="main"></main>
+  <div class="ac-toast" id="toast"></div>
 </div>
-<div class="toast" id="toast"></div>
 <script src="/static/app.js"></script>
 </body>
 </html>

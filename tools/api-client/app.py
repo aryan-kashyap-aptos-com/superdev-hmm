@@ -167,6 +167,11 @@ def _merged_variables(collection_id: str | None) -> dict[str, str]:
     return variables
 
 
+@app.get("/api/variables")
+def get_variables():
+    return jsonify(_merged_variables(request.args.get("collection_id")))
+
+
 @app.post("/api/send")
 def send_request():
     body = request.get_json(force=True)

@@ -18,9 +18,11 @@ from exporter import export_docx, export_pdf, render_html
 
 ROOT = Path(__file__).resolve().parent
 LIBRARY = ROOT / "library"
+ASSETS = ROOT / "assets"
 META_PATH = LIBRARY / "_order.json"
 STATIC = ROOT / "static"
 LIBRARY.mkdir(exist_ok=True)
+ASSETS.mkdir(exist_ok=True)
 
 app = Flask(__name__, static_folder=None)
 
@@ -86,6 +88,32 @@ def delete_file(entry_id: str):
     if path.exists():
         path.unlink()
     return jsonify(entries)
+
+
+@app.post("/api/assets")
+def upload_assets():
+    added = []
+    for f in request.files.getlist("files"):
+        name = Path(f.filename or "image").name  # drop any path, keep basename only
+        f.save(ASSETS / name)
+        added.append(name)
+    return jsonify({"added": added})
+
+
+@app.get("/api/assets/<path:name>")
+def get_asset(name: str):
+    path = ASSETS / Path(name).name
+    if not path.exists():
+        return jsonify({"error": "not found"}), 404
+    return send_file(path)
+
+
+@app.get("/api/files/<entry_id>/raw")
+def file_raw(entry_id: str):
+    path = _entry_path(entry_id)
+    if not path.exists():
+        return jsonify({"error": "not found"}), 404
+    return jsonify({"text": path.read_text(encoding="utf-8", errors="replace")})
 
 
 @app.get("/api/files/<entry_id>/html")

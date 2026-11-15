@@ -1,45 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MD Reader</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem('md_reader_theme')||'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
-<link rel="stylesheet" href="/static/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;1,6..72,300;1,6..72,400&family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+<div class="progress" id="progress"></div>
+<div class="dropveil">Drop .md files to add them</div>
 <div class="app">
-  <aside class="side">
-    <div class="brand"><i></i>MD Reader</div>
-    <label class="add-btn btn primary sm">
-      + Add files
-      <input id="fileInput" type="file" accept=".md,.markdown,.txt" multiple hidden>
-    </label>
-    <div id="fileList" class="file-list"></div>
-    <div style="margin-top:auto"></div>
-    <div class="appear" id="appear">
-      <button data-v="dark">Dark</button>
-      <button data-v="light">Light</button>
-    </div>
+  <aside>
+    <div class="brand"><b>MD Reader</b><span>local only</span></div>
+    <button class="add" id="addBtn"><span>Add files</span><kbd>Press O</kbd></button>
+    <input type="file" id="picker" accept=".md,.markdown,.txt,text/markdown,image/*" multiple hidden>
+    <div class="label"><span>Reading order</span><span id="count">0</span></div>
+    <ol class="files" id="files"></ol>
+    <div class="hint"><kbd>J</kbd> <kbd>K</kbd> next / previous &nbsp; <kbd>F</kbd> focus &nbsp; <kbd>T</kbd> theme<br>Drag rows to reorder</div>
   </aside>
-  <main class="main">
-    <div class="topbar">
-      <div id="currentName" class="current-name">Select a file</div>
-      <div class="actions">
-        <label class="pill accent" style="cursor:pointer"><input type="checkbox" id="exportAll"> export all, in order</label>
-        <button class="btn sm" id="exportDocx">Export Word</button>
-        <button class="btn primary sm" id="exportPdf">Export PDF</button>
+  <main>
+    <header>
+      <div class="title"><b id="fname">No file</b><small id="fmeta"></small></div>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="Text size"><button id="fsDown" aria-label="Smaller text" title="Smaller text">A−</button><span class="fs-pct" id="fsPct">100%</span><button id="fsUp" aria-label="Larger text" title="Larger text">A+</button></div>
+        <div class="seg" role="group" aria-label="Reading font"><button id="fontSerifBtn" aria-pressed="true">Serif</button><button id="fontSansBtn" aria-pressed="false">Sans</button></div>
+        <div class="seg" role="group" aria-label="View"><button id="themeBtn" aria-pressed="false" title="Toggle paper theme (T)">Paper</button><button id="focusBtn" aria-pressed="false" title="Focus mode (F)">Focus</button></div>
+        <div class="seg" role="group" aria-label="Export scope">
+          <button id="scopeOne" aria-pressed="true">This file</button>
+          <button id="scopeAll" aria-pressed="false">All, in order</button>
+        </div>
+        <button class="btn" id="expWord">Export Word</button>
+        <button class="btn primary" id="expPdf">Export PDF</button>
       </div>
-    </div>
-    <div class="reader" id="reader">
-      <div class="empty">Add one or more .md files on the left to start reading.<br>Nothing here ever leaves this machine.</div>
+    </header>
+    <div class="stage">
+      <div id="scroll"><article id="article"></article></div>
+      <nav class="toc" id="toc" aria-label="On this page"></nav>
     </div>
   </main>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status"></div>
 <script src="/static/app.js"></script>
 </body>
 </html>
