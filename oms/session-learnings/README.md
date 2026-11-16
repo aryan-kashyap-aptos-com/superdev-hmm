@@ -31,6 +31,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [misc-ops-gotchas.md](./misc-ops-gotchas.md) | DB connector `PGDATABASE`, timezone / JobManager, CloudTrail MQ delete, OMS Engine GUI |
 | [toronado-hosts.md](./toronado-hosts.md) | Shared multi-tenant Toronado vs standalone stacks, instance inventory, service naming (from ConnectorSuite's `oms-infra-knowledge/`) |
 | [databases-and-local-access.md](./databases-and-local-access.md) | Postgres DB names vs Toronado host, SSH tunnel / MCP notes (from ConnectorSuite's `oms-infra-knowledge/`) |
+| [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) | Which checkout IIS actually serves, OMS Setup Wizard's effects, `customErrors` trick, stale-`/bin`-DLL chain after branch switch, full-solution-build blockers + `oms-nuget-aws-setup` slice build, stray git worktrees |
 
 ---
 
@@ -42,6 +43,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [DCOMS-29982](https://aptos.atlassian.net/browse/DCOMS-29982) | SM history / pod-qa MQ password |
 | [DCOMS-29931](https://aptos.atlassian.net/browse/DCOMS-29931) | CRM REST endpoints |
 | [DCOMS-29975](https://aptos.atlassian.net/browse/DCOMS-29975) | Simfa digital delivery |
+| [DCOMS-30186](https://aptos.atlassian.net/browse/DCOMS-30186) | Sales by User date-field alignment fix + local `svdev` build/deploy notes — see [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) |
 | `tickets/RANDOM/g2-mq-ssm-backup` | G2 cutover summary |
 | `tickets/RANDOM/oms-consolidated-mq-pre-destroy-audit` | G1 re-apply, omsfeed stuck orders |
 | `tickets/RANDOM/order-worklist-picklist-disk-space-qa-sm` | EBS / picklist |
