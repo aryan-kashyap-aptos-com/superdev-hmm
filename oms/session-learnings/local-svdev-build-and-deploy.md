@@ -105,9 +105,3 @@ Found `C:\oms\_wt-sanika-29425` — a **registered git worktree** (another engin
 1. `git -C <worktree-path> status --porcelain` — confirm no uncommitted changes
 2. `git -C <worktree-path> branch -vv` — confirm its branch is pushed (not behind by uncommitted local-only work)
 3. `git -C C:\oms worktree remove <path>` — safe, doesn't touch the branch or its commits, just the extra working-directory checkout
-
-## 9. This ticket's actual fix, and a bigger pattern it exposed
-
-[DCOMS-30186](https://aptos.atlassian.net/browse/DCOMS-30186): `upsellingReport.aspx` ("Sales by User") had its "Date Thru" `<td>` cells missing `valign=middle`, present on "Date From" since the file's original 2013 commit — default HTML cell alignment is baseline, not middle, so the shorter label floated relative to the taller date-picker control next to it. Fixed by adding `valign=middle` to match, confirmed against the known-good identical pattern already live in `noStockReport.aspx`.
-
-**This bug is not unique to that one file.** An audit of every `backadmin/*.aspx` Date-From/Date-Thru filter pair found the **same mismatch in 24 other reports**, including `orderstatusreport.aspx`, `itemStatusReport.aspx`, `AuditTrailReport.aspx`, `AverageSalesReport.aspx`, `shippingLatency.aspx`, `PermissionsReport.aspx`, `trendingReports.aspx`, `SiteStatsbyDate.aspx`, `couponReport.aspx`, `crosssellReport.aspx`, `HackerReport.aspx`, `fulfillmentSettlement.aspx`, `consumerDisposition.aspx`, `CreditReturnsReport.aspx`, `amazonSettlement.aspx`, `errorReport.aspx`, `heardFromReport.aspx`, `HistoricalAffiliateTracking.aspx`, `Profit_Margin_report.aspx`, `inventoryVelocity.aspx`, `rptWishList.aspx`, `ShippingCostReport.aspx`, `AuditTableReport.aspx`, and `amazonHistory.aspx` (twice — two separate filter rows). Not yet filed/fixed as its own ticket — worth doing as a batch cleanup rather than one-ticket-at-a-time.
