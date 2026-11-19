@@ -62,6 +62,23 @@ Found a real plaintext production Postgres password inside Tommy Bahama's own jo
 - Changing a job's code means: `dotnet publish` -> `docker build` -> tag -> push to ECR -> **register a new Job Definition revision pointing at the new image tag**. Job Definitions are versioned/immutable; forgetting the last step means the code change never actually runs even though the image exists.
 - There is currently no admin UI equivalent to the old Toro backadmin (job name + steps visible at a glance). `oms-aws-job-scheduler.Api` is pure REST (Controllers/Filters/Middleware only, no Views/Pages/wwwroot), Swagger is the only visual surface and it's just an API explorer. Today the only way to see "this job has these steps" is the REST API or querying `oms_batch.scheduled_job`/`scheduled_job_step` directly. Confirmed gap, not an oversight in looking.
 
+## A pre-existing failing test is not proof of a real bug
+
+`alf-scheduledjobOrchestrator`'s own test (`test_build_payload_maps_db_rows`) expected the Batch
+`Parameters` key to be named `SubmitJobParameterJson`, while the deployed code used `jobParamter`.
+That looked like a confirmed, already-broken bug (test red on master) and got "fixed" to match
+the test, then deployed to poddev. It was backwards: the **real, currently-registered AWS Batch
+Job Definition** (`oms-pod-dev-inventory-feed-wf-jd`, confirmed via `aws batch
+describe-job-definitions`) has `command: ["Ref::jobParamter"]`. The deployed code was right; the
+test was aspirational, written for a rename that never happened anywhere else. The "fix" briefly
+broke the live poddev Lambda until this was caught and reverted.
+
+**Lesson:** before trusting a test as the arbiter of what's "correct" against deployed
+infrastructure, check the thing the test is implicitly claiming to describe against what's
+actually registered/running (`aws batch describe-job-definitions`, `aws lambda
+get-function-configuration`, etc.), not just whether the test passes or fails. A test can be
+wrong and never caught if it was never exercised in CI or never checked against real infra.
+
 ## poddev/podqa share one cluster
 
 `poddev` and `podqa` are different database names on the **same** shared-dev Aurora Postgres cluster/RDS proxy (`oms-shared-dev-postgresql-rds-proxy`), confirmed via `PGDATABASE=poddev python oms_db.py test`. They share seeded data, same job IDs (e.g. 68821/73000, 75973/80769/80835) exist on both.
