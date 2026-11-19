@@ -33,6 +33,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [databases-and-local-access.md](./databases-and-local-access.md) | Postgres DB names vs Toronado host, SSH tunnel / MCP notes (from ConnectorSuite's `oms-infra-knowledge/`) |
 | [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) | Which checkout IIS actually serves, OMS Setup Wizard's effects, `customErrors` trick, stale-`/bin`-DLL chain after branch switch, full-solution-build blockers + `oms-nuget-aws-setup` slice build, stray git worktrees |
 | [packing-slip-extensibility-templates.md](./packing-slip-extensibility-templates.md) | `generateCustomPackingSlip` trailing-comma FormatException fix, missing/broken `ext_templates` packingslip rows across envs, FedEx/USPS label gap, manual Minisoft Lambda/EFS/S3 recovery via AWS CLI |
+| [inventory-feed-scheduler-migration.md](./inventory-feed-scheduler-migration.md) | Toro -> AWS Batch InventoryFeedScheduler migration: cross-tenant SSO survey, legacy detection query, CustomField1-10 decoding, EventBridge schedule-translation limits, MessageExpiration gap, two-repo (`oms-aws-job-scheduler` / `oms-aws-service-manager-batch`) + Job Definition architecture, poddev/podqa shared cluster, CodeArtifact auth-looks-like-a-hang |
 
 ---
 
@@ -46,6 +47,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [DCOMS-29975](https://aptos.atlassian.net/browse/DCOMS-29975) | Simfa digital delivery |
 | [DCOMS-30186](https://aptos.atlassian.net/browse/DCOMS-30186) | Sales by User date-field alignment fix + local `svdev` build/deploy notes — see [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) |
 | [DCOMS-30254](https://aptos.atlassian.net/browse/DCOMS-30254) | Packing slip FormatException fix + extensibility template/Minisoft EFS recovery — see [packing-slip-extensibility-templates.md](./packing-slip-extensibility-templates.md) |
+| [DCOMS-30140](https://aptos.atlassian.net/browse/DCOMS-30140) | Inventory Feed scheduler migration (Toro -> AWS Batch), see [inventory-feed-scheduler-migration.md](./inventory-feed-scheduler-migration.md), docs in `kt-docs/dcoms-30140/` |
 | `tickets/RANDOM/g2-mq-ssm-backup` | G2 cutover summary |
 | `tickets/RANDOM/oms-consolidated-mq-pre-destroy-audit` | G1 re-apply, omsfeed stuck orders |
 | `tickets/RANDOM/order-worklist-picklist-disk-space-qa-sm` | EBS / picklist |
