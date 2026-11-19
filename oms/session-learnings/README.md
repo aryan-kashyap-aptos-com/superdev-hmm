@@ -32,6 +32,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [toronado-hosts.md](./toronado-hosts.md) | Shared multi-tenant Toronado vs standalone stacks, instance inventory, service naming (from ConnectorSuite's `oms-infra-knowledge/`) |
 | [databases-and-local-access.md](./databases-and-local-access.md) | Postgres DB names vs Toronado host, SSH tunnel / MCP notes (from ConnectorSuite's `oms-infra-knowledge/`) |
 | [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) | Which checkout IIS actually serves, OMS Setup Wizard's effects, `customErrors` trick, stale-`/bin`-DLL chain after branch switch, full-solution-build blockers + `oms-nuget-aws-setup` slice build, stray git worktrees |
+| [packing-slip-extensibility-templates.md](./packing-slip-extensibility-templates.md) | `generateCustomPackingSlip` trailing-comma FormatException fix, missing/broken `ext_templates` packingslip rows across envs, FedEx/USPS label gap, manual Minisoft Lambda/EFS/S3 recovery via AWS CLI |
 
 ---
 
@@ -44,6 +45,7 @@ Machine index: [transcript-index.json](./transcript-index.json). Rebuild: `pytho
 | [DCOMS-29931](https://aptos.atlassian.net/browse/DCOMS-29931) | CRM REST endpoints |
 | [DCOMS-29975](https://aptos.atlassian.net/browse/DCOMS-29975) | Simfa digital delivery |
 | [DCOMS-30186](https://aptos.atlassian.net/browse/DCOMS-30186) | Sales by User date-field alignment fix + local `svdev` build/deploy notes — see [local-svdev-build-and-deploy.md](./local-svdev-build-and-deploy.md) |
+| [DCOMS-30254](https://aptos.atlassian.net/browse/DCOMS-30254) | Packing slip FormatException fix + extensibility template/Minisoft EFS recovery — see [packing-slip-extensibility-templates.md](./packing-slip-extensibility-templates.md) |
 | `tickets/RANDOM/g2-mq-ssm-backup` | G2 cutover summary |
 | `tickets/RANDOM/oms-consolidated-mq-pre-destroy-audit` | G1 re-apply, omsfeed stuck orders |
 | `tickets/RANDOM/order-worklist-picklist-disk-space-qa-sm` | EBS / picklist |
